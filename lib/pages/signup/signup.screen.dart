@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:template/common/enums/signup_status.enum.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
 import 'package:template/generated/assets.gen.dart';
 import 'package:template/pages/signup/bloc/signup.bloc.dart';
+import 'package:template/root/app_routers.dart';
 
 class SignupForm extends StatefulWidget {
   final SignupBloc signupBloc;
@@ -118,13 +120,17 @@ class _SignupForm extends State<SignupForm> {
               margin: const EdgeInsets.only(bottom: 20),
               child: BigCustomButton(onPressed: () {}, text: 'Sign Up'),
             ),
-            Text(
-              'Sign In',
-              style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                  color: Colors.green[700]),
-            )
+            InkWell(
+                onTap: () {
+                  widget.signupBloc.add(const GoToSignIn());
+                },
+                child: Text(
+                  'Sign In',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                      color: Colors.green[700]),
+                ))
           ],
         ),
       ),
@@ -160,4 +166,12 @@ class SignUpScreen extends StatelessWidget {
       );
 }
 
-void _listener(BuildContext context, SignupState state) {}
+void _listener(BuildContext context, SignupState state) {
+  switch (state.signupStatus) {
+    case SignupStatus.goToSignIn:
+      Navigator.of(context).pushNamed(AppRouters.login);
+      context.read<SignupBloc>().add(const Inititalize());
+      break;
+    default:
+  }
+}

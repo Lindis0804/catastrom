@@ -1,3 +1,5 @@
 enum SignupStatus {
-  init;
+  init,
+  goToSignIn,
+  goToHome;
 }
