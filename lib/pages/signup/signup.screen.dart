@@ -49,25 +49,25 @@ class _SignupForm extends State<SignupForm> {
             ),
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              child: const NormalTextfield(
+              child: NormalTextfield(
                 text: 'First Name',
               ),
             ),
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              child: const NormalTextfield(
+              child: NormalTextfield(
                 text: 'Last Name',
               ),
             ),
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              child: const NormalTextfield(
+              child: NormalTextfield(
                 text: 'Phone',
               ),
             ),
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              child: const NormalTextfield(
+              child: NormalTextfield(
                 text: 'Username',
               ),
             ),
@@ -169,7 +169,7 @@ class SignUpScreen extends StatelessWidget {
 void _listener(BuildContext context, SignupState state) {
   switch (state.signupStatus) {
     case SignupStatus.goToSignIn:
-      Navigator.of(context).pushNamed(AppRouters.login);
+      Navigator.of(context).pushReplacementNamed(AppRouters.login);
       context.read<SignupBloc>().add(const Inititalize());
       break;
     default:
