@@ -10,7 +10,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<ForgotPasswordWhenLogIn>(_onForgotPasswordWhenLogIn);
     on<LoginStatusChanged>(_onLoginStatusChanged);
     on<Inititalize>(_onInitialize);
-    on<SignUp>(_onSignUp);
+    on<MoveToSignUp>(_onMoveToSignUp);
+    on<Login>(_onLogin);
+    on<MoveToHome>(_onMoveToHome);
   }
   void _onLoginStatusChanged(
     LoginEvent loginEvent,
@@ -21,9 +23,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         case LoginStatus.forgotPassword:
           loginEmitter(const LoginState.forgotPassword());
           break;
-        case LoginStatus.signUp:
-          loginEmitter(const LoginState.signUp());
+        case LoginStatus.moveToSignUp:
+          loginEmitter(const LoginState.moveToSignUp());
           break;
+        case LoginStatus.login:
+          loginEmitter(const LoginState.login());
+          break;
+        case LoginStatus.moveToHome:
+          loginEmitter(const LoginState.moveToHome());
         default:
           loginEmitter(const LoginState.initialize());
           break;
@@ -41,8 +48,22 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     add(const LoginStatusChanged(LoginStatus.forgotPassword));
   }
 
-  void _onSignUp(LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {
+  void _onMoveToSignUp(
+      LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {
     print('Create new account.');
-    add(const LoginStatusChanged(LoginStatus.signUp));
+    add(const LoginStatusChanged(LoginStatus.moveToSignUp));
   }
+
+  void _onLogin(LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {
+    print('Gazer, log in!');
+    if (loginEvent is Login) {
+      String email = loginEvent.email;
+      String password = loginEvent.password;
+      print('$email $password');
+    }
+
+    add(const LoginStatusChanged(LoginStatus.moveToHome));
+  }
+
+  void _onMoveToHome(LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {}
 }

@@ -61,6 +61,11 @@ class $AssetsImagesGen {
   AssetGenImage get logoImage => const AssetGenImage('assets/images/logo.png');
   AssetGenImage get logoImage4x =>
       const AssetGenImage('assets/images/logo_4x.png');
+  AssetGenImage get plan => const AssetGenImage('assets/images/plan.png');
+  AssetGenImage get location =>
+      const AssetGenImage('assets/images/location.png');
+  AssetGenImage get hourglass =>
+      const AssetGenImage('assets/images/hourglass.png');
 
   /// List of all assets
   List<AssetGenImage> get values => [splashImage];

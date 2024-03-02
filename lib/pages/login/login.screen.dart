@@ -12,12 +12,13 @@ import 'package:logger/logger.dart';
 
 class SignInForm extends StatefulWidget {
   final LoginBloc loginBloc;
-  const SignInForm({required this.loginBloc});
+  const SignInForm({super.key, required this.loginBloc});
   @override
   _SignInFormState createState() => _SignInFormState();
 }
 
 class _SignInFormState extends State<SignInForm> {
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
   @override
@@ -47,12 +48,14 @@ class _SignInFormState extends State<SignInForm> {
                   color: Colors.green),
             ),
           ),
-          const NormalTextfield(
-            text: 'Gmail',
+          NormalTextfield(
+            text: 'Email',
+            controller: _emailController,
           ),
           Container(
               margin: const EdgeInsets.only(top: 10, bottom: 5),
               child: NormalTextfield(
+                controller: _passwordController,
                 isObscureText: _obscureText,
                 text: 'Password',
                 suffixIcon: IconButton(
@@ -91,13 +94,19 @@ class _SignInFormState extends State<SignInForm> {
           Container(
             width: double.infinity,
             margin: const EdgeInsets.only(bottom: 20),
-            child: BigCustomButton(onPressed: () {}, text: 'Sign In'),
+            child: BigCustomButton(
+                onPressed: () {
+                  widget.loginBloc.add(Login(
+                      email: _emailController.text,
+                      password: _passwordController.text));
+                },
+                text: 'Sign In'),
           ),
           InkWell(
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Create new account.')));
-              widget.loginBloc.add(const SignUp());
+              widget.loginBloc.add(const MoveToSignUp());
             },
             child: Text(
               'Create new account',
@@ -125,14 +134,20 @@ void _listener(BuildContext context, LoginState state) {
     case LoginStatus.forgotPassword:
       Navigator.of(context).pushNamed(AppRouters.forgotPassword);
       context.read<LoginBloc>().add(const Inititalize());
-    case LoginStatus.signUp:
+      break;
+    case LoginStatus.moveToSignUp:
       Navigator.of(context).pushReplacementNamed(AppRouters.signUp);
+      break;
+    case LoginStatus.moveToHome:
+      print('Move to home');
+      Navigator.of(context).pushReplacementNamed(AppRouters.home);
+      break;
     default:
   }
 }
 
 class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

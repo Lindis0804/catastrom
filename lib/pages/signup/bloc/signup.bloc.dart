@@ -1,22 +1,103 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:template/common/constants/host.dart';
+import 'package:template/common/constants/keys.dart';
 import 'package:template/common/enums/signup_status.enum.dart';
 import 'package:equatable/equatable.dart';
+import 'package:template/common/ultis/share_preferences.dart';
+import 'package:template/pages/signup/dto/signup.dto.dart';
 part 'signup.event.dart';
 part 'signup.state.dart';
 
 class SignupBloc extends Bloc<SignupEvent, SignupState> {
   SignupBloc() : super(const SignupState.init()) {
     on<SignupStatusChanged>(_onSignupStatusChanged);
+    on<Inititalize>(_onInitialize);
+    on<GoToSignIn>(_onGoToSignIn);
+    on<SignUp>(_onSignUp);
+    on<CallApiSignupFail>(_onCallApiSignupFail);
+    on<GoToVerifySignUpCode>(_onGoToVerifySignUpCode);
   }
   void _onSignupStatusChanged(
-    SignupEvent loginEvent,
-    Emitter<SignupState> loginEmitter,
+    SignupEvent signupEvent,
+    Emitter<SignupState> signupEmitter,
   ) {
-    if (loginEvent is SignupStatusChanged) {
-      switch (loginEvent.status) {
+    if (signupEvent is SignupStatusChanged) {
+      switch (signupEvent.status) {
+        case SignupStatus.goToSignIn:
+          signupEmitter(const SignupState.goToSignIn());
+          break;
+        case SignupStatus.signUp:
+          signupEmitter(const SignupState.signUp());
+          break;
+        case SignupStatus.callApiSignUpFail:
+          signupEmitter(const SignupState.callApiSignUpFail());
+          break;
+        case SignupStatus.goToVerifySignUpCode:
+          signupEmitter(const SignupState.goToVerifySignUpCode());
+          break;
         default:
+          signupEmitter(const SignupState.init());
+          break;
       }
     }
+  }
+
+  void _onInitialize(
+      SignupEvent signupEvent, Emitter<SignupState> signupEmitter) {
+    add(const SignupStatusChanged(SignupStatus.init));
+  }
+
+  void _onGoToSignIn(
+      SignupEvent signupEvent, Emitter<SignupState> signupEmitter) {
+    add(const SignupStatusChanged(SignupStatus.goToSignIn));
+  }
+
+  void _onSignUp(
+      SignupEvent signupEvent, Emitter<SignupState> signupEmitter) async {
+    if (signupEvent is! SignUp) {
+      return;
+    }
+    add(const SignupStatusChanged(SignupStatus.signUp));
+    try {
+      String firstName = signupEvent.firstName;
+      String lastName = signupEvent.lastName;
+      String username = signupEvent.username;
+      String password = signupEvent.password;
+      String phoneNumber = signupEvent.phoneNumber;
+      Dio dio = Dio(BaseOptions(connectTimeout: 10000));
+      SignUpUserDto signUpUserData = SignUpUserDto(
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+          username: username,
+          password: password);
+      Response res = await dio.post('${Host.address}/api/signup',
+          data: signUpUserData.toJson());
+      if (res.statusCode == 200) {
+        String accessToken = res.data['data']['accessToken'] ?? '';
+        if (accessToken == '') {
+          add(const CallApiSignupFail(message: 'Access token is empty'));
+          return;
+        }
+        await SharedPreferencesManager.saveString(
+            ACCESS_TOKEN_KEY, accessToken);
+        add(const GoToVerifySignUpCode());
+      }
+    } catch (err) {
+      add(CallApiSignupFail(message: 'Error in call api sign-up: $err'));
+    }
+  }
+
+  void _onCallApiSignupFail(
+      SignupEvent signupEvent, Emitter<SignupState> signupEmitter) {
+    add(const SignupStatusChanged(SignupStatus.callApiSignUpFail));
+  }
+
+  void _onGoToVerifySignUpCode(
+      SignupEvent signupEvent, Emitter<SignupState> signupEmitter) {
+    add(const SignupStatusChanged(SignupStatus.goToVerifySignUpCode));
   }
 }

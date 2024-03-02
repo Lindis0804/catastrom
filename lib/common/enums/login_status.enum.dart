@@ -1,7 +1,9 @@
 enum LoginStatus {
   initialize,
   forgotPassword,
-  signUp;
+  login,
+  moveToSignUp,
+  moveToHome;
 
   bool get isForgotPassword => this == LoginStatus.forgotPassword;
 }
