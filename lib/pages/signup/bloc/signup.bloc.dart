@@ -87,13 +87,15 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
         add(const GoToVerifySignUpCode());
       }
     } catch (err) {
-      add(CallApiSignupFail(message: 'Error in call api sign-up: $err'));
+      add(const CallApiSignupFail(message: 'Call api sign up fail'));
     }
   }
 
   void _onCallApiSignupFail(
       SignupEvent signupEvent, Emitter<SignupState> signupEmitter) {
-    add(const SignupStatusChanged(SignupStatus.callApiSignUpFail));
+    if (signupEvent is CallApiSignupFail) {
+      signupEmitter(CallApiFailState(message: signupEvent.message));
+    }
   }
 
   void _onGoToVerifySignUpCode(

@@ -2,6 +2,7 @@ enum LoginStatus {
   initialize,
   forgotPassword,
   login,
+  callApiLoginFail,
   moveToSignUp,
   moveToHome;
 

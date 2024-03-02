@@ -6,10 +6,13 @@ class Loading extends StatelessWidget {
   const Loading({super.key});
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
     return Container(
+      height: screenSize.height,
+      width: screenSize.width,
       color: Colours.gray.withOpacity(0.5),
       child: const Center(
-        child: SpinKitPouringHourGlassRefined(color: Colours.primary),
+        child: SpinKitFadingCircle(color: Colours.gray),
       ),
     );
   }
