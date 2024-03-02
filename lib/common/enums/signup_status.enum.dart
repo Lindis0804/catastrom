@@ -1,5 +1,8 @@
 enum SignupStatus {
   init,
+  signUp,
   goToSignIn,
-  goToHome;
+  goToVerifySignUpCode,
+  goToHome,
+  callApiSignUpFail;
 }

@@ -12,14 +12,14 @@ import 'package:logger/logger.dart';
 
 class SignInForm extends StatefulWidget {
   final LoginBloc loginBloc;
-  const SignInForm({required this.loginBloc});
+  const SignInForm({super.key, required this.loginBloc});
   @override
   _SignInFormState createState() => _SignInFormState();
 }
 
 class _SignInFormState extends State<SignInForm> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
@@ -147,7 +147,7 @@ void _listener(BuildContext context, LoginState state) {
 }
 
 class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
