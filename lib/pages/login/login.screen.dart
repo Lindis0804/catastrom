@@ -1,11 +1,8 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/login_status.enum.dart';
-import 'package:template/common/ultis/log.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
 import 'package:template/generated/assets.gen.dart';
@@ -44,8 +41,8 @@ class _SignInFormState extends State<SignInForm> {
       return Stack(
         children: [
           Visibility(
-            child: Loading(),
             visible: state.loginStatus == LoginStatus.login,
+            child: const Loading(),
           ),
           SingleChildScrollView(
             child: Container(
