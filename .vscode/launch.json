@@ -2,31 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "template dev",
+            "name": "dev",
             "request": "launch",
             "type": "dart",
             "program": "lib/root/main_dev.dart",
-            "args":[
+            "args": [
                 "--flavor",
                 "dev"
             ]
         },
         {
-            "name": "template prod",
+            "name": "prod",
             "request": "launch",
             "type": "dart",
             "program": "lib/root/main_prod.dart",
-            "args":[
+            "args": [
                 "--flavor",
                 "dev"
             ]
         },
         {
-            "name": "template (release mode)",
+            "name": "release",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "args":[
+            "args": [
                 "--flavor",
                 "dev"
             ]
