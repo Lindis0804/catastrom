@@ -54,7 +54,7 @@ class PlanItem extends StatelessWidget {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 10),
             child: Image(
-              image: Assets.images.plan.provider(),
+              image: Assets.icons.plan.provider(),
               width: 30,
             ),
           ),
@@ -72,10 +72,10 @@ class PlanItem extends StatelessWidget {
                   style: const TextStyle(fontSize: 8),
                 ),
                 TextWithLeftIcon(
-                    image: Assets.images.location.provider(),
+                    image: Assets.icons.location.provider(),
                     content: '$starting - $destination'),
                 TextWithLeftIcon(
-                    image: Assets.images.hourglass.provider(),
+                    image: Assets.icons.hourglass.provider(),
                     content: '$startingTime - $endTime')
               ],
             ),

@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/common/constants/host.dart';
 import 'package:template/common/constants/keys.dart';
 import 'package:template/common/enums/login_status.enum.dart';
 import 'package:equatable/equatable.dart';
-import 'package:template/common/ultis/share_preferences.dart';
+import 'package:template/common/utils/env.dart';
+import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/pages/login/dto/LoginUser.dto.dart';
 part 'login.event.dart';
 part 'login.state.dart';
@@ -56,12 +56,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   void _onMoveToSignUp(
       LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {
-    print('Create new account.');
     add(const LoginStatusChanged(LoginStatus.moveToSignUp));
   }
 
   void _onLogin(LoginEvent loginEvent, Emitter<LoginState> loginEmitter) async {
-    print('Gazer, log in!');
     if (loginEvent is! Login) {
       return;
     }
@@ -70,12 +68,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       String username = loginEvent.username;
       String password = loginEvent.password;
       bool rememberMe = loginEvent.rememberMe;
+      EnvVariable envVariable = EnvVariable();
       LoginUser loginUserData = LoginUser(
           username: username, password: password, rememberMe: rememberMe);
 
       Dio dio = Dio(BaseOptions(connectTimeout: 10000));
-      Response res =
-          await dio.post('${Host.address}/api/login', data: loginUserData);
+      Response res = await dio.post(
+          '${envVariable.clientCustomerHost}/api/login',
+          data: loginUserData);
       if (res.statusCode == 200) {
         String accessToken = res.data['data']['accessToken'] ?? '';
         if (accessToken == '') {
@@ -90,7 +90,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             message: 'Username or password is incorrect.'));
       }
     } catch (err) {
-      print('Error in call api log in');
+      print('Error in call api log in: $err');
       add(CallApiLoginFailEvent(message: 'Call api login fail: $err'));
     }
   }

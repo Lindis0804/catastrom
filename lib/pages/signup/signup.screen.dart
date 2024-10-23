@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/signup_status.enum.dart';
-import 'package:template/common/ultis/validate.dart';
+import 'package:template/common/utils/validate.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
 import 'package:template/generated/assets.gen.dart';
@@ -73,7 +73,7 @@ class _SignupForm extends State<SignupForm> {
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
                       child: Image(
-                        image: Assets.images.logoImage4x.provider(),
+                        image: Assets.images.logo4x.provider(),
                         width: 150,
                         fit: BoxFit.fitWidth,
                       ),

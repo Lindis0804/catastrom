@@ -9,7 +9,7 @@ import 'package:template/generated/assets.gen.dart';
 import 'package:template/pages/login/bloc/login.bloc.dart';
 import 'package:template/pages/signup/loading.screen.dart';
 import 'package:template/root/app_routers.dart';
-import 'package:template/common/ultis/validate.dart';
+import 'package:template/common/utils/validate.dart';
 
 class SignInForm extends StatefulWidget {
   final LoginBloc loginBloc;
@@ -54,7 +54,7 @@ class _SignInFormState extends State<SignInForm> {
                   Container(
                     margin: const EdgeInsets.only(bottom: 30),
                     child: Image(
-                      image: Assets.images.logoImage4x.provider(),
+                      image: Assets.images.logo4x.provider(),
                       width: 170,
                       fit: BoxFit.fitWidth,
                     ),

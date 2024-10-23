@@ -1,36 +1,36 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:template/common/widgets/custom_icon.dart';
+import 'package:template/pages/home/screen/home.screen.dart';
 import 'package:template/pages/messenger/messenger.screen.dart';
-import 'package:template/pages/newfeeds/newfeeds.screen.dart';
 import 'package:template/pages/plans/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/shop/shop.screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class ManageScreen extends StatefulWidget {
+  const ManageScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ManageScreen> createState() => _ManageScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _ManageScreenState extends State<ManageScreen> {
   int index = 2;
   @override
   Widget build(BuildContext context) {
     final screens = [
-      NewfeedsScreen(),
-      PlanScreen(),
-      ShopScreen(),
-      MessengerScreen(),
-      ProfileScreen()
+      const HomeScreen(),
+      const PlanScreen(),
+      const ShopScreen(),
+      const MessengerScreen(),
+      const ProfileScreen()
     ];
     final items = <Widget>[
-      HomeNavigationBarIcon(icon: Icons.home),
-      HomeNavigationBarIcon(icon: Icons.directions_walk),
-      HomeNavigationBarIcon(icon: Icons.shopping_cart),
-      HomeNavigationBarIcon(icon: Icons.messenger),
-      HomeNavigationBarIcon(icon: Icons.person_pin)
+      const ManageNavigationBarIcon(icon: Icons.home),
+      const ManageNavigationBarIcon(icon: Icons.directions_walk),
+      const ManageNavigationBarIcon(icon: Icons.shopping_cart),
+      const ManageNavigationBarIcon(icon: Icons.messenger),
+      const ManageNavigationBarIcon(icon: Icons.person_pin)
     ];
     return Scaffold(
       body: screens[index],

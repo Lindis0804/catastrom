@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/common/constants/host.dart';
 import 'package:template/common/constants/keys.dart';
 import 'package:template/common/enums/signup_status.enum.dart';
 import 'package:equatable/equatable.dart';
-import 'package:template/common/ultis/share_preferences.dart';
+import 'package:template/common/utils/env.dart';
+import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/pages/signup/dto/signup.dto.dart';
 part 'signup.event.dart';
 part 'signup.state.dart';
@@ -65,15 +65,20 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
       String username = signupEvent.username;
       String password = signupEvent.password;
       String phoneNumber = signupEvent.phoneNumber;
-      Dio dio = Dio(BaseOptions(connectTimeout: 10000));
+      Dio dio = Dio(
+        BaseOptions(connectTimeout: 10000),
+      );
+      EnvVariable envVariable = EnvVariable();
       SignUpUserDto signUpUserData = SignUpUserDto(
           firstName: firstName,
           lastName: lastName,
           phoneNumber: phoneNumber,
           username: username,
           password: password);
-      Response res = await dio.post('${Host.address}/api/signup',
-          data: signUpUserData.toJson());
+      Response res = await dio.post(
+        '${envVariable.clientCustomerHost}/api/signup',
+        data: signUpUserData.toJson(),
+      );
       if (res.statusCode == 200) {
         String accessToken = res.data['data']['accessToken'] ?? '';
         if (accessToken == '') {

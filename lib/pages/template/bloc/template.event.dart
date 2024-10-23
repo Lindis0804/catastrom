@@ -1,4 +1,4 @@
-part of 'home.bloc.dart';
+part of 'template.bloc.dart';
 
 sealed class TemplateEvent {
   const TemplateEvent();
