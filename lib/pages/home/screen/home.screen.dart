@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/utils/size.dart';
+import 'package:template/common/widgets/custom_image.widget.dart';
 import 'package:template/generated/assets.gen.dart';
 import 'package:template/pages/template/bloc/template.bloc.dart';
 
@@ -42,12 +43,67 @@ class _HomeState extends State<Home> {
                     );
                   },
                 ),
-                actions: [],
+                actions: [
+                  CustomImage.asset(
+                      imagePath: 'assets/images/default_avatar.png',
+                      width: 30,
+                      height: 30,
+                      radius: 15),
+                  const SizedBox(
+                    width: 10,
+                  )
+                ],
               ),
               drawer: Drawer(
                 child: ListView(),
               ),
-            )
+              body: Container(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Good morning, Hiếu',
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                'Đại Lộ Thăng Long, Hà Nội',
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: Colors.white),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
           ],
         );
       },

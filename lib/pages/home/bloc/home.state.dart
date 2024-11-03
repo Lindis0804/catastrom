@@ -1,26 +1,26 @@
 part of 'home.bloc.dart';
 
 class HomeState extends Equatable {
-  final LoadingStatus templateStatus;
+  final LoadingStatus homeStatus;
 
   const HomeState({
-    required this.templateStatus,
+    required this.homeStatus,
   });
 
   factory HomeState.initialize() {
     return const HomeState(
-      templateStatus: LoadingStatus.initialize,
+      homeStatus: LoadingStatus.initialize,
     );
   }
 
   HomeState copyWith({
-    LoadingStatus? getSubscribedDocumentsStatus,
+    LoadingStatus? homeStatus,
   }) {
     return HomeState(
-      templateStatus: getSubscribedDocumentsStatus ?? this.templateStatus,
+      homeStatus: homeStatus ?? this.homeStatus,
     );
   }
 
   @override
-  List<Object?> get props => [templateStatus];
+  List<Object?> get props => [homeStatus];
 }
