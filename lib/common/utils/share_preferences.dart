@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:template/common/constants/keys.dart';
 
 class SharedPreferencesManager {
   static Future<void> saveString(String key, String value) async {
@@ -14,5 +15,11 @@ class SharedPreferencesManager {
   static Future<void> removeToken(String key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(key);
+  }
+
+  static Future<String> getAccessToken() async {
+    String spAccessToken =
+        await SharedPreferencesManager.getString(ACCESS_TOKEN_KEY) ?? '';
+    return spAccessToken;
   }
 }

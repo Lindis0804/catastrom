@@ -1,6 +1,6 @@
 #include "Generated.xcconfig"
 
-FLUTTER_TARGET=lib/main_dev.dart
+FLUTTER_TARGET=lib/root/main_dev.dart
 ASSET_PREFIX=dev
-BUNDLE_NAME=Template Dev
-BUNDLE_DISPLAY_NAME=Template Dev
+BUNDLE_NAME=$Trip Dev
+BUNDLE_DISPLAY_NAME=$Trip Dev

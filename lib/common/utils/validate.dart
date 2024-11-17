@@ -15,12 +15,13 @@ bool validateName(String name) {
 }
 
 bool validatePassword(String password) {
-  RegExp regex = RegExp(
-      r'^(?=[^a-z]*[a-z])(?=.*[A-Z])(?=.*[!@#$])(?=\D*\d)[^:&.~\s]{5,20}$');
-  if (regex.hasMatch(password)) {
-    return true;
-  }
-  return false;
+  // RegExp regex = RegExp(
+  //     r'^(?=[^a-z]*[a-z])(?=.*[A-Z])(?=.*[!@#$])(?=\D*\d)[^:&.~\s]{5,20}$');
+  // if (regex.hasMatch(password)) {
+  //   return true;
+  // }
+  // return false;
+  return true;
 }
 
 bool validatePhoneNumber(String phoneNumber) {

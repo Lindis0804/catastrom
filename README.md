@@ -18,3 +18,8 @@ flutter pub get
 ### Run app in debug mode:
 - Ctrl + Shift + D to open VSCode in debug mode.
 - Press play button.
+
+### Generate reference-assets code
+```bash
+flutter pub run build_runner build
+```

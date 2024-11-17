@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class HomeNavigationBarIcon extends StatelessWidget {
+class ManageNavigationBarIcon extends StatelessWidget {
   final IconData icon;
-  HomeNavigationBarIcon({required this.icon});
+  const ManageNavigationBarIcon({required this.icon, super.key});
   @override
   Widget build(BuildContext context) {
     return Icon(icon, size: 30);

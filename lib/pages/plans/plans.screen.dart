@@ -1,10 +1,6 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:template/common/widgets/custom_button.dart';
-import 'package:template/common/widgets/custom_icon.dart';
 import 'package:template/pages/plans/custom_app_bar.dart';
-import 'package:template/pages/plans/plan_item.dart';
-import 'package:template/pages/plans/sample_data.dart';
 
 class PlanScreen extends StatefulWidget {
   const PlanScreen({super.key});

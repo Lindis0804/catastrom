@@ -1,10 +1,10 @@
 enum LoadingStatus {
-  initial,
+  initialize,
   loading,
   loaded,
   error;
 
-  bool get isInitial => this == LoadingStatus.initial;
+  bool get isInitial => this == LoadingStatus.initialize;
 
   bool get isLoading => this == LoadingStatus.loading;
 

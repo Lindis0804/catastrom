@@ -9,6 +9,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
 
 class $AssetsFontsGen {
   const $AssetsFontsGen();
@@ -36,6 +37,10 @@ class $AssetsFontsGen {
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/hourglass.png
+  AssetGenImage get hourglass =>
+      const AssetGenImage('assets/icons/hourglass.png');
+
   /// File path: assets/icons/ic_antiem.png
   AssetGenImage get icAntiem =>
       const AssetGenImage('assets/icons/ic_antiem.png');
@@ -48,27 +53,47 @@ class $AssetsIconsGen {
   AssetGenImage get icAnuongVip =>
       const AssetGenImage('assets/icons/ic_anuong_vip.png');
 
+  /// File path: assets/icons/ic_eye_off.svg
+  SvgGenImage get icEyeOff => const SvgGenImage('assets/icons/ic_eye_off.svg');
+
+  /// File path: assets/icons/location.png
+  AssetGenImage get location =>
+      const AssetGenImage('assets/icons/location.png');
+
+  /// File path: assets/icons/plan.png
+  AssetGenImage get plan => const AssetGenImage('assets/icons/plan.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [icAntiem, icAnuongColor, icAnuongVip];
+  List<dynamic> get values => [
+        hourglass,
+        icAntiem,
+        icAnuongColor,
+        icAnuongVip,
+        icEyeOff,
+        location,
+        plan
+      ];
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/default_cover.png
+  AssetGenImage get defaultCover =>
+      const AssetGenImage('assets/images/default_cover.png');
+
+  /// File path: assets/images/logo.png
+  AssetGenImage get logo => const AssetGenImage('assets/images/logo.png');
+
+  /// File path: assets/images/logo_4x.png
+  AssetGenImage get logo4x => const AssetGenImage('assets/images/logo_4x.png');
+
   /// File path: assets/images/splash_image.png
   AssetGenImage get splashImage =>
       const AssetGenImage('assets/images/splash_image.png');
-  AssetGenImage get logoImage => const AssetGenImage('assets/images/logo.png');
-  AssetGenImage get logoImage4x =>
-      const AssetGenImage('assets/images/logo_4x.png');
-  AssetGenImage get plan => const AssetGenImage('assets/images/plan.png');
-  AssetGenImage get location =>
-      const AssetGenImage('assets/images/location.png');
-  AssetGenImage get hourglass =>
-      const AssetGenImage('assets/images/hourglass.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [splashImage];
+  List<AssetGenImage> get values => [defaultCover, logo, logo4x, splashImage];
 }
 
 class Assets {
@@ -145,6 +170,59 @@ class AssetGenImage {
       _assetName,
       bundle: bundle,
       package: package,
+    );
+  }
+
+  String get path => _assetName;
+
+  String get keyName => _assetName;
+}
+
+class SvgGenImage {
+  const SvgGenImage(this._assetName);
+
+  final String _assetName;
+
+  SvgPicture svg({
+    Key? key,
+    bool matchTextDirection = false,
+    AssetBundle? bundle,
+    String? package,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    bool allowDrawingOutsideViewBox = false,
+    WidgetBuilder? placeholderBuilder,
+    String? semanticsLabel,
+    bool excludeFromSemantics = false,
+    SvgTheme theme = const SvgTheme(),
+    ColorFilter? colorFilter,
+    Clip clipBehavior = Clip.hardEdge,
+    @deprecated Color? color,
+    @deprecated BlendMode colorBlendMode = BlendMode.srcIn,
+    @deprecated bool cacheColorFilter = false,
+  }) {
+    return SvgPicture.asset(
+      _assetName,
+      key: key,
+      matchTextDirection: matchTextDirection,
+      bundle: bundle,
+      package: package,
+      width: width,
+      height: height,
+      fit: fit,
+      alignment: alignment,
+      allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
+      placeholderBuilder: placeholderBuilder,
+      semanticsLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      theme: theme,
+      colorFilter: colorFilter,
+      color: color,
+      colorBlendMode: colorBlendMode,
+      clipBehavior: clipBehavior,
+      cacheColorFilter: cacheColorFilter,
     );
   }
 

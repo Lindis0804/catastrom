@@ -17,9 +17,11 @@ class Inititalize extends LoginEvent {
 }
 
 class Login extends LoginEvent {
-  final String email;
+  final String username;
   final String password;
-  const Login({required this.email, required this.password});
+  final bool rememberMe;
+  const Login(
+      {required this.username, required this.password, this.rememberMe = true});
 }
 
 class MoveToHome extends LoginEvent {
@@ -29,4 +31,9 @@ class MoveToHome extends LoginEvent {
 class LoginStatusChanged extends LoginEvent {
   final LoginStatus status;
   const LoginStatusChanged(this.status);
+}
+
+class CallApiLoginFailEvent extends LoginEvent {
+  final String message;
+  const CallApiLoginFailEvent({required this.message});
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:template/pages/forgot_password/forgot_password.screen.dart';
-import 'package:template/pages/home/home.screen.dart';
+import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
@@ -23,7 +23,7 @@ abstract class AppRouters {
 
       case login:
         return MaterialPageRoute(
-          builder: (_) => LoginScreen(),
+          builder: (_) => const LoginScreen(),
         );
 
       case signUp:
@@ -31,7 +31,7 @@ abstract class AppRouters {
 
       case home:
         return MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) => const ManageScreen(),
         );
 
       case forgotPassword:
