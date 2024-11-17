@@ -5,8 +5,8 @@ import 'package:template/common/enums/loading_status.enum.dart';
 part 'template.event.dart';
 part 'template.state.dart';
 
-class HomeBloc extends Bloc<TemplateEvent, HomeState> {
-  HomeBloc() : super(HomeState.initialize()) {
+class TemplateBloc extends Bloc<TemplateEvent, TemplateState> {
+  TemplateBloc() : super(TemplateState.initialize()) {
     on<Inititalize>(_onInitialize);
 
     add(
@@ -16,7 +16,7 @@ class HomeBloc extends Bloc<TemplateEvent, HomeState> {
 
   void _onInitialize(
     TemplateEvent event,
-    Emitter<HomeState> emitter,
+    Emitter<TemplateState> emitter,
   ) async {
     if (event is! Inititalize) {
       return;

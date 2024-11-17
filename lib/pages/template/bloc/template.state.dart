@@ -1,22 +1,22 @@
 part of 'template.bloc.dart';
 
-class HomeState extends Equatable {
+class TemplateState extends Equatable {
   final LoadingStatus homeStatus;
 
-  const HomeState({
+  const TemplateState({
     required this.homeStatus,
   });
 
-  factory HomeState.initialize() {
-    return const HomeState(
+  factory TemplateState.initialize() {
+    return const TemplateState(
       homeStatus: LoadingStatus.initialize,
     );
   }
 
-  HomeState copyWith({
+  TemplateState copyWith({
     LoadingStatus? getSubscribedDocumentsStatus,
   }) {
-    return HomeState(
+    return TemplateState(
       homeStatus: getSubscribedDocumentsStatus ?? this.homeStatus,
     );
   }

@@ -41,4 +41,41 @@ class CustomImage extends StatelessWidget {
           )
         : image;
   }
+
+  static Widget network(
+      {required String imageUrl,
+      double width = 150,
+      double height = 150,
+      double? radius}) {
+    Widget image = Image.network(
+      imageUrl,
+      width: width,
+      height: height,
+      fit: BoxFit.fill,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes!
+                : null,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return const Text('Fail to load image.');
+      },
+    );
+
+    return radius != null
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: image,
+          )
+        : image;
+  }
 }

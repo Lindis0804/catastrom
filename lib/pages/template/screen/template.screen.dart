@@ -4,7 +4,7 @@ import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/pages/template/bloc/template.bloc.dart';
 
 class Template extends StatefulWidget {
-  final HomeBloc templateBloc;
+  final TemplateBloc templateBloc;
   const Template({super.key, required this.templateBloc});
 
   @override
@@ -14,7 +14,7 @@ class Template extends StatefulWidget {
 class _TemplateState extends State<Template> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(
+    return BlocBuilder<TemplateBloc, TemplateState>(
       builder: (context, state) {
         return const Scaffold(
           body: SafeArea(child: Text('template')),
@@ -27,21 +27,21 @@ class _TemplateState extends State<Template> {
 class TemplateScreen extends StatelessWidget {
   const TemplateScreen({super.key});
   @override
-  Widget build(BuildContext context) => BlocProvider<HomeBloc>(
-        create: (_) => HomeBloc(),
-        child: BlocListener<HomeBloc, HomeState>(
+  Widget build(BuildContext context) => BlocProvider<TemplateBloc>(
+        create: (_) => TemplateBloc(),
+        child: BlocListener<TemplateBloc, TemplateState>(
           listenWhen: (pre, cur) => pre.homeStatus != cur.homeStatus,
           listener: _listener,
           child: Builder(
             builder: (BuildContext context) => Template(
-              templateBloc: context.read<HomeBloc>(),
+              templateBloc: context.read<TemplateBloc>(),
             ),
           ),
         ),
       );
 }
 
-void _listener(BuildContext context, HomeState state) {
+void _listener(BuildContext context, TemplateState state) {
   switch (state.homeStatus) {
     case LoadingStatus.initialize:
     default:

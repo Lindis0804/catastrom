@@ -1,9 +1,9 @@
 part of 'home.bloc.dart';
 
-sealed class TemplateEvent {
-  const TemplateEvent();
+sealed class HomeEvent {
+  const HomeEvent();
 }
 
-class Inititalize extends TemplateEvent {
+class Inititalize extends HomeEvent {
   const Inititalize();
 }
