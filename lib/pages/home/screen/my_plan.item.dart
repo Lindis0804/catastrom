@@ -32,14 +32,14 @@ class MyPlanItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  plan.name,
+                  '${plan.name}',
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Row(
                   children: [
-                    WidLocationName(location: plan.address),
+                    WidLocationName(location: '${plan.address}'),
                     const SizedBox(
                       width: 5,
                     ),

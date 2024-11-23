@@ -15,6 +15,10 @@ git clone
 flutter pub get
 ```
 ### Run app:
+- Run web:
+```
+flutter run --target lib/root/main.dart
+```
 ### Run app in debug mode:
 - Ctrl + Shift + D to open VSCode in debug mode.
 - Press play button.

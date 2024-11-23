@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:template/api/plan/dto/CreatePlanDto.dart';
+import 'package:template/common/constants/api.dart';
 import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 
@@ -31,5 +33,14 @@ class PlanApiProvider {
     ];
 
     return plans;
+  }
+
+  Future<Plan> createPlan({required CreatePlanDto createPlanDto}) async {
+    Response res =
+        await dio.post('${Api.host}/api/v1/plan/create', data: createPlanDto);
+
+    Plan createdPlan = Plan.fromDynamic(res.data['data']);
+
+    return createdPlan;
   }
 }
