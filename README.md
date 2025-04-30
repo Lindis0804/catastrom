@@ -23,3 +23,19 @@ flutter pub get
 ```bash
 flutter pub run build_runner build
 ```
+
+### Run flutter web
+```bash
+flutter run -d web-server --target  lib/root/main.dart --web-port=<PORT>
+```
+
+## Config git LOCAL profile:
+```bash
+git config user.name "<username>"
+git config user.email "<useremail>"
+```
+
+## Check git profile
+```bash
+git config --list
+```
