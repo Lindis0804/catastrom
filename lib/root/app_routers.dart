@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:template/pages/forgot_password/forgot_password.screen.dart';
 import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
+import 'package:template/pages/new_plan/screen/new_plan.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
 
@@ -13,6 +14,7 @@ abstract class AppRouters {
   static const String home = '/home';
   static const String profile = '/profile';
   static const String setting = '/setting';
+  static const String newPlan = '/new-plan';
 
   static Route? onGenRoutes(RouteSettings setting) {
     switch (setting.name) {
@@ -36,6 +38,9 @@ abstract class AppRouters {
 
       case forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+
+      case newPlan:
+        return MaterialPageRoute(builder: (_) => const NewPlanScreen());
 
       default:
         return null;

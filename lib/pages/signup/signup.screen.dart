@@ -289,7 +289,6 @@ void _listener(BuildContext context, SignupState state) {
       Navigator.of(context).pushReplacementNamed(AppRouters.home);
       break;
     case SignupStatus.callApiSignUpFail:
-      print('call api log in fail');
       if (state is CallApiFailState) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

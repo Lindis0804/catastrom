@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:template/common/widgets/custom_icon.dart';
 import 'package:template/pages/home/screen/home.screen.dart';
 import 'package:template/pages/messenger/messenger.screen.dart';
-import 'package:template/pages/plans/plans.screen.dart';
+import 'package:template/pages/plans/screens/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/shop/shop.screen.dart';
 
@@ -20,7 +20,7 @@ class _ManageScreenState extends State<ManageScreen> {
   Widget build(BuildContext context) {
     final screens = [
       const HomeScreen(),
-      const PlanScreen(),
+      const PlansScreen(),
       const ShopScreen(),
       const MessengerScreen(),
       const ProfileScreen()
