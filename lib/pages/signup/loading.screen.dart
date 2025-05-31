@@ -10,9 +10,9 @@ class Loading extends StatelessWidget {
     return Container(
       height: screenSize.height,
       width: screenSize.width,
-      color: Colours.gray.withOpacity(0.5),
+      color: CustomColors.gray.withOpacity(0.5),
       child: const Center(
-        child: SpinKitFadingCircle(color: Colours.gray),
+        child: SpinKitFadingCircle(color: CustomColors.gray),
       ),
     );
   }

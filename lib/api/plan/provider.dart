@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:template/api/plan/dto/CreatePlanDto.dart';
+import 'package:template/api/plan/dto/ReqCreateTrip.dart';
+import 'package:template/api/plan/dto/getSection.dart';
 import 'package:template/common/constants/api.dart';
 import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/data/models/plan/plan.model.dart';
@@ -35,12 +36,28 @@ class PlanApiProvider {
     return plans;
   }
 
-  Future<Plan> createPlan({required CreatePlanDto createPlanDto}) async {
-    Response res =
-        await dio.post('${Api.host}/api/v1/plan/create', data: createPlanDto);
+  Future<ResCreateTrip> createPlan(
+      {required ReqCreateTrip reqCreateTrip}) async {
+    Response res = await dio.post(
+      '${Api.host}/api/v1/trip/create',
+      data: reqCreateTrip.toJson(),
+    );
 
-    Plan createdPlan = Plan.fromDynamic(res.data['data']);
+    ResCreateTrip createdTrip = ResCreateTrip.fromDynamic(res.data);
 
-    return createdPlan;
+    return createdTrip;
+  }
+
+  Future<ResGetSections> getSections(
+      {required ReqGetSections reqGetSections}) async {
+    ResGetSections sections = const ResGetSections(sections: [
+      SectionItem(sectionId: "1", sectionName: "Hà Tĩnh"),
+      SectionItem(sectionId: "2", sectionName: "Nghệ An"),
+      SectionItem(sectionId: "3", sectionName: "Quảng Bình"),
+      SectionItem(sectionId: "4", sectionName: "Quảng Trị"),
+      SectionItem(sectionId: "5", sectionName: "Thừa Thiên Huế"),
+      SectionItem(sectionId: '6', sectionName: 'Đà Nẵng'),
+    ]);
+    return sections;
   }
 }

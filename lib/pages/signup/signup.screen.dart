@@ -223,8 +223,8 @@ class _SignupForm extends State<SignupForm> {
                               : null,
                           text: 'Sign Up',
                           backgroundColor: enableSignUp(widget.signupBloc)
-                              ? Colours.primary
-                              : Colours.disable),
+                              ? CustomColors.primary
+                              : CustomColors.gray),
                     ),
                     InkWell(
                         onTap: () {

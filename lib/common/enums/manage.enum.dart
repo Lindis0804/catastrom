@@ -1,0 +1,1 @@
+enum EPageManageStatus { init, toCreatePlanPage }

@@ -25,12 +25,12 @@ class _SignInFormState extends State<SignInForm> {
   bool _passwordObscureText = true;
 
   bool enableLogin() {
-    if (_usernameController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        wrongUsernameMessage.isNotEmpty ||
-        wrongPasswordMessage.isNotEmpty) {
-      return false;
-    }
+    // if (_usernameController.text.isEmpty ||
+    //     _passwordController.text.isEmpty ||
+    //     wrongUsernameMessage.isNotEmpty ||
+    //     wrongPasswordMessage.isNotEmpty) {
+    //   return false;
+    // }
     return true;
   }
 
@@ -66,7 +66,7 @@ class _SignInFormState extends State<SignInForm> {
                       style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 25,
-                          color: Colours.primary),
+                          color: CustomColors.primary),
                     ),
                   ),
                   FormTextField(
@@ -149,8 +149,9 @@ class _SignInFormState extends State<SignInForm> {
                             }
                           : null,
                       text: 'Sign In',
-                      backgroundColor:
-                          enableLogin() ? Colours.primary : Colours.disable,
+                      backgroundColor: enableLogin()
+                          ? CustomColors.primary
+                          : CustomColors.disable,
                     ),
                   ),
                   InkWell(

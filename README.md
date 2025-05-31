@@ -14,11 +14,7 @@ git clone
 ```bash
 flutter pub get
 ```
-### Run app:
-- Run web:
-```
-flutter run --target lib/root/main.dart
-```
+## Run app:
 ### Run app in debug mode:
 - Ctrl + Shift + D to open VSCode in debug mode.
 - Press play button.
@@ -42,4 +38,34 @@ git config user.email "<useremail>"
 ## Check git profile
 ```bash
 git config --list
+```
+
+## Remote server
+
+1. Remote vào server bằng linux command
+```bash
+ssh <username>@<ip_address> -p <port>
+```
+
+2. Kiểm tra dung lượng server
+```bash
+df -h
+```
+
+## Docker
+1. Dừng tất cả docker container
+```bash
+docker stop $(docker ps -aq)
+```
+
+2. Xoá all docker container:
+```bash
+docker system prune -a --volumes
+```
+
+## Run in iOS simulator
+
+1. Open IOS simulator
+```bash
+open -a Simulator
 ```
