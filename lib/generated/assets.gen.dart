@@ -78,6 +78,10 @@ class $AssetsIconsGen {
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/default_avatar.png
+  AssetGenImage get defaultAvatar =>
+      const AssetGenImage('assets/images/default_avatar.png');
+
   /// File path: assets/images/default_cover.png
   AssetGenImage get defaultCover =>
       const AssetGenImage('assets/images/default_cover.png');
@@ -93,7 +97,29 @@ class $AssetsImagesGen {
       const AssetGenImage('assets/images/splash_image.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [defaultCover, logo, logo4x, splashImage];
+  List<AssetGenImage> get values =>
+      [defaultAvatar, defaultCover, logo, logo4x, splashImage];
+}
+
+class $AssetsSvgIconsGen {
+  const $AssetsSvgIconsGen();
+
+  /// File path: assets/svg_icons/favorite.svg
+  SvgGenImage get favorite =>
+      const SvgGenImage('assets/svg_icons/favorite.svg');
+
+  /// File path: assets/svg_icons/home_page.svg
+  SvgGenImage get homePage =>
+      const SvgGenImage('assets/svg_icons/home_page.svg');
+
+  /// File path: assets/svg_icons/my_plan.svg
+  SvgGenImage get myPlan => const SvgGenImage('assets/svg_icons/my_plan.svg');
+
+  /// File path: assets/svg_icons/profile.svg
+  SvgGenImage get profile => const SvgGenImage('assets/svg_icons/profile.svg');
+
+  /// List of all assets
+  List<SvgGenImage> get values => [favorite, homePage, myPlan, profile];
 }
 
 class Assets {
@@ -102,6 +128,7 @@ class Assets {
   static const $AssetsFontsGen fonts = $AssetsFontsGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $AssetsSvgIconsGen svgIcons = $AssetsSvgIconsGen();
 }
 
 class AssetGenImage {

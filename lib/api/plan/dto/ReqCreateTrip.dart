@@ -37,7 +37,7 @@ class ReqCreateTrip {
       'endDate': DateFormat('yyyyMMdd').format(endTime),
       'numOfParticipants': numOfMembers,
       'budget': maxBudget,
-      'mainLocations': mainLocations,
+      'mainLocation': mainLocations,
       'intentDescription': tripIntentDescription,
     };
   }
@@ -70,17 +70,29 @@ class ResCreateTrip extends ReqCreateTrip {
         );
 
   factory ResCreateTrip.fromDynamic(Map<String, dynamic> json) {
+    List<String> mainLocations = List<String>.from(json['mainLocations'] ?? []);
+    double minBudget = json['minBudget'] ?? 0.0,
+        maxBudget = json['budget'] ?? 0.0;
+    String tripCode = json['tripCode'] ?? '',
+        createdBy = json['createdBy'] ?? '',
+        tripName = json['tripCode'] ?? '',
+        tripIntent = json['tripIntent'] ?? '',
+        tripIntentDescription = json['intentDescription'] ?? '';
+    DateTime startTime = DateTime.parse(json['startDate']),
+        endTime = DateTime.parse(json['endDate']);
+    int numOfMembers = int.tryParse('${json['numOfParticipants']}') ?? 1;
+    print(mainLocations);
     return ResCreateTrip(
-        tripCode: json['tripCode'],
-        createdBy: json['createdBy'],
-        tripName: json['tripName'],
-        tripIntent: json['tripIntent'],
-        startTime: DateTime.parse(json['startDate']),
-        endTime: DateTime.parse(json['endDate']),
-        numOfMembers: json['numOfParticipants'],
-        minBudget: json['minBudget']?.toDouble() ?? 0.0,
-        maxBudget: json['budget']?.toDouble() ?? 0.0,
-        mainLocations: List<String>.from(json['mainLocations'] ?? []),
-        tripIntentDescription: json['intentDescription'] ?? '');
+        tripCode: tripCode,
+        createdBy: createdBy,
+        tripName: tripName,
+        tripIntent: tripIntent,
+        startTime: startTime,
+        endTime: endTime,
+        numOfMembers: numOfMembers,
+        minBudget: minBudget,
+        maxBudget: maxBudget,
+        mainLocations: mainLocations,
+        tripIntentDescription: tripIntentDescription);
   }
 }

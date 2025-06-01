@@ -18,8 +18,8 @@ class UserApiProvider {
         lastName: 'Hiếu',
         phone: '0819019699',
         username: 'hieule',
-        avatar: EnvVariable().defaultAvatar,
-        cover: EnvVariable().defaultCover);
+        avatar: EnvVariable.defaultAvatar,
+        cover: EnvVariable.defaultCover);
     return user;
   }
 }

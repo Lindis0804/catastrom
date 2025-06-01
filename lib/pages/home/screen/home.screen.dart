@@ -48,8 +48,7 @@ class _HomeState extends State<Home> {
                 ),
                 actions: [
                   CustomImage.network(
-                      imageUrl:
-                          state.user?.avatar ?? EnvVariable().defaultAvatar,
+                      imageUrl: state.user?.avatar ?? EnvVariable.defaultAvatar,
                       width: 30,
                       height: 30,
                       radius: 15),

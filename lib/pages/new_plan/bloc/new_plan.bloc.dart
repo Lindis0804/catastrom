@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/plan/dto/CreatePlanDto.dart';
 import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/api/plan/dto/getSection.dart';
 import 'package:template/api/plan/provider.dart';
@@ -98,8 +97,8 @@ class NewPlanBloc extends Bloc<NewPlanEvent, NewPlanState> {
   ) {
     emitter(
       state.copyWith(
-        sections: event.selectedSections,
-      ),
+          sections: event.selectedSections,
+          getSectionsStatus: LoadingStatus.loaded),
     );
   }
 }

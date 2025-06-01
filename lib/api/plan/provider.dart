@@ -3,6 +3,7 @@ import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/api/plan/dto/getSection.dart';
 import 'package:template/common/constants/api.dart';
 import 'package:template/common/utils/dio.utils.dart';
+import 'package:template/common/utils/env.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 
 class PlanApiProvider {
@@ -38,12 +39,18 @@ class PlanApiProvider {
 
   Future<ResCreateTrip> createPlan(
       {required ReqCreateTrip reqCreateTrip}) async {
+    dynamic input = reqCreateTrip.toJson();
     Response res = await dio.post(
-      '${Api.host}/api/v1/trip/create',
-      data: reqCreateTrip.toJson(),
+      '${EnvVariable.clientCustomerHost}/api/v1/trip/create',
+      data: input,
     );
 
-    ResCreateTrip createdTrip = ResCreateTrip.fromDynamic(res.data);
+    String responseCode = res.data['responseCode'];
+    if (responseCode == '' || responseCode != '0000') {
+      throw Exception('Create trip fail.');
+    }
+    dynamic data = res.data['data'];
+    ResCreateTrip createdTrip = ResCreateTrip.fromDynamic(data);
 
     return createdTrip;
   }

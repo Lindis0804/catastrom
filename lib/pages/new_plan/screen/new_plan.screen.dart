@@ -7,6 +7,7 @@ import 'package:template/api/plan/dto/getSection.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/constants/page_title.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
+import 'package:template/common/utils/log.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_chip_list.dart';
 import 'package:template/common/widgets/custom_datetime_picker.dart';
@@ -182,9 +183,11 @@ class _NewPlanState extends State<NewPlan> {
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: sections == null || sections!.isEmpty
-                                  ? const Text("Chọn tỉnh...",
-                                      style: TextStyle(color: Colors.grey))
+                              child: sections == null || sections.isEmpty
+                                  ? const Text(
+                                      "Chọn tỉnh...",
+                                      style: TextStyle(color: Colors.grey),
+                                    )
                                   : Wrap(
                                       spacing: 6,
                                       runSpacing: 6,
@@ -229,6 +232,11 @@ class _NewPlanState extends State<NewPlan> {
                           widget.newPlanBloc.add(
                             CreatePlanEvent(
                               reqCreateTrip: ReqCreateTrip(
+                                mainLocations: state.sections != null
+                                    ? state.sections!
+                                        .map((item) => item.sectionId)
+                                        .toList()
+                                    : [],
                                 tripName: _planNameController.text,
                                 tripIntent: _tripIntentController.text,
                                 tripIntentDescription:
@@ -278,11 +286,12 @@ class NewPlanScreen extends StatelessWidget {
 
 void _listener(BuildContext context, NewPlanState state) {
   switch (state.createPlanStatus) {
-    case LoadingStatus.initialize:
     case LoadingStatus.loaded:
       Navigator.of(context).pop();
       // Do nothing
       break;
+    case LoadingStatus.error:
+      showMessage(context, state.createPlanErrMsg ?? 'Error in create plan', 1);
     default:
   }
 }

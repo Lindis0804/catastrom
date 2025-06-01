@@ -6,10 +6,9 @@ import 'package:template/pages/login/dto/LoginUser.dto.dart';
 class AuthApiProvider {
   Dio dio;
   AuthApiProvider({required this.dio});
-  EnvVariable envVariable = EnvVariable();
 
   Future<ResLogin> login({required LoginUser data}) async {
-    Response res = await dio.post('${envVariable.clientCustomerHost}/api/login',
+    Response res = await dio.post('${EnvVariable.clientCustomerHost}/api/login',
         data: data);
     if (res.statusCode == 200) {
       String accessToken = res.data['data']['accessToken'] ?? '';
