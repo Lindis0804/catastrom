@@ -1,15 +1,12 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/hieusmacbook/Documents/software/flutter/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/hieusmacbook/Documents/projects/dolatrip_mobile_app"
+export "FLUTTER_ROOT=/Users/lehieu/fvm/versions/3.29.2"
+export "FLUTTER_APPLICATION_PATH=/Users/lehieu/Documents/projects/dolatrip_mobile_app"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
-export "FLUTTER_TARGET=/Users/hieusmacbook/Documents/projects/dolatrip_mobile_app/lib/root/main_dev.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
 export "FLUTTER_BUILD_NUMBER=1"
-export "DART_DEFINES=RkxVVFRFUl9BUFBfRkxBVk9SPWRldg=="
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=true"
 export "TREE_SHAKE_ICONS=false"
-export "PACKAGE_CONFIG=/Users/hieusmacbook/Documents/projects/dolatrip_mobile_app/.dart_tool/package_config.json"
-export "FLAVOR=dev"
+export "PACKAGE_CONFIG=.dart_tool/package_config.json"

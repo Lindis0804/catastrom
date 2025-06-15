@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/login_status.enum.dart';
+import 'package:template/common/utils/size.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
 import 'package:template/generated/assets.gen.dart';
@@ -36,143 +37,150 @@ class _SignInFormState extends State<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
-    print({'status__': widget.loginBloc.state.loginStatus});
-    return BlocBuilder<LoginBloc, LoginState>(builder: (context, state) {
-      return Stack(
-        children: [
-          Visibility(
-            visible: state.loginStatus == LoginStatus.login,
-            child: const Loading(),
-          ),
-          SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16),
+    //print({'status__': widget.loginBloc.state.loginStatus});
+    double screenHeight = getScreenHeight(context);
+    double screenWidth = getScreenWidth(context);
+    return BlocBuilder<LoginBloc, LoginState>(
+      builder: (context, state) {
+        return Stack(
+          children: [
+            Visibility(
+              visible: state.loginStatus == LoginStatus.login,
+              child: const Loading(),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
               alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 30),
-                    child: Image(
-                      image: Assets.images.logo4x.provider(),
-                      width: 170,
-                      fit: BoxFit.fitWidth,
+              width: screenWidth,
+              height: screenHeight,
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 30),
+                      child: Image(
+                        image: Assets.images.logo4x.provider(),
+                        width: 170,
+                        fit: BoxFit.fitWidth,
+                      ),
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: const Text(
-                      'Welcome to DoLa Trip',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 25,
-                          color: CustomColors.primary),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: const Text(
+                        'Welcome to DoLa Trip',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 25,
+                            color: CustomColors.primary),
+                      ),
                     ),
-                  ),
-                  FormTextField(
-                    text: 'Username',
-                    errorMessage: wrongUsernameMessage,
-                    controller: _usernameController,
-                    onChanged: (username) {
-                      setState(
-                        () {
-                          wrongUsernameMessage = (username.isNotEmpty &&
-                                  !validateUserName(username))
-                              ? 'Username must have at least 8 character, contain at least 1 letter and 1 digit.'
-                              : '';
-                        },
-                      );
-                    },
-                  ),
-                  FormTextField(
-                    controller: _passwordController,
-                    text: 'Password',
-                    errorMessage: wrongPasswordMessage,
-                    isObscureText: _passwordObscureText,
-                    onChanged: (password) {
-                      setState(
-                        () {
-                          wrongPasswordMessage = (password.isNotEmpty &&
-                                  !validatePassword(password))
-                              ? 'Password must have at least 5 characters - include at least 1 lower case letter, 1 uppder case letter, 1 digit and 1 special letter'
-                              : '';
-                        },
-                      );
-                    },
-                    suffixIcon: IconButton(
-                      icon: _passwordObscureText
-                          ? SvgPicture.asset(
-                              'assets/icons/ic_eye_off.svg',
-                              width: 20,
-                              height: 20,
-                            )
-                          : const Icon(Icons.remove_red_eye, size: 20),
-                      onPressed: () {
+                    FormTextField(
+                      text: 'Username',
+                      errorMessage: wrongUsernameMessage,
+                      controller: _usernameController,
+                      onChanged: (username) {
                         setState(
                           () {
-                            _passwordObscureText = !_passwordObscureText;
+                            wrongUsernameMessage = (username.isNotEmpty &&
+                                    !validateUserName(username))
+                                ? 'Username must have at least 8 character, contain at least 1 letter and 1 digit.'
+                                : '';
                           },
                         );
                       },
                     ),
-                  ),
-                  Container(
-                    alignment: Alignment.centerRight,
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: InkWell(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Forgot Password')));
-                        widget.loginBloc.add(const ForgotPasswordWhenLogIn());
+                    FormTextField(
+                      controller: _passwordController,
+                      text: 'Password',
+                      errorMessage: wrongPasswordMessage,
+                      isObscureText: _passwordObscureText,
+                      onChanged: (password) {
+                        setState(
+                          () {
+                            wrongPasswordMessage = (password.isNotEmpty &&
+                                    !validatePassword(password))
+                                ? 'Password must have at least 5 characters - include at least 1 lower case letter, 1 uppder case letter, 1 digit and 1 special letter'
+                                : '';
+                          },
+                        );
                       },
-                      child: Text(
-                        'Forgot password ? 🧐',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green[700],
-                            fontSize: 15),
+                      suffixIcon: IconButton(
+                        icon: _passwordObscureText
+                            ? SvgPicture.asset(
+                                'assets/icons/ic_eye_off.svg',
+                                width: 20,
+                                height: 20,
+                              )
+                            : const Icon(Icons.remove_red_eye, size: 20),
+                        onPressed: () {
+                          setState(
+                            () {
+                              _passwordObscureText = !_passwordObscureText;
+                            },
+                          );
+                        },
                       ),
                     ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: BigCustomButton(
-                      onPressed: (enableLogin() &&
-                              state.loginStatus == LoginStatus.initialize)
-                          ? () {
-                              widget.loginBloc.add(
-                                Login(
-                                    username: _usernameController.text,
-                                    password: _passwordController.text),
-                              );
-                            }
-                          : null,
-                      text: 'Sign In',
-                      backgroundColor: enableLogin()
-                          ? CustomColors.primary
-                          : CustomColors.disable,
+                    Container(
+                      alignment: Alignment.centerRight,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: InkWell(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Forgot Password')));
+                          widget.loginBloc.add(const ForgotPasswordWhenLogIn());
+                        },
+                        child: Text(
+                          'Forgot password ? 🧐',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700],
+                              fontSize: 15),
+                        ),
+                      ),
                     ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      widget.loginBloc.add(const MoveToSignUp());
-                    },
-                    child: Text(
-                      'Create new account',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                          color: Colors.green[700]),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: BigCustomButton(
+                        onPressed: (enableLogin() &&
+                                state.loginStatus == LoginStatus.initialize)
+                            ? () {
+                                widget.loginBloc.add(
+                                  Login(
+                                      username: _usernameController.text,
+                                      password: _passwordController.text),
+                                );
+                              }
+                            : null,
+                        text: 'Sign In',
+                        backgroundColor: enableLogin()
+                            ? CustomColors.primary
+                            : CustomColors.disable,
+                      ),
                     ),
-                  ),
-                ],
+                    InkWell(
+                      onTap: () {
+                        widget.loginBloc.add(const MoveToSignUp());
+                      },
+                      child: Text(
+                        'Create new account',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                            color: Colors.green[700]),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      );
-    });
+          ],
+        );
+      },
+    );
   }
 
   @override

@@ -287,7 +287,7 @@ class NewPlanScreen extends StatelessWidget {
 void _listener(BuildContext context, NewPlanState state) {
   switch (state.createPlanStatus) {
     case LoadingStatus.loaded:
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(state.createdPlan);
       // Do nothing
       break;
     case LoadingStatus.error:

@@ -19,6 +19,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    widget.homeBloc.add(Inititalize());
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenHeight = getScreenHeight(context);
     return BlocBuilder<HomeBloc, HomeState>(
@@ -27,7 +34,7 @@ class _HomeState extends State<Home> {
           children: [
             Image(
               image: Assets.images.defaultCover.provider(),
-              height: screenHeight * 0.37,
+              width: double.infinity,
             ),
             Scaffold(
               backgroundColor: Colors.transparent,

@@ -60,13 +60,15 @@ class _ChipSearchDropdownState extends State<ChipSearchDropdown> {
                             label: Text(option),
                             selected: isSelected,
                             onSelected: (selected) {
-                              setModalState(() {
-                                if (selected) {
-                                  _selected.add(option);
-                                } else {
-                                  _selected.remove(option);
-                                }
-                              });
+                              setModalState(
+                                () {
+                                  if (selected) {
+                                    _selected.add(option);
+                                  } else {
+                                    _selected.remove(option);
+                                  }
+                                },
+                              );
                               setState(() {}); // Cập nhật giao diện bên ngoài
                             },
                           );

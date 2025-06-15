@@ -14,6 +14,11 @@ git clone
 ```bash
 flutter pub get
 ```
+
+- Recreate Android folder
+```bash
+flutter create . --platforms=android
+```
 ## Run app:
 ### Run app in debug mode:
 - Ctrl + Shift + D to open VSCode in debug mode.
@@ -28,6 +33,12 @@ flutter pub run build_runner build
 ```bash
 flutter run -d web-server --target  lib/root/main.dart --web-port=<PORT>
 ```
+
+### Run flutter web by Chrome, tránh lỗi CORS
+```bash
+flutter run -d chrome --web-browser-flag "--disable-web-security" --web-browser-flag "--user-data-dir=/tmp/temp_chrome" --target  lib/root/main.dart --web-port=8080
+```
+
 
 ## Config git LOCAL profile:
 ```bash

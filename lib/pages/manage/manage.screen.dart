@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/manage.enum.dart';
 import 'package:template/common/widgets/custom_icon.dart';
@@ -114,10 +115,20 @@ class _ManageState extends State<Manage> {
 void _listener(BuildContext context, ManageState state) async {
   switch (state.pageIdx) {
     case IManagePageIdx.CREATE_PLAN:
-      await Navigator.of(context).pushNamed(AppRouters.newPlan);
+      ResCreateTrip? resCreateTrip = await Navigator.of(context)
+          .pushNamed(AppRouters.newPlan) as ResCreateTrip?;
       if (!context.mounted) {
         return;
       }
+      if (resCreateTrip != null) {
+        context.read<ManageBloc>().emit(
+              state.copyWith(
+                pageManageStatus: EPageManageStatus.init,
+                pageIdx: IManagePageIdx.MY_PLANS,
+              ),
+            );
+      }
+
       context.read<ManageBloc>().emit(
             state.copyWith(
               pageManageStatus: EPageManageStatus.init,

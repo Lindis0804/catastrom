@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:template/api/place/dto/recommended_place.dart';
-import 'package:template/common/utils/size.dart';
 
 class RecommendedPlaceItem extends StatelessWidget {
   final RecommendedPlace recommendedPlace;
@@ -10,7 +9,7 @@ class RecommendedPlaceItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: getScreenWidth(context) * 0.48,
+      width: 180,
       decoration: BoxDecoration(
         image: DecorationImage(
             image: NetworkImage(recommendedPlace.imageUrl), fit: BoxFit.fill),
@@ -32,7 +31,7 @@ class RecommendedPlaceItem extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {},
-                icon: Icon(
+                icon: const Icon(
                   Icons.favorite,
                   color: Colors.white,
                 ),
@@ -51,7 +50,8 @@ class RecommendedPlaceItem extends StatelessWidget {
               children: [
                 Text(
                   recommendedPlace.name,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
                   height: 5,

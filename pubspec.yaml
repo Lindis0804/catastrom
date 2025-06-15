@@ -23,6 +23,7 @@ dependencies:
   flutter_spinkit: ^5.2.0
   intl: 
   flutter_cupertino_datetime_picker:
+  flutter_slidable:
 
 dev_dependencies:
   flutter_test:
@@ -60,13 +61,13 @@ flavorizr:
       app:
         name: "$Trip"
       android:
-        applicationId: "com.template.demo"
+        applicationId: "com.hieuld.demo"
       ios:
-        bundleId: "com.template.demo"
+        bundleId: "com.hieuld.demo"
     dev:
       app:
         name: "$Trip Dev"
       android:
-        applicationId: "dev.template.demo"
+        applicationId: "dev.hieuld.demo"
       ios:
-        bundleId: "dev.template.demo"
+        bundleId: "dev.hieuld.demo"

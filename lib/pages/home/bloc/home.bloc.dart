@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/api/place/dto/recommended_place.dart';
 import 'package:template/api/place/provider.dart';
+import 'package:template/api/plan/dto/ReqParamsSearchTrip.dart';
 import 'package:template/api/plan/provider.dart';
 import 'package:template/api/user/provider.dart';
 import 'package:template/common/enums/home.enum.dart';
@@ -76,8 +77,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }(),
           () async {
             try {
-              myPlans = await PlanApiProvider(accessToken: accessToken)
-                  .getMyPlans(userId: 1);
+              myPlans =
+                  await PlanApiProvider(accessToken: accessToken).getMyPlans(
+                      reqParamsSearchTrip: ReqParamsSearchTrip(
+                pagable: ObjPagable(
+                  page: 0,
+                  size: 3,
+                  sort: [],
+                ),
+              ));
               emitter(
                 state.copyWith(
                     myPlans: myPlans, getMyPlansStatus: LoadingStatus.loaded),

@@ -6,7 +6,6 @@ import 'package:template/common/constants/keys.dart';
 import 'package:template/common/enums/login_status.enum.dart';
 import 'package:equatable/equatable.dart';
 import 'package:template/common/utils/dio.utils.dart';
-import 'package:template/common/utils/env.dart';
 import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/pages/login/dto/LoginUser.dto.dart';
 part 'login.event.dart';
@@ -47,7 +46,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  void _onInitialize(LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {
+  void _onInitialize(
+      LoginEvent loginEvent, Emitter<LoginState> loginEmitter) async {
+    String accessToken = await SharedPreferencesManager.getAccessToken();
+    if (accessToken.isNotEmpty) {
+      add(const MoveToHome());
+      return;
+    }
     add(const LoginStatusChanged(LoginStatus.initialize));
   }
 
@@ -66,18 +71,24 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (loginEvent is! Login) {
       return;
     }
+
     add(const LoginStatusChanged(LoginStatus.login));
     try {
       String username = loginEvent.username;
       String password = loginEvent.password;
       bool rememberMe = loginEvent.rememberMe;
+      String userId = '103';
+
       LoginUser loginUserData = LoginUser(
           username: username, password: password, rememberMe: rememberMe);
       Dio dio = DioUtils.getDioClient();
       AuthApiProvider authApiProvider = AuthApiProvider(dio: dio);
       ResLogin resLogin = await authApiProvider.login(data: loginUserData);
+
       await SharedPreferencesManager.saveString(
-          ACCESS_TOKEN_KEY, resLogin.accessToken);
+          SPKeys.ACCESS_TOKEN, resLogin.accessToken);
+      await SharedPreferencesManager.saveString(SPKeys.USER_ID, userId);
+
       add(const MoveToHome());
     } catch (err) {
       print('Error in call api log in: $err');

@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:template/api/plan/dto/DeleteTrip.dart';
 import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/api/plan/dto/getSection.dart';
 import 'package:template/common/constants/api.dart';
 import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/common/utils/env.dart';
 import 'package:template/data/models/plan/plan.model.dart';
+import 'package:template/api/plan/dto/ReqParamsSearchTrip.dart';
 
 class PlanApiProvider {
   String accessToken;
@@ -14,26 +16,31 @@ class PlanApiProvider {
     dio = DioUtils.getDioClient(accessToken: accessToken);
   }
 
-  Future<List<Plan>> getMyPlans({required int userId}) async {
-    List<Plan> plans = [
-      Plan(
-          id: 1,
-          name: 'Du hí Hà Tĩnh',
-          address: 'Hà Tĩnh',
-          startTime: DateTime(2024, 11, 17),
-          endTime: DateTime(2024, 11, 20),
-          imageUrl:
-              'https://images.baoangiang.com.vn/image/fckeditor/upload/2023/20231102/images/T11.jpg'),
-      Plan(
-          id: 2,
-          name: 'Tắm biển cửa lò',
-          address: 'Cửa Lò, Nghệ An',
-          startTime: DateTime(2024, 10, 17),
-          endTime: DateTime(2024, 10, 21),
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/commons/6/61/Cualovedem.jpg')
-    ];
-
+  Future<List<Plan>> getMyPlans(
+      {required ReqParamsSearchTrip reqParamsSearchTrip}) async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/api/v1/trip/search',
+      queryParameters: {
+        'userId': reqParamsSearchTrip.userId,
+        'startDate': reqParamsSearchTrip.startDate,
+        'endDate': reqParamsSearchTrip.endDate,
+        'pageable': {
+          'page': reqParamsSearchTrip.pagable.page,
+          'size': reqParamsSearchTrip.pagable.size,
+          'sort': reqParamsSearchTrip.pagable.sort,
+        }
+      },
+    );
+    dynamic resData = res.data;
+    print('🏖 [GET_MY_PLANS] resData: $resData');
+    if (resData["responseCode"] != "0000") {
+      throw Exception('Get my plans fail}');
+    }
+    List<dynamic> rawPlansData = resData['data']['content'];
+    List<Plan> plans = rawPlansData
+        .map((dynamic planData) => Plan.fromDynamic(planData))
+        .toList();
+    print('🏖 [GET_MY_PLANS] plans: $plans');
     return plans;
   }
 
@@ -53,6 +60,20 @@ class PlanApiProvider {
     ResCreateTrip createdTrip = ResCreateTrip.fromDynamic(data);
 
     return createdTrip;
+  }
+
+  Future<ResDeleteTrip> deletePlan(
+      {required ReqDeleteTrip reqDeleteTrip}) async {
+    Response res = await dio.delete(
+        '${EnvVariable.clientCustomerHost}/api/v1/trip/delete',
+        queryParameters: {'tripCode': reqDeleteTrip.tripCode});
+    EDeleteTripStatus status;
+    if (res.data["responseCode"] == "0000") {
+      status = EDeleteTripStatus.SUCCESS;
+    } else {
+      status = EDeleteTripStatus.FAIL;
+    }
+    return ResDeleteTrip(status: status);
   }
 
   Future<ResGetSections> getSections(

@@ -9,6 +9,14 @@ class SplashState extends Equatable {
 
   const SplashState.unauthenticated() : status = SplashStatus.unauthenticated;
 
+  const SplashState({required this.status});
+
   @override
   List<Object?> get props => [status];
+
+  SplashState copyWith({SplashStatus? status}) {
+    return SplashState(
+      status: status ?? this.status,
+    );
+  }
 }
