@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/auth/provider.dart';
+import 'package:template/api/auth/response.dart';
 import 'package:template/common/constants/keys.dart';
 import 'package:template/common/enums/login_status.enum.dart';
 import 'package:equatable/equatable.dart';
-import 'package:template/common/utils/env.dart';
+import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/pages/login/dto/LoginUser.dto.dart';
 part 'login.event.dart';
@@ -44,7 +46,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  void _onInitialize(LoginEvent loginEvent, Emitter<LoginState> loginEmitter) {
+  void _onInitialize(
+      LoginEvent loginEvent, Emitter<LoginState> loginEmitter) async {
+    String accessToken = await SharedPreferencesManager.getAccessToken();
+    if (accessToken.isNotEmpty) {
+      add(const MoveToHome());
+      return;
+    }
     add(const LoginStatusChanged(LoginStatus.initialize));
   }
 
@@ -63,32 +71,25 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (loginEvent is! Login) {
       return;
     }
+
     add(const LoginStatusChanged(LoginStatus.login));
     try {
       String username = loginEvent.username;
       String password = loginEvent.password;
       bool rememberMe = loginEvent.rememberMe;
-      EnvVariable envVariable = EnvVariable();
+      String userId = '103';
+
       LoginUser loginUserData = LoginUser(
           username: username, password: password, rememberMe: rememberMe);
+      Dio dio = DioUtils.getDioClient();
+      AuthApiProvider authApiProvider = AuthApiProvider(dio: dio);
+      ResLogin resLogin = await authApiProvider.login(data: loginUserData);
 
-      Dio dio = Dio(BaseOptions(connectTimeout: 10000));
-      Response res = await dio.post(
-          '${envVariable.clientCustomerHost}/api/login',
-          data: loginUserData);
-      if (res.statusCode == 200) {
-        String accessToken = res.data['data']['accessToken'] ?? '';
-        if (accessToken == '') {
-          add(const CallApiLoginFailEvent(message: 'Access token is empty'));
-          return;
-        }
-        await SharedPreferencesManager.saveString(
-            ACCESS_TOKEN_KEY, accessToken);
-        add(const MoveToHome());
-      } else {
-        add(const CallApiLoginFailEvent(
-            message: 'Username or password is incorrect.'));
-      }
+      await SharedPreferencesManager.saveString(
+          SPKeys.ACCESS_TOKEN, resLogin.accessToken);
+      await SharedPreferencesManager.saveString(SPKeys.USER_ID, userId);
+
+      add(const MoveToHome());
     } catch (err) {
       print('Error in call api log in: $err');
       add(CallApiLoginFailEvent(message: 'Call api login fail: $err'));

@@ -4,3 +4,4 @@ linter:
   rules:
     avoid_print: false
     prefer_single_quotes: true
+    non_constant_identifier_names: false

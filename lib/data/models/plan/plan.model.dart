@@ -40,6 +40,8 @@ class SubPlan {
 
 class Plan {
   final int id;
+  final String tripCode, tripIntent, type, intentDescription;
+  final int numberOfParticipants;
   final String? name;
   final String? address;
   final List<SubPlan>? subPlans;
@@ -47,9 +49,17 @@ class Plan {
   final DateTime startTime, endTime;
   final double price;
   final String imageUrl;
+  final List<String> mainLocations;
+  final String createdBy;
 
   const Plan(
       {required this.id,
+      required this.tripCode,
+      required this.tripIntent,
+      required this.type,
+      required this.intentDescription,
+      required this.numberOfParticipants,
+      required this.mainLocations,
       this.name,
       this.address,
       this.subPlans,
@@ -57,33 +67,49 @@ class Plan {
       required this.startTime,
       required this.endTime,
       this.price = 0.0,
-      this.imageUrl = 'https://i.ytimg.com/vi/2pH4Kr48zVo/maxresdefault.jpg'});
+      this.imageUrl = 'https://i.ytimg.com/vi/2pH4Kr48zVo/maxresdefault.jpg',
+      required this.createdBy});
 
   factory Plan.fromDynamic(dynamic rawPlan) {
-    int id = rawPlan['id'];
-    String? name = rawPlan['name'];
+    int id = rawPlan['id'] ?? 0;
+    String? name = rawPlan['tripName'];
+    String createdBy = rawPlan['createdBy'] ?? '';
+    String tripCode = rawPlan['tripCode'] ?? '';
+    String tripIntent = rawPlan['tripIntent'] ?? '';
+    String type = rawPlan['type'] ?? 'default';
+    String intentDescription = rawPlan['intentDescription'] ?? '';
+    int numberOfParticipants = rawPlan['numberOfParticipants'] ?? 1;
+    List<String> mainLocations =
+        List<String>.from(rawPlan['mainLocations'] ?? []);
     String? address = rawPlan['address'];
-    DateTime startTime = DateTime.parse(rawPlan['startTime']);
-    DateTime endTime = DateTime.parse(rawPlan['endTime']);
-    double price = rawPlan['price'] ?? 0.0;
+    DateTime startTime = DateTime.parse(rawPlan['startDate']);
+    DateTime endTime = DateTime.parse(rawPlan['endDate']);
+    double price = rawPlan['budget'] ?? 0.0;
 
-    dynamic rawSubPlans = rawPlan['subPlan'];
-    List<SubPlan>? subPlans = rawSubPlans != null && rawSubPlans.length > 0
-        ? List.generate(
-            rawSubPlans.length,
-            (idx) => SubPlan.fromDynamic(
-              rawSubPlans[idx],
-            ),
-          )
-        : null;
+    // dynamic rawSubPlans = rawPlan['subPlan'];
+    // List<SubPlan>? subPlans = rawSubPlans != null && rawSubPlans.length > 0
+    //     ? List.generate(
+    //         rawSubPlans.length,
+    //         (idx) => SubPlan.fromDynamic(
+    //           rawSubPlans[idx],
+    //         ),
+    //       )
+    //     : null;
 
     return Plan(
-        id: id,
-        name: name,
-        address: address,
-        startTime: startTime,
-        endTime: endTime,
-        price: price,
-        subPlans: subPlans);
+      id: id,
+      tripCode: tripCode,
+      tripIntent: tripIntent,
+      createdBy: createdBy,
+      type: type,
+      intentDescription: intentDescription,
+      numberOfParticipants: numberOfParticipants,
+      mainLocations: mainLocations,
+      name: name,
+      address: address,
+      startTime: startTime,
+      endTime: endTime,
+      price: price,
+    );
   }
 }

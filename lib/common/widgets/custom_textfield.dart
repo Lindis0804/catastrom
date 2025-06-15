@@ -9,6 +9,7 @@ class NormalTextfield extends StatelessWidget {
   final Color borderColor;
   final bool isError;
   final ValueChanged<String>? onChanged;
+  final TextInputType keyboardType;
   const NormalTextfield(
       {super.key,
       required this.text,
@@ -17,10 +18,12 @@ class NormalTextfield extends StatelessWidget {
       this.isObscureText,
       this.borderColor = Colors.green,
       this.isError = false,
-      this.onChanged});
+      this.onChanged,
+      required this.keyboardType});
   @override
   Widget build(BuildContext context) {
     return TextField(
+      keyboardType: keyboardType,
       controller: controller,
       obscureText: isObscureText ?? false,
       onChanged: onChanged,
@@ -31,13 +34,13 @@ class NormalTextfield extends StatelessWidget {
             ),
           ),
           focusedBorder: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: isError ? Colours.error : Colours.primary)),
-          labelStyle:
-              TextStyle(color: isError ? Colours.error : Colours.primary),
+              borderSide: BorderSide(
+                  color: isError ? CustomColors.error : CustomColors.primary)),
+          labelStyle: TextStyle(
+              color: isError ? CustomColors.error : CustomColors.primary),
           label: Text(
             text,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            // style: const TextStyle(fontSize: 12),
           ),
           suffixIcon: suffixIcon),
     );
@@ -51,6 +54,7 @@ class FormTextField extends StatelessWidget {
   final bool isObscureText;
   final String errorMessage;
   final ValueChanged<String>? onChanged;
+  final TextInputType? keyboardType;
   const FormTextField(
       {super.key,
       required this.text,
@@ -58,7 +62,8 @@ class FormTextField extends StatelessWidget {
       this.controller,
       this.isObscureText = false,
       this.errorMessage = '',
-      this.onChanged});
+      this.onChanged,
+      this.keyboardType = TextInputType.text});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -66,6 +71,7 @@ class FormTextField extends StatelessWidget {
       child: Column(
         children: [
           NormalTextfield(
+            keyboardType: keyboardType!,
             onChanged: onChanged,
             text: text,
             suffixIcon: suffixIcon,
@@ -77,7 +83,7 @@ class FormTextField extends StatelessWidget {
             visible: errorMessage.isNotEmpty,
             child: Text(
               errorMessage,
-              style: const TextStyle(color: Colours.error, fontSize: 10),
+              style: const TextStyle(color: CustomColors.error, fontSize: 10),
             ),
           )
         ],

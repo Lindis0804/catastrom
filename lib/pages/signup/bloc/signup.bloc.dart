@@ -68,7 +68,6 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
       Dio dio = Dio(
         BaseOptions(connectTimeout: 10000),
       );
-      EnvVariable envVariable = EnvVariable();
       SignUpUserDto signUpUserData = SignUpUserDto(
           firstName: firstName,
           lastName: lastName,
@@ -76,7 +75,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
           username: username,
           password: password);
       Response res = await dio.post(
-        '${envVariable.clientCustomerHost}/api/signup',
+        '${EnvVariable.clientCustomerHost}/api/signup',
         data: signUpUserData.toJson(),
       );
       if (res.statusCode == 200) {

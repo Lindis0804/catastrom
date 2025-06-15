@@ -16,3 +16,12 @@ class CreatedPlanEvent extends PlansEvent {
   final Plan? plan;
   const CreatedPlanEvent({this.plan});
 }
+
+class DeletePlanEvent extends PlansEvent {
+  final String planCode;
+  const DeletePlanEvent({required this.planCode});
+}
+
+class ToEditPlanScreenEvent extends PlansEvent {
+  const ToEditPlanScreenEvent();
+}

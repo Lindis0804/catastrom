@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/signup_status.enum.dart';
+import 'package:template/common/utils/size.dart';
 import 'package:template/common/utils/validate.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
@@ -55,6 +56,8 @@ class _SignupForm extends State<SignupForm> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = getScreenHeight(context);
+    double screenWidth = getScreenWidth(context);
     return BlocBuilder<SignupBloc, SignupState>(
       builder: (context, state) {
         return Stack(
@@ -63,170 +66,178 @@ class _SignupForm extends State<SignupForm> {
               visible: state.signupStatus == SignupStatus.signUp,
               child: const Loading(),
             ),
-            SafeArea(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                alignment: Alignment.topCenter,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: Image(
-                        image: Assets.images.logo4x.provider(),
-                        width: 150,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 15),
-                      child: const Text(
-                        'Welcome to DoLa Trip',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
-                            color: Colors.green),
-                      ),
-                    ),
-                    FormTextField(
-                      text: 'First Name',
-                      errorMessage: wrongFirstNameMessage,
-                      controller: _firstNameController,
-                      onChanged: (text) => {
-                        setState(
-                          () {
-                            wrongFirstNameMessage = (text.isNotEmpty &&
-                                    !validateName(text))
-                                ? 'First Name can only contains alphabetic characters.'
-                                : '';
-                          },
+            Container(
+              padding: const EdgeInsets.all(10),
+              alignment: Alignment.topCenter,
+              width: screenWidth,
+              height: screenHeight,
+              child: Scaffold(
+                resizeToAvoidBottomInset: true,
+                body: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Image(
+                          image: Assets.images.logo4x.provider(),
+                          width: 150,
+                          fit: BoxFit.fitWidth,
                         ),
-                      },
-                    ),
-                    FormTextField(
-                      text: 'Last Name',
-                      errorMessage: wrongLastNameMessage,
-                      controller: _lastNameController,
-                      onChanged: (text) => {
-                        setState(
-                          () {
-                            wrongLastNameMessage = (text.isNotEmpty &&
-                                    !validateName(text))
-                                ? 'Last Name can only contains alphabetic characters.'
-                                : '';
-                          },
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 15),
+                        child: const Text(
+                          'Welcome to DoLa Trip',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 20,
+                              color: Colors.green),
                         ),
-                      },
-                    ),
-                    FormTextField(
-                      text: 'Phone Number',
-                      errorMessage: wrongPhoneNumberMessage,
-                      controller: _phoneNumberController,
-                      onChanged: (phoneNumber) => {
-                        setState(() {
-                          wrongPhoneNumberMessage = (phoneNumber.isNotEmpty &&
-                                  !validatePhoneNumber(phoneNumber))
-                              ? 'Phone number must have at least 9 digits'
-                              : '';
-                        })
-                      },
-                    ),
-                    FormTextField(
-                      text: 'Username',
-                      errorMessage: wrongUsernameMessage,
-                      controller: _usernameController,
-                      onChanged: (username) {
-                        setState(
-                          () {
-                            wrongUsernameMessage = (username.isNotEmpty &&
-                                    !validateUserName(username))
-                                ? 'Username must have at least 8 character, contain at least 1 letter and 1 digit.'
-                                : '';
-                          },
-                        );
-                      },
-                    ),
-                    FormTextField(
-                      controller: _passwordController,
-                      text: 'Password',
-                      errorMessage: wrongPasswordMessage,
-                      suffixIcon: IconButton(
-                        icon: _passwordObscureText
-                            ? SvgPicture.asset(
-                                'assets/icons/ic_eye_off.svg',
-                                width: 20,
-                                height: 20,
-                              )
-                            : const Icon(Icons.remove_red_eye, size: 20),
-                        onPressed: () {
-                          setState(() {
-                            _passwordObscureText = !_passwordObscureText;
-                          });
+                      ),
+                      FormTextField(
+                        text: 'First Name',
+                        errorMessage: wrongFirstNameMessage,
+                        controller: _firstNameController,
+                        onChanged: (text) => {
+                          setState(
+                            () {
+                              wrongFirstNameMessage = (text.isNotEmpty &&
+                                      !validateName(text))
+                                  ? 'First Name can only contains alphabetic characters.'
+                                  : '';
+                            },
+                          ),
                         },
                       ),
-                      isObscureText: _passwordObscureText,
-                      onChanged: (password) {
-                        setState(
-                          () {
-                            wrongPasswordMessage = (password.isNotEmpty &&
-                                    !validatePassword(password))
-                                ? 'Password must have at least 5 characters - include at least 1 lower case letter, 1 uppder case letter, 1 digit and 1 special letter'
-                                : '';
-                          },
-                        );
-                      },
-                    ),
-                    FormTextField(
-                      controller: _confirmPasswordController,
-                      isObscureText: _confirmPasswordObscureText,
-                      text: 'Confirm Password',
-                      errorMessage: wrongConfirmPasswordMessage,
-                      suffixIcon: IconButton(
-                        icon: _confirmPasswordObscureText
-                            ? SvgPicture.asset(
-                                'assets/icons/ic_eye_off.svg',
-                                width: 20,
-                                height: 20,
-                              )
-                            : const Icon(Icons.remove_red_eye, size: 20),
-                        onPressed: () {
-                          setState(() {
-                            _confirmPasswordObscureText =
-                                !_confirmPasswordObscureText;
-                          });
+                      FormTextField(
+                        text: 'Last Name',
+                        errorMessage: wrongLastNameMessage,
+                        controller: _lastNameController,
+                        onChanged: (text) => {
+                          setState(
+                            () {
+                              wrongLastNameMessage = (text.isNotEmpty &&
+                                      !validateName(text))
+                                  ? 'Last Name can only contains alphabetic characters.'
+                                  : '';
+                            },
+                          ),
                         },
                       ),
-                      onChanged: (confirmPassword) {
-                        setState(
-                          () {
-                            wrongConfirmPasswordMessage = (confirmPassword !=
-                                    _passwordController.text)
-                                ? 'ConfirmePassword is not the same to password.'
+                      FormTextField(
+                        text: 'Phone Number',
+                        errorMessage: wrongPhoneNumberMessage,
+                        controller: _phoneNumberController,
+                        onChanged: (phoneNumber) => {
+                          setState(() {
+                            wrongPhoneNumberMessage = (phoneNumber.isNotEmpty &&
+                                    !validatePhoneNumber(phoneNumber))
+                                ? 'Phone number must have at least 9 digits'
                                 : '';
+                          })
+                        },
+                      ),
+                      FormTextField(
+                        text: 'Username',
+                        errorMessage: wrongUsernameMessage,
+                        controller: _usernameController,
+                        onChanged: (username) {
+                          setState(
+                            () {
+                              wrongUsernameMessage = (username.isNotEmpty &&
+                                      !validateUserName(username))
+                                  ? 'Username must have at least 8 character, contain at least 1 letter and 1 digit.'
+                                  : '';
+                            },
+                          );
+                        },
+                      ),
+                      FormTextField(
+                        controller: _passwordController,
+                        text: 'Password',
+                        errorMessage: wrongPasswordMessage,
+                        suffixIcon: IconButton(
+                          icon: _passwordObscureText
+                              ? SvgPicture.asset(
+                                  'assets/icons/ic_eye_off.svg',
+                                  width: 20,
+                                  height: 20,
+                                )
+                              : const Icon(Icons.remove_red_eye, size: 20),
+                          onPressed: () {
+                            setState(
+                              () {
+                                _passwordObscureText = !_passwordObscureText;
+                              },
+                            );
                           },
-                        );
-                      },
-                    ),
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: BigCustomButton(
-                          onPressed: (enableSignUp(widget.signupBloc))
-                              ? () {
-                                  widget.signupBloc.add(SignUp(
-                                      firstName: _firstNameController.text,
-                                      lastName: _lastNameController.text,
-                                      phoneNumber: _phoneNumberController.text,
-                                      username: _usernameController.text,
-                                      password: _passwordController.text));
-                                }
-                              : null,
-                          text: 'Sign Up',
-                          backgroundColor: enableSignUp(widget.signupBloc)
-                              ? Colours.primary
-                              : Colours.disable),
-                    ),
-                    InkWell(
+                        ),
+                        isObscureText: _passwordObscureText,
+                        onChanged: (password) {
+                          setState(
+                            () {
+                              wrongPasswordMessage = (password.isNotEmpty &&
+                                      !validatePassword(password))
+                                  ? 'Password must have at least 5 characters - include at least 1 lower case letter, 1 uppder case letter, 1 digit and 1 special letter'
+                                  : '';
+                            },
+                          );
+                        },
+                      ),
+                      FormTextField(
+                        controller: _confirmPasswordController,
+                        isObscureText: _confirmPasswordObscureText,
+                        text: 'Confirm Password',
+                        errorMessage: wrongConfirmPasswordMessage,
+                        suffixIcon: IconButton(
+                          icon: _confirmPasswordObscureText
+                              ? SvgPicture.asset(
+                                  'assets/icons/ic_eye_off.svg',
+                                  width: 20,
+                                  height: 20,
+                                )
+                              : const Icon(Icons.remove_red_eye, size: 20),
+                          onPressed: () {
+                            setState(() {
+                              _confirmPasswordObscureText =
+                                  !_confirmPasswordObscureText;
+                            });
+                          },
+                        ),
+                        onChanged: (confirmPassword) {
+                          setState(
+                            () {
+                              wrongConfirmPasswordMessage = (confirmPassword !=
+                                      _passwordController.text)
+                                  ? 'ConfirmePassword is not the same to password.'
+                                  : '';
+                            },
+                          );
+                        },
+                      ),
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: BigCustomButton(
+                            onPressed: (enableSignUp(widget.signupBloc))
+                                ? () {
+                                    widget.signupBloc.add(SignUp(
+                                        firstName: _firstNameController.text,
+                                        lastName: _lastNameController.text,
+                                        phoneNumber:
+                                            _phoneNumberController.text,
+                                        username: _usernameController.text,
+                                        password: _passwordController.text));
+                                  }
+                                : null,
+                            text: 'Sign Up',
+                            backgroundColor: enableSignUp(widget.signupBloc)
+                                ? CustomColors.primary
+                                : CustomColors.gray),
+                      ),
+                      InkWell(
                         onTap: () {
                           widget.signupBloc.add(const GoToSignIn());
                         },
@@ -236,11 +247,14 @@ class _SignupForm extends State<SignupForm> {
                               fontWeight: FontWeight.w900,
                               fontSize: 18,
                               color: Colors.green[700]),
-                        ))
-                  ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            )
+            ),
+            //  ),
           ],
         );
       },

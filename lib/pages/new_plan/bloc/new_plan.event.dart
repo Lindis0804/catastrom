@@ -9,7 +9,20 @@ class Inititalize extends NewPlanEvent {
 }
 
 class CreatePlanEvent extends NewPlanEvent {
-  final CreatePlanDto createPlanDto;
+  final ReqCreateTrip reqCreateTrip;
 
-  const CreatePlanEvent({required this.createPlanDto});
+  const CreatePlanEvent({required this.reqCreateTrip});
+}
+
+class SelectSectionEvent extends NewPlanEvent {
+  final SectionItem section;
+  final bool isSelected;
+
+  const SelectSectionEvent({required this.section, required this.isSelected});
+}
+
+class SelectSectionListEvent extends NewPlanEvent {
+  final List<SectionItem> selectedSections;
+
+  const SelectSectionListEvent({required this.selectedSections});
 }

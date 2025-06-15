@@ -1,1 +1,1 @@
-enum EPlans { init, toNewPlanScreen }
+enum EPlans { init, toNewPlanScreen, toEditPlanScreen }

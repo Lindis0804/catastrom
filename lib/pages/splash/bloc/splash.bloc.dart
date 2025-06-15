@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:template/common/enums/splash_status.enum.dart';
+import 'package:template/common/utils/share_preferences.dart';
 
 part 'splash.event.dart';
 part 'splash.state.dart';
@@ -44,13 +45,18 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         seconds: 2,
       ),
     );
-    // if (token == null)
-    //   add(
-    //     const SplashStatusChanged(
-    //       SplashStatus.unauthenticated,
-    //     ),
-    //   );
-    // else
+    String accessToken = await SharedPreferencesManager.getAccessToken();
+    if (accessToken.isNotEmpty) {
+      // User is authenticated
+      // You can also check if the token is valid by making an API call
+      // If the token is valid, emit authenticated state
+      emitter(
+        state.copyWith(
+          status: SplashStatus.authenticated,
+        ),
+      );
+      return;
+    }
     add(
       const SplashStatusChanged(
         SplashStatus.unauthenticated,
