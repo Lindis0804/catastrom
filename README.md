@@ -80,3 +80,6 @@ docker system prune -a --volumes
 ```bash
 open -a Simulator
 ```
+
+2.
+ - Mở Cài đặt > Cài đặt chung > Quản lý VPN & thiết bị > Ứng dụng của nhà phát triển 
