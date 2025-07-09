@@ -77,7 +77,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       String username = loginEvent.username;
       String password = loginEvent.password;
       bool rememberMe = loginEvent.rememberMe;
-      String userId = '103';
 
       LoginUser loginUserData = LoginUser(
           username: username, password: password, rememberMe: rememberMe);
@@ -87,9 +86,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       await SharedPreferencesManager.saveString(
           SPKeys.ACCESS_TOKEN, resLogin.accessToken);
-      await SharedPreferencesManager.saveString(SPKeys.USER_ID, userId);
+      await SharedPreferencesManager.saveString(
+          SPKeys.USER_PROFILE, resLogin.strUser);
+      SharedPreferencesManager.saveString(
+          SPKeys.REFRESH_TOKEN, resLogin.refreshToken);
 
-      add(const MoveToHome());
+      add(
+        const MoveToHome(),
+      );
     } catch (err) {
       print('Error in call api log in: $err');
       add(CallApiLoginFailEvent(message: 'Call api login fail: $err'));

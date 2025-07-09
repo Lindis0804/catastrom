@@ -22,7 +22,7 @@ class _HomeState extends State<Home> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    widget.homeBloc.add(Inititalize());
+    widget.homeBloc.add(const Inititalize());
   }
 
   @override
@@ -40,39 +40,13 @@ class _HomeState extends State<Home> {
               backgroundColor: Colors.transparent,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
-                leading: Builder(
-                  builder: (context) {
-                    return IconButton(
-                      onPressed: () {
-                        Scaffold.of(context).openDrawer();
-                      },
-                      icon: const Icon(
-                        Icons.menu,
-                        color: Colors.white,
-                      ),
-                    );
-                  },
-                ),
-                actions: [
-                  CustomImage.network(
-                      imageUrl: state.user?.avatar ?? EnvVariable.defaultAvatar,
-                      width: 30,
-                      height: 30,
-                      radius: 15),
-                  const SizedBox(
-                    width: 10,
-                  )
-                ],
-              ),
-              drawer: Drawer(
-                child: ListView(),
               ),
               body: Container(
                 child: Column(
                   children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
+                    // const SizedBox(
+                    //   height: 50,
+                    // ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Column(

@@ -4,11 +4,12 @@ class ManageState extends Equatable {
   final LoadingStatus loadManagePageStatus;
   final EPageManageStatus pageManageStatus;
   final int pageIdx;
-  const ManageState({
-    required this.loadManagePageStatus,
-    this.pageManageStatus = EPageManageStatus.init,
-    this.pageIdx = 0,
-  });
+  final User? user;
+  const ManageState(
+      {required this.loadManagePageStatus,
+      this.pageManageStatus = EPageManageStatus.init,
+      this.pageIdx = 0,
+      this.user});
 
   factory ManageState.initialize() {
     return const ManageState(
@@ -18,14 +19,17 @@ class ManageState extends Equatable {
   ManageState copyWith(
       {LoadingStatus? loadManagePageStatus,
       EPageManageStatus? pageManageStatus,
-      int? pageIdx}) {
+      int? pageIdx,
+      User? user}) {
     return ManageState(
       loadManagePageStatus: loadManagePageStatus ?? this.loadManagePageStatus,
       pageManageStatus: pageManageStatus ?? this.pageManageStatus,
       pageIdx: pageIdx ?? this.pageIdx,
+      user: user ?? this.user,
     );
   }
 
   @override
-  List<Object?> get props => [loadManagePageStatus, pageManageStatus, pageIdx];
+  List<Object?> get props =>
+      [loadManagePageStatus, pageManageStatus, pageIdx, user];
 }
