@@ -38,13 +38,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     List<Plan>? myPlans;
     try {
       String accessToken = await SharedPreferencesManager.getAccessToken();
-      UserApiProvider userApiProvider =
-          UserApiProvider(accessToken: accessToken);
       await Future.wait(
         [
           () async {
             try {
-              user = await userApiProvider.getUser(userId: 1);
+              emitter(
+                state.copyWith(getUserStatus: LoadingStatus.loading),
+              );
+              user = await SharedPreferencesManager.getUser();
               emitter(
                 state.copyWith(user: user, getUserStatus: LoadingStatus.loaded),
               );
@@ -79,13 +80,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             try {
               myPlans =
                   await PlanApiProvider(accessToken: accessToken).getMyPlans(
-                      reqParamsSearchTrip: ReqParamsSearchTrip(
-                pagable: ObjPagable(
-                  page: 0,
-                  size: 3,
-                  sort: [],
+                reqParamsSearchTrip: ReqParamsSearchTrip(
+                  pagable: ObjPagable(
+                    page: 0,
+                    size: 3,
+                    sort: [],
+                  ),
                 ),
-              ));
+              );
               emitter(
                 state.copyWith(
                     myPlans: myPlans, getMyPlansStatus: LoadingStatus.loaded),

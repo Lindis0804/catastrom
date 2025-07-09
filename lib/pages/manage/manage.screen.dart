@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/manage.enum.dart';
+import 'package:template/common/utils/env.dart';
 import 'package:template/common/widgets/custom_icon.dart';
+import 'package:template/common/widgets/custom_image.widget.dart';
 import 'package:template/pages/home/screen/home.screen.dart';
 import 'package:template/pages/manage/bloc/manage.bloc.dart';
 import 'package:template/pages/manage/constants.dart';
@@ -53,6 +55,37 @@ class _ManageState extends State<Manage> {
       bloc: widget.manageBloc,
       builder: (context, state) {
         return Scaffold(
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            leading: Builder(
+              builder: (context) {
+                return IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  icon: const Icon(
+                    Icons.menu,
+                    color: Colors.white,
+                  ),
+                );
+              },
+            ),
+            actions: [
+              CustomImage.network(
+                  imageUrl: state.user?.avatar ?? EnvVariable.defaultAvatar,
+                  width: 30,
+                  height: 30,
+                  radius: 15),
+              const SizedBox(
+                width: 10,
+              )
+            ],
+          ),
+          drawer: Drawer(
+            child: ListView(),
+          ),
           body: screens[state.pageIdx],
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,

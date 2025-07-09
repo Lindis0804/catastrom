@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/enums/manage.enum.dart';
+import 'package:template/data/models/user/user.model.dart';
 
 part 'manage.event.dart';
 part 'manage.state.dart';
