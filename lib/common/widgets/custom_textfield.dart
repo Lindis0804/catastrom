@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/widgets/number_input_formatter.dart';
-import 'package:template/common/widgets/number_text_controller.dart';
 
 // Enum định nghĩa các trạng thái của TextField
 enum TextFieldState {
@@ -299,7 +298,7 @@ class FormTextField extends StatelessWidget {
         children: [
           NormalTextfield(
             label: label,
-            placeholder: placeholder ?? '',
+            placeholder: placeholder ?? (label ?? ''),
             suffixIcon: suffixIcon,
             controller: controller,
             isError: _hasError,
