@@ -1,0 +1,4 @@
+enum ENewFeeds {
+  init,
+  toProfileScreen,
+}
