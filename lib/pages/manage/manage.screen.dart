@@ -1,20 +1,14 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/common/constants/colors.dart';
-import 'package:template/common/enums/manage.enum.dart';
-import 'package:template/common/utils/env.dart';
-import 'package:template/common/widgets/custom_icon.dart';
-import 'package:template/common/widgets/custom_image.widget.dart';
 import 'package:template/pages/home/screen/home.screen.dart';
 import 'package:template/pages/manage/bloc/manage.bloc.dart';
 import 'package:template/pages/manage/constants.dart';
-import 'package:template/pages/messenger/messenger.screen.dart';
+import 'package:template/pages/newfeeds/newfeeds.screen.dart';
+import 'package:template/pages/notifications/screen/notifications.screen.dart';
 import 'package:template/pages/plans/screens/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
-import 'package:template/pages/shop/shop.screen.dart';
-import 'package:template/root/app_routers.dart';
+import 'package:template/pages/settings/screen/settings.screen.dart';
 import 'package:template/generated/assets.gen.dart';
 
 class Manage extends StatefulWidget {
@@ -45,9 +39,10 @@ class _ManageState extends State<Manage> {
     final screens = [
       const HomeScreen(),
       const PlansScreen(),
-      const ShopScreen(),
-      const MessengerScreen(),
-      const ProfileScreen()
+      const NewfeedsScreen(),
+      const ProfileScreen(),
+      const NotificationsScreen(),
+      const SettingsScreen(),
     ];
     final items = <BottomNavigationBarItem>[];
 
@@ -55,53 +50,7 @@ class _ManageState extends State<Manage> {
       bloc: widget.manageBloc,
       builder: (context, state) {
         return Scaffold(
-          extendBodyBehindAppBar: true,
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            leading: Builder(
-              builder: (context) {
-                return IconButton(
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  icon: const Icon(
-                    Icons.menu,
-                    color: Colors.white,
-                  ),
-                );
-              },
-            ),
-            actions: [
-              CustomImage.network(
-                  imageUrl: state.user?.avatar ?? EnvVariable.defaultAvatar,
-                  width: 30,
-                  height: 30,
-                  radius: 15),
-              const SizedBox(
-                width: 10,
-              )
-            ],
-          ),
-          drawer: Drawer(
-            child: ListView(),
-          ),
           body: screens[state.pageIdx],
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: FloatingActionButton(
-            shape: CircleBorder(),
-            onPressed: () {
-              widget.manageBloc.add(
-                ChangePageIdxEvent(pageIdx: IManagePageIdx.CREATE_PLAN),
-              );
-            },
-            backgroundColor: CustomColors.primary,
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
           bottomNavigationBar: Theme(
             data: Theme.of(context)
                 .copyWith(iconTheme: const IconThemeData(color: Colors.black)),
@@ -114,22 +63,25 @@ class _ManageState extends State<Manage> {
                     label: 'Trang chủ',
                     isSelected: state.pageIdx == IManagePageIdx.HOME_PAGE),
                 getCustomNavigationItem(
-                    icon: Assets.svgIcons.favorite,
-                    label: 'Yêu thích',
-                    isSelected: state.pageIdx == IManagePageIdx.FAVORITE),
-                const BottomNavigationBarItem(
-                  icon: const SizedBox(
-                      height: 24, width: 24), // chỗ trống cho FAB
-                  label: '',
-                ),
-                getCustomNavigationItem(
                     icon: Assets.svgIcons.myPlan,
                     label: 'Kế hoạch',
                     isSelected: state.pageIdx == IManagePageIdx.MY_PLANS),
                 getCustomNavigationItem(
+                    icon: Assets.svgIcons.favorite,
+                    label: 'Yêu thích',
+                    isSelected: state.pageIdx == IManagePageIdx.FAVORITE),
+                getCustomNavigationItem(
                     icon: Assets.svgIcons.profile,
                     label: 'Cá nhân',
                     isSelected: state.pageIdx == IManagePageIdx.PROFILE),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.notify,
+                    label: 'Thông báo',
+                    isSelected: state.pageIdx == IManagePageIdx.NOTIFICATIONS),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.settings,
+                    label: 'Cài đặt',
+                    isSelected: state.pageIdx == IManagePageIdx.SETTINGS),
               ],
               backgroundColor: Colors.white,
               onTap: (index) {
@@ -147,28 +99,28 @@ class _ManageState extends State<Manage> {
 
 void _listener(BuildContext context, ManageState state) async {
   switch (state.pageIdx) {
-    case IManagePageIdx.CREATE_PLAN:
-      ResCreateTrip? resCreateTrip = await Navigator.of(context)
-          .pushNamed(AppRouters.newPlan) as ResCreateTrip?;
-      if (!context.mounted) {
-        return;
-      }
-      if (resCreateTrip != null) {
-        context.read<ManageBloc>().emit(
-              state.copyWith(
-                pageManageStatus: EPageManageStatus.init,
-                pageIdx: IManagePageIdx.MY_PLANS,
-              ),
-            );
-      }
+    // case IManagePageIdx.CREATE_PLAN:
+    //   ResCreateTrip? resCreateTrip = await Navigator.of(context)
+    //       .pushNamed(AppRouters.newPlan) as ResCreateTrip?;
+    //   if (!context.mounted) {
+    //     return;
+    //   }
+    //   if (resCreateTrip != null) {
+    //     context.read<ManageBloc>().emit(
+    //           state.copyWith(
+    //             pageManageStatus: EPageManageStatus.init,
+    //             pageIdx: IManagePageIdx.MY_PLANS,
+    //           ),
+    //         );
+    //   }
 
-      context.read<ManageBloc>().emit(
-            state.copyWith(
-              pageManageStatus: EPageManageStatus.init,
-              pageIdx: IManagePageIdx.HOME_PAGE,
-            ),
-          );
-      break;
+    //   context.read<ManageBloc>().emit(
+    //         state.copyWith(
+    //           pageManageStatus: EPageManageStatus.init,
+    //           pageIdx: IManagePageIdx.HOME_PAGE,
+    //         ),
+    //       );
+    //   break;
     default:
   }
 }
@@ -181,9 +133,6 @@ class ManageScreen extends StatelessWidget {
     return BlocProvider<ManageBloc>(
       create: (_) => ManageBloc(),
       child: BlocListener<ManageBloc, ManageState>(
-        // listenWhen: ((previous, current) =>
-        //     previous.loadManagePageStatus != current.loadManagePageStatus ||
-        //     previous.pageManageStatus != current.pageManageStatus),
         listener: _listener,
         child: Builder(
           builder: (BuildContext context) => Scaffold(

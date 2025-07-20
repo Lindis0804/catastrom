@@ -1,29 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:template/common/widgets/custom_text_with_left_icon.dart';
 import 'package:template/generated/assets.gen.dart';
-
-class TextWithLeftIcon extends StatelessWidget {
-  const TextWithLeftIcon(
-      {super.key, required this.image, required this.content});
-  final ImageProvider image;
-  final String content;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Image(
-          image: image,
-          width: 10,
-          height: 10,
-        ),
-        Text(
-          content,
-          style: const TextStyle(fontSize: 8),
-        )
-      ],
-    );
-  }
-}
 
 class PlanItem extends StatelessWidget {
   const PlanItem(
@@ -71,10 +48,10 @@ class PlanItem extends StatelessWidget {
                   description,
                   style: const TextStyle(fontSize: 8),
                 ),
-                TextWithLeftIcon(
+                CustomTextWithLeftIcon(
                     image: Assets.icons.location.provider(),
                     content: '$starting - $destination'),
-                TextWithLeftIcon(
+                CustomTextWithLeftIcon(
                     image: Assets.icons.hourglass.provider(),
                     content: '$startingTime - $endTime')
               ],

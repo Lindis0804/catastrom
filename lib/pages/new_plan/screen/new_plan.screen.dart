@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/api/plan/dto/getSection.dart';
@@ -8,9 +7,10 @@ import 'package:template/common/constants/colors.dart';
 import 'package:template/common/constants/page_title.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/utils/log.dart';
+import 'package:template/common/utils/string.utils.dart';
 import 'package:template/common/widgets/custom_button.dart';
-import 'package:template/common/widgets/custom_chip_list.dart';
 import 'package:template/common/widgets/custom_datetime_picker.dart';
+import 'package:template/common/widgets/custom_gap.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
 import 'package:template/common/widgets/custome_component_title.dart';
 import 'package:template/pages/new_plan/bloc/new_plan.bloc.dart';
@@ -144,6 +144,14 @@ class _NewPlanState extends State<NewPlan> {
                                   text: 'Min',
                                   controller: _minBudgetController,
                                   keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      String newFormattedValue =
+                                          StringUtils.formatNumber(value);
+                                      _minBudgetController.text =
+                                          newFormattedValue;
+                                    });
+                                  },
                                 ),
                               ),
                               const SizedBox(width: 7),
@@ -152,6 +160,14 @@ class _NewPlanState extends State<NewPlan> {
                                   text: 'Max',
                                   controller: _maxBudgetController,
                                   keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    setState(
+                                      () {
+                                        _maxBudgetController.text =
+                                            StringUtils.formatNumber(value);
+                                      },
+                                    );
+                                  },
                                 ),
                               ),
                             ],
@@ -218,44 +234,43 @@ class _NewPlanState extends State<NewPlan> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      BigCustomButton(
+                      CustomOutlinedButton(
                         text: 'Tạo lịch trình bằng AI',
-                        backgroundColor: Colors.white,
-                        borderColor: CustomColors.primary,
-                        textColor: CustomColors.primary,
                         onPressed: () {},
                       ),
-                      const SizedBox(width: 10),
-                      BigCustomButton(
-                        text: 'Lưu',
-                        onPressed: () {
-                          widget.newPlanBloc.add(
-                            CreatePlanEvent(
-                              reqCreateTrip: ReqCreateTrip(
-                                mainLocations: state.sections != null
-                                    ? state.sections!
-                                        .map((item) => item.sectionId)
-                                        .toList()
-                                    : [],
-                                tripName: _planNameController.text,
-                                tripIntent: _tripIntentController.text,
-                                tripIntentDescription:
-                                    _tripIntentDescController.text,
-                                numOfMembers:
-                                    int.tryParse(_numOfMember.text) ?? 1,
-                                startTime: _startTime,
-                                endTime: _endTime,
-                                minBudget: double.tryParse(
-                                        _minBudgetController.text) ??
-                                    0.0,
-                                maxBudget: double.tryParse(
-                                        _maxBudgetController.text) ??
-                                    0.0,
-                              ),
-                            ),
-                          );
-                        },
-                      )
+                      const CustomVerticalGap(),
+                      state.createPlanStatus == LoadingStatus.loading
+                          ? const CircularProgressIndicator()
+                          : BigCustomButton(
+                              text: 'Lưu',
+                              onPressed: () {
+                                widget.newPlanBloc.add(
+                                  CreatePlanEvent(
+                                    reqCreateTrip: ReqCreateTrip(
+                                      mainLocations: state.sections != null
+                                          ? state.sections!
+                                              .map((item) => item.sectionId)
+                                              .toList()
+                                          : [],
+                                      tripName: _planNameController.text,
+                                      tripIntent: _tripIntentController.text,
+                                      tripIntentDescription:
+                                          _tripIntentDescController.text,
+                                      numOfMembers:
+                                          int.tryParse(_numOfMember.text) ?? 1,
+                                      startTime: _startTime,
+                                      endTime: _endTime,
+                                      minBudget:
+                                          StringUtils.parseFormattedStrToDouble(
+                                              _minBudgetController.text),
+                                      maxBudget:
+                                          StringUtils.parseFormattedStrToDouble(
+                                              _maxBudgetController.text),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
                     ],
                   ),
                 ],

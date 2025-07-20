@@ -3,6 +3,7 @@ import 'package:template/pages/forgot_password/forgot_password.screen.dart';
 import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
 import 'package:template/pages/new_plan/screen/new_plan.screen.dart';
+import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
 
@@ -41,6 +42,15 @@ abstract class AppRouters {
 
       case newPlan:
         return MaterialPageRoute(builder: (_) => const NewPlanScreen());
+
+      case profile:
+        Map<String, dynamic> args = setting.arguments as Map<String, dynamic>;
+        int? userId = args['userId'];
+        return MaterialPageRoute(
+          builder: (_) => ProfileScreen(
+            userId: userId,
+          ),
+        );
 
       default:
         return null;

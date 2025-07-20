@@ -14,27 +14,44 @@ class BigCustomButton extends StatelessWidget {
       this.textColor = Colors.white});
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
-        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-          const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-        ),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-            side: BorderSide(
-              color: borderColor,
-              width: 1,
+    return SizedBox(
+      height: 42,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50),
+              side: BorderSide(
+                color: borderColor,
+                width: 1,
+              ),
             ),
           ),
         ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(color: textColor, fontSize: 15),
+        child: Text(
+          text,
+          style: TextStyle(color: textColor, fontSize: 15),
+        ),
       ),
     );
   }
+}
+
+class CustomOutlinedButton extends BigCustomButton {
+  const CustomOutlinedButton({
+    super.key,
+    required VoidCallback? onPressed,
+    required String text,
+    Color backgroundColor = Colors.white,
+    Color borderColor = CustomColors.primary,
+    Color textColor = CustomColors.primary,
+  }) : super(
+          onPressed: onPressed,
+          text: text,
+          backgroundColor: backgroundColor,
+          borderColor: borderColor,
+          textColor: textColor,
+        );
 }
