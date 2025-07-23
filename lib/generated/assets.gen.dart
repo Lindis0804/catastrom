@@ -136,11 +136,18 @@ class $AssetsSvgIconsGen {
   /// File path: assets/svg_icons/my_plan.svg
   SvgGenImage get myPlan => const SvgGenImage('assets/svg_icons/my_plan.svg');
 
+  /// File path: assets/svg_icons/notify.svg
+  SvgGenImage get notify => const SvgGenImage('assets/svg_icons/notify.svg');
+
   /// File path: assets/svg_icons/phone.svg
   SvgGenImage get phone => const SvgGenImage('assets/svg_icons/phone.svg');
 
   /// File path: assets/svg_icons/profile.svg
   SvgGenImage get profile => const SvgGenImage('assets/svg_icons/profile.svg');
+
+  /// File path: assets/svg_icons/settings.svg
+  SvgGenImage get settings =>
+      const SvgGenImage('assets/svg_icons/settings.svg');
 
   /// File path: assets/svg_icons/trip.svg
   SvgGenImage get trip => const SvgGenImage('assets/svg_icons/trip.svg');
@@ -153,8 +160,10 @@ class $AssetsSvgIconsGen {
     homePage,
     location,
     myPlan,
+    notify,
     phone,
     profile,
+    settings,
     trip,
   ];
 }

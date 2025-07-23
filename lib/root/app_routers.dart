@@ -4,11 +4,13 @@ import 'package:template/pages/forgot_password/forgot_password.screen.dart';
 import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
 import 'package:template/pages/new_plan/screen/new_plan.screen.dart';
+import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
-import 'package:template/pages/trip_detail/trip_detail.screen.dart';
-import 'package:template/pages/trip_detail/bloc/trip_detail.bloc.dart';
-import 'package:template/pages/create_time_line/create_timeline.screen.dart';
+
+import '../pages/create_time_line/create_timeline.screen.dart';
+import '../pages/trip_detail/bloc/trip_detail.bloc.dart';
+import '../pages/trip_detail/trip_detail.screen.dart';
 
 abstract class AppRouters {
   static const String splash = '/splash';
@@ -61,6 +63,15 @@ abstract class AppRouters {
         final String? tripCode = setting.arguments as String?;
         return MaterialPageRoute(
           builder: (_) => CreateTimelineScreen(tripCode: tripCode),
+        );
+
+      case profile:
+        Map<String, dynamic> args = setting.arguments as Map<String, dynamic>;
+        int? userId = args['userId'];
+        return MaterialPageRoute(
+          builder: (_) => ProfileScreen(
+            userId: userId,
+          ),
         );
 
       default:

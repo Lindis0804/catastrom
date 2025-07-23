@@ -38,8 +38,35 @@ class _HomeState extends State<Home> {
             ),
             Scaffold(
               backgroundColor: Colors.transparent,
+              //  extendBodyBehindAppBar: true,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
+                leading: Builder(
+                  builder: (context) {
+                    return IconButton(
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                      icon: const Icon(
+                        Icons.menu,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                ),
+                actions: [
+                  CustomImage.network(
+                      imageUrl: state.user?.avatar ?? EnvVariable.defaultAvatar,
+                      width: 30,
+                      height: 30,
+                      radius: 15),
+                  const SizedBox(
+                    width: 10,
+                  )
+                ],
+              ),
+              drawer: Drawer(
+                child: ListView(),
               ),
               body: Container(
                 child: Column(

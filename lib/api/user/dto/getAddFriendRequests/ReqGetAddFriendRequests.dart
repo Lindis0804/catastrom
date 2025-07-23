@@ -1,0 +1,3 @@
+class ReqGetAddFriendRequests {
+  const ReqGetAddFriendRequests();
+}

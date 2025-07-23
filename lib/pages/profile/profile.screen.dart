@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/user/dto/addFriend/ReqAddFriend.dart';
 import 'package:template/common/constants/colors.dart';
+import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/utils/env.dart';
-import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/common/utils/size.dart';
+import 'package:template/common/utils/user.utils.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_image.widget.dart';
 import 'package:template/generated/assets.gen.dart';
 import 'package:template/pages/profile/bloc/profile.bloc.dart';
 import 'package:template/pages/profile/custom_detail_item.dart';
-import 'package:template/root/app_routers.dart';
 
-class BLOCProfile extends StatefulWidget {
+class ProfileBlocBuilder extends StatefulWidget {
   final ProfileBloc profileBloc;
-  const BLOCProfile({super.key, required this.profileBloc});
+  final int? userId;
+  const ProfileBlocBuilder({super.key, required this.profileBloc, this.userId});
 
   @override
-  State<BLOCProfile> createState() => _ProfileScreenState();
+  State<ProfileBlocBuilder> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<BLOCProfile> {
+class _ProfileScreenState extends State<ProfileBlocBuilder> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    widget.profileBloc.add(Inititalize(userId: widget.userId));
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = getScreenHeight(context);
@@ -27,6 +36,11 @@ class _ProfileScreenState extends State<BLOCProfile> {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
         return Scaffold(
+          appBar: widget.userId != null
+              ? AppBar(
+                  title: const Text('Profile'),
+                )
+              : null,
           body: Container(
             child: Column(
               children: [
@@ -64,6 +78,38 @@ class _ProfileScreenState extends State<BLOCProfile> {
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
+                        !UserUtils.isMe(
+                                currentProfile: state.currentProfile,
+                                user: state.user)
+                            ? (state.requestAddFriendStatus ==
+                                    LoadingStatus.loading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : (state.resRequestAddFriend?.status ==
+                                        'PENDING_ACCEPT'
+                                    ? CustomOutlinedButton(
+                                        text: 'Đã gửi lời mời',
+                                        onPressed: () {},
+                                      )
+                                    : BigCustomButton(
+                                        text: 'Kết bạn',
+                                        onPressed: () {
+                                          String? username =
+                                              state.user!.username;
+                                          if (username == null) {
+                                            return;
+                                          }
+                                          widget.profileBloc.add(
+                                            RequestAddFriendEvent(
+                                              req: ReqRequestAddFriend(
+                                                username: username,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      )))
+                            : const SizedBox.shrink(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Column(
@@ -71,11 +117,13 @@ class _ProfileScreenState extends State<BLOCProfile> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Chi tiết',
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: CustomColors.primary))
+                                  Text(
+                                    'Chi tiết',
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: CustomColors.primary),
+                                  )
                                 ],
                               ),
                               CustomDetailItem(
@@ -110,7 +158,8 @@ class _ProfileScreenState extends State<BLOCProfile> {
 }
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final int? userId;
+  const ProfileScreen({super.key, this.userId});
   @override
   Widget build(BuildContext context) => BlocProvider<ProfileBloc>(
         create: (_) => ProfileBloc(),
@@ -118,8 +167,9 @@ class ProfileScreen extends StatelessWidget {
           // listenWhen: (pre, cur) => pre.homeStatus != cur.homeStatus,
           listener: _listener,
           child: Builder(
-            builder: (BuildContext context) => BLOCProfile(
+            builder: (BuildContext context) => ProfileBlocBuilder(
               profileBloc: context.read<ProfileBloc>(),
+              userId: userId,
             ),
           ),
         ),

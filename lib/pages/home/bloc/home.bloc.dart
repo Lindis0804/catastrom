@@ -4,7 +4,6 @@ import 'package:template/api/place/dto/recommended_place.dart';
 import 'package:template/api/place/provider.dart';
 import 'package:template/api/plan/dto/ReqParamsSearchTrip.dart';
 import 'package:template/api/plan/provider.dart';
-import 'package:template/api/user/provider.dart';
 import 'package:template/common/enums/home.enum.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/utils/share_preferences.dart';
