@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/pages/forgot_password/forgot_password.screen.dart';
 import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
@@ -6,6 +7,10 @@ import 'package:template/pages/new_plan/screen/new_plan.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
+
+import '../pages/create_time_line/create_timeline.screen.dart';
+import '../pages/trip_detail/bloc/trip_detail.bloc.dart';
+import '../pages/trip_detail/trip_detail.screen.dart';
 
 abstract class AppRouters {
   static const String splash = '/splash';
@@ -16,6 +21,8 @@ abstract class AppRouters {
   static const String profile = '/profile';
   static const String setting = '/setting';
   static const String newPlan = '/new-plan';
+  static const String tripDetail = '/trip-detail';
+  static const String createTimeline = '/create-timeline';
 
   static Route? onGenRoutes(RouteSettings setting) {
     switch (setting.name) {
@@ -42,6 +49,21 @@ abstract class AppRouters {
 
       case newPlan:
         return MaterialPageRoute(builder: (_) => const NewPlanScreen());
+
+      case tripDetail:
+        final tripDetailBloc = setting.arguments as TripDetailBloc?;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: tripDetailBloc ?? TripDetailBloc(),
+            child: const TripDetailScreen(),
+          ),
+        );
+
+      case createTimeline:
+        final String? tripCode = setting.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => CreateTimelineScreen(tripCode: tripCode),
+        );
 
       case profile:
         Map<String, dynamic> args = setting.arguments as Map<String, dynamic>;

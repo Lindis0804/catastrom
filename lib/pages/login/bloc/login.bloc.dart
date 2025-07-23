@@ -91,6 +91,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       SharedPreferencesManager.saveString(
           SPKeys.REFRESH_TOKEN, resLogin.refreshToken);
 
+      print('Login successful, access token: ${resLogin.accessToken}');
       add(
         const MoveToHome(),
       );

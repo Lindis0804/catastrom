@@ -36,8 +36,8 @@ class _NewfeedsState extends State<Newfeeds> {
         body: Column(
           children: [
             CustomSearchBar(
-              searchHint: 'Tìm kiếm bạn bè',
-              onChanged: (value) {
+              hintText: 'Tìm kiếm bạn bè',
+              onSearch: (value) {
                 widget.newfeedsBloc.add(
                   SearchUsersEvent(
                     ReqSearchUsers(username: value),

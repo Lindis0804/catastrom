@@ -62,22 +62,22 @@ class _NewPlanState extends State<NewPlan> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           FormTextField(
-                            text: 'Tên chuyến đi',
+                            label: 'Tên chuyến đi',
                             controller: _planNameController,
                           ),
                           const SizedBox(height: 5),
                           FormTextField(
-                            text: 'Mô tả chuyến đi',
+                            label: 'Mô tả chuyến đi',
                             controller: _tripIntentController,
                           ),
                           const SizedBox(height: 5),
                           FormTextField(
-                            text: 'Một số yêu cầu cho chuyến đi',
+                            label: 'Một số yêu cầu cho chuyến đi',
                             controller: _tripIntentDescController,
                           ),
                           const SizedBox(height: 5),
                           FormTextField(
-                            text: 'Bắt đầu',
+                            label: 'Bắt đầu',
                             controller: _startTimeController,
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.calendar_today),
@@ -105,7 +105,7 @@ class _NewPlanState extends State<NewPlan> {
                             height: 5,
                           ),
                           FormTextField(
-                            text: 'Kết thúc',
+                            label: 'Kết thúc',
                             controller: _endTimeController,
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.calendar_today),
@@ -131,7 +131,7 @@ class _NewPlanState extends State<NewPlan> {
                           ),
                           const SizedBox(height: 5),
                           FormTextField(
-                            text: 'Số thành viên',
+                            label: 'Số thành viên',
                             controller: _numOfMember,
                             keyboardType: TextInputType.number,
                           ),
@@ -141,7 +141,7 @@ class _NewPlanState extends State<NewPlan> {
                             children: [
                               Expanded(
                                 child: FormTextField(
-                                  text: 'Min',
+                                  label: 'Min',
                                   controller: _minBudgetController,
                                   keyboardType: TextInputType.number,
                                   onChanged: (value) {
@@ -157,7 +157,7 @@ class _NewPlanState extends State<NewPlan> {
                               const SizedBox(width: 7),
                               Expanded(
                                 child: FormTextField(
-                                  text: 'Max',
+                                  label: 'Max',
                                   controller: _maxBudgetController,
                                   keyboardType: TextInputType.number,
                                   onChanged: (value) {

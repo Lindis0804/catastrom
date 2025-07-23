@@ -14,6 +14,7 @@ class App extends StatelessWidget {
       ),
       onGenerateRoute: AppRouters.onGenRoutes,
       initialRoute: AppRouters.splash,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
