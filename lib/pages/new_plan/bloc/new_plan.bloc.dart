@@ -40,10 +40,13 @@ class NewPlanBloc extends Bloc<NewPlanEvent, NewPlanState> {
       ),
     );
     try {
+      emitter(
+        state.copyWith(createPlanStatus: LoadingStatus.loading),
+      );
       final ReqCreateTrip reqCreateTrip = event.reqCreateTrip;
       final String accessToken =
           await SharedPreferencesManager.getAccessToken();
-      final createdTrip =
+      final Plan createdTrip =
           await PlanApiProvider(accessToken: accessToken).createPlan(
         reqCreateTrip: reqCreateTrip,
       );

@@ -2,7 +2,7 @@ part of 'edit_plan.bloc.dart';
 
 class NewPlanState extends Equatable {
   final LoadingStatus createPlanStatus, getSectionsStatus;
-  final ResCreateTrip? createdPlan;
+  final Plan? createdPlan;
   final String? createPlanErrMsg;
   final List<SectionItem>? sections;
 
@@ -23,7 +23,7 @@ class NewPlanState extends Equatable {
       {LoadingStatus? createPlanStatus,
       LoadingStatus? getSectionsStatus,
       String? createPlanErrMsg,
-      ResCreateTrip? createdPlan,
+      Plan? createdPlan,
       List<SectionItem>? sections}) {
     return NewPlanState(
         createPlanStatus: createPlanStatus ?? this.createPlanStatus,
