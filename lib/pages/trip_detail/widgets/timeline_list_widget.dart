@@ -4,7 +4,6 @@ import 'package:template/api/plan/dto/Timeline.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/pages/trip_detail/widgets/time_line_cell.dart';
 import 'package:template/pages/trip_detail/widgets/timeline_skeleton_cell.dart';
-import 'package:template/data/mocks/timeline_mock.dart'; // TODO: REMOVE when API is working
 
 class TimelineListWidget extends StatelessWidget {
   final List<Timeline>? timelines;
@@ -12,6 +11,7 @@ class TimelineListWidget extends StatelessWidget {
   final String? timelineErrorMessage;
   final VoidCallback? onAddItem;
   final VoidCallback? onRetry;
+  final Function(Timeline)? onEditTimeline;
 
   const TimelineListWidget({
     Key? key,
@@ -20,6 +20,7 @@ class TimelineListWidget extends StatelessWidget {
     this.timelineErrorMessage,
     this.onAddItem,
     this.onRetry,
+    this.onEditTimeline,
   }) : super(key: key);
 
   @override
@@ -29,49 +30,6 @@ class TimelineListWidget extends StatelessWidget {
         return _buildSkeletonLoading();
 
       case LoadingStatus.error:
-        // TODO: REMOVE this when API is working - Using mock data for demo
-        if (TimelineMockData.ENABLE_MOCK) {
-          return Column(
-            children: [
-              // Mock data notification banner
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  border: Border.all(color: Colors.orange.shade200),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.orange.shade600,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'DEMO MODE: Đang hiển thị dữ liệu mẫu do API lỗi, vui lòng test UI với dữ liệu thật khi API hoạt động trở lại.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Mock timeline list
-              Expanded(
-                child: _buildTimelineList(context, TimelineMockData.getMockTimelines()),
-              ),
-            ],
-          );
-        }
-
         return CustomEmptyList(
           icon: Icons.error_outline,
           title: 'Lỗi tải lịch trình',
@@ -85,7 +43,8 @@ class TimelineListWidget extends StatelessWidget {
           return CustomEmptyList(
             icon: Icons.schedule_outlined,
             title: 'Chưa có lịch trình',
-            subtitle: 'Thêm địa điểm và hoạt động để tạo lịch trình cho chuyến đi của bạn',
+            subtitle:
+                'Thêm địa điểm và hoạt động để tạo lịch trình cho chuyến đi của bạn',
             buttonText: 'Thêm lịch trình',
             onButtonPressed: onAddItem,
           );
@@ -122,7 +81,7 @@ class TimelineListWidget extends StatelessWidget {
           },
           onEdit: () {
             print('Sửa timeline: ${timeline.id}');
-            // TODO: Navigate to edit timeline screen
+            onEditTimeline?.call(timeline);
           },
           onDelete: () {
             print('Xóa timeline: ${timeline.id}');
@@ -207,7 +166,8 @@ class TimelineListWidget extends StatelessWidget {
                 Navigator.of(context).pop(); // Đóng dialog
               },
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               child: Text(
                 'Hủy',
@@ -226,7 +186,8 @@ class TimelineListWidget extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5775),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -259,9 +220,12 @@ class TimelineListWidget extends StatelessWidget {
   // Convert Timeline DTO to TimelineItem for compatibility with TimelineCell
   TimelineItem _convertTimelineToTimelineItem(Timeline timeline) {
     return TimelineItem(
-      title: '${_getLocationDisplayName(timeline.locationCode)} - ${_getActivityDisplayName(timeline.activityCode)}',
-      time: '${_formatTime(timeline.startTime)} - ${_formatTime(timeline.endTime)}',
-      description: _getActivityDescription(timeline.activityCode, timeline.subTimeLine.length),
+      title:
+          '${_getLocationDisplayName(timeline.locationCode)} - ${_getActivityDisplayName(timeline.activityCode)}',
+      time:
+          '${_formatTime(timeline.startTime)} - ${_formatTime(timeline.endTime)}',
+      description: _getActivityDescription(
+          timeline.activityCode, timeline.subTimeLine.length),
       cost: _getEstimatedCost(timeline.activityCode),
       hasMapAction: true,
       hasDetailAction: timeline.subTimeLine.isNotEmpty,

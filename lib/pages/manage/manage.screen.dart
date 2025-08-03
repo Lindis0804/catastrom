@@ -166,6 +166,24 @@ class _ManageState extends State<Manage> {
                           ChangePageIdxEvent(pageIdx: IManagePageIdx.PROFILE),
                         ),
                       ),
+                      // _buildBottomNavItem(
+                      //   icon: Assets.svgIcons.profile,
+                      //   label: 'Thông báo',
+                      //   index: IManagePageIdx.NOTIFICATIONS,
+                      //   currentIndex: state.pageIdx,
+                      //   onTap: () => widget.manageBloc.add(
+                      //     ChangePageIdxEvent(pageIdx: IManagePageIdx.NOTIFICATIONS),
+                      //   ),
+                      // ),
+                      // _buildBottomNavItem(
+                      //   icon: Assets.svgIcons.profile,
+                      //   label: 'Cài đặt',
+                      //   index: IManagePageIdx.SETTINGS,
+                      //   currentIndex: state.pageIdx,
+                      //   onTap: () => widget.manageBloc.add(
+                      //     ChangePageIdxEvent(pageIdx: IManagePageIdx.SETTINGS),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

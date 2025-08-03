@@ -5,5 +5,5 @@ abstract class IManagePageIdx {
       MY_PLANS = 3,
       PROFILE = 4,
       SETTINGS = 5,
-      NOTIFICATIONS = 6;
+      NOTIFICATIONS = 4;
 }
