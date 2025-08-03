@@ -80,19 +80,40 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
       print(
           '[TRIP_DETAIL_BLOC] Timeline API call successful, timelines count: ${response.timelines.length}');
 
+      // Always emit loaded state, even if timelines list is empty
       emitter(
         state.copyWith(
-          timelines: response.timelines,
+          timelines: response.timelines, // This can be an empty list now
           timelineStatus: LoadingStatus.loaded,
           timelineErrorMessage: null,
         ),
       );
     } catch (err) {
       print('[TRIP_DETAIL_BLOC] Error getting timeline: $err');
+
+      // Handle specific error cases
+      String errorMessage;
+      if (err.toString().contains('type \'Null\' is not a subtype')) {
+        // This means the API returned null for timelines, so we should show empty state
+        print('[TRIP_DETAIL_BLOC] Timeline data is null, showing empty state');
+        emitter(
+          state.copyWith(
+            timelines: <Timeline>[], // Set empty list instead of error
+            timelineStatus: LoadingStatus.loaded,
+            timelineErrorMessage: null,
+          ),
+        );
+        return;
+      } else if (err.toString().contains('Access token not found')) {
+        errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
+      } else {
+        errorMessage = 'Lỗi khi tải lịch trình. Vui lòng thử lại.';
+      }
+
       emitter(
         state.copyWith(
           timelineStatus: LoadingStatus.error,
-          timelineErrorMessage: 'Lỗi khi tải lịch trình: $err',
+          timelineErrorMessage: errorMessage,
         ),
       );
     }

@@ -9,6 +9,7 @@ import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
 
 import '../pages/create_time_line/create_timeline.screen.dart';
+import '../pages/create_time_line/models/create_timeline_arguments.dart';
 import '../pages/trip_detail/bloc/trip_detail.bloc.dart';
 import '../pages/trip_detail/trip_detail.screen.dart';
 
@@ -60,10 +61,19 @@ abstract class AppRouters {
         );
 
       case createTimeline:
-        final String? tripCode = setting.arguments as String?;
-        return MaterialPageRoute(
-          builder: (_) => CreateTimelineScreen(tripCode: tripCode),
-        );
+        // Handle both old String arguments and new CreateTimelineArguments
+        if (setting.arguments is CreateTimelineArguments) {
+          final args = setting.arguments as CreateTimelineArguments;
+          return MaterialPageRoute(
+            builder: (_) => CreateTimelineScreen.fromArguments(args),
+          );
+        } else {
+          // Backward compatibility for String tripCode
+          final String? tripCode = setting.arguments as String?;
+          return MaterialPageRoute(
+            builder: (_) => CreateTimelineScreen(tripCode: tripCode),
+          );
+        }
 
       case profile:
         Map<String, dynamic> args = setting.arguments as Map<String, dynamic>;
