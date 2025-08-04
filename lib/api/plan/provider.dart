@@ -49,8 +49,7 @@ class PlanApiProvider {
     return plans;
   }
 
-  Future<ResCreateTrip> createPlan(
-      {required ReqCreateTrip reqCreateTrip}) async {
+  Future<Plan> createPlan({required ReqCreateTrip reqCreateTrip}) async {
     dynamic input = reqCreateTrip.toJson();
 
     Response res = await dio.post(
@@ -63,7 +62,7 @@ class PlanApiProvider {
       throw Exception('Create trip fail.');
     }
     dynamic data = res.data['data'];
-    ResCreateTrip createdTrip = ResCreateTrip.fromDynamic(data);
+    Plan createdTrip = Plan.fromDynamic(data);
 
     return createdTrip;
   }

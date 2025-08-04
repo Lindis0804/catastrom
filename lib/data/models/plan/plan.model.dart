@@ -86,16 +86,6 @@ class Plan {
     DateTime endTime = DateTime.parse(rawPlan['endDate']);
     double price = rawPlan['budget'] ?? 0.0;
 
-    // dynamic rawSubPlans = rawPlan['subPlan'];
-    // List<SubPlan>? subPlans = rawSubPlans != null && rawSubPlans.length > 0
-    //     ? List.generate(
-    //         rawSubPlans.length,
-    //         (idx) => SubPlan.fromDynamic(
-    //           rawSubPlans[idx],
-    //         ),
-    //       )
-    //     : null;
-
     return Plan(
       id: id,
       tripCode: tripCode,

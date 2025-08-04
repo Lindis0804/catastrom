@@ -46,7 +46,7 @@ class _TripScreenContentState extends State<_TripScreenContent> {
     print('Thêm chuyến đi mới');
     // Navigate to new plan creation screen
     final result = await Navigator.of(context).pushNamed(AppRouters.newPlan);
-    
+
     // If a plan was created successfully, you might want to refresh the trips list
     if (result != null) {
       print('Plan created successfully, refreshing trips...');
@@ -216,7 +216,9 @@ class _TripScreenContentState extends State<_TripScreenContent> {
         return TripCell(
           thumbnail: plan.imageUrl,
           tripName: plan.name ?? plan.tripIntent,
-          location: plan.mainLocations.isNotEmpty ? plan.mainLocations.join(', ') : 'Chưa có địa điểm',
+          location: plan.mainLocations.isNotEmpty
+              ? plan.mainLocations.join(', ')
+              : 'Chưa có địa điểm',
           time: _formatDateRange(plan.startTime, plan.endTime),
           isLoading: false,
           onTap: () {
@@ -227,7 +229,8 @@ class _TripScreenContentState extends State<_TripScreenContent> {
 
             // Get timeline for this trip code
             if (plan.tripCode != null && plan.tripCode!.isNotEmpty) {
-              tripDetailBloc.add(GetTimelineByTripCode(tripCode: plan.tripCode!));
+              tripDetailBloc
+                  .add(GetTimelineByTripCode(tripCode: plan.tripCode!));
             }
 
             Navigator.of(context).pushNamed(
@@ -253,9 +256,10 @@ class _TripScreenContentState extends State<_TripScreenContent> {
       case 0: // Đã đi
         return plans.where((plan) => plan.endTime.isBefore(now)).toList();
       case 1: // Đang đi
-        return plans.where((plan) =>
-          plan.startTime.isBefore(now) && plan.endTime.isAfter(now)
-        ).toList();
+        return plans
+            .where((plan) =>
+                plan.startTime.isBefore(now) && plan.endTime.isAfter(now))
+            .toList();
       case 2: // Sẽ đi
         return plans.where((plan) => plan.startTime.isAfter(now)).toList();
       default:
