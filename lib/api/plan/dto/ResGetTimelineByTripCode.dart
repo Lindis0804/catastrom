@@ -11,9 +11,11 @@ class ResGetTimelineByTripCode {
 
   factory ResGetTimelineByTripCode.fromJson(Map<String, dynamic> json) {
     return ResGetTimelineByTripCode(
-      timelines: (json['data'] as List<dynamic>)
-          .map((item) => Timeline.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      timelines: json['data'] != null
+          ? (json['data'] as List<dynamic>)
+              .map((item) => Timeline.fromJson(item as Map<String, dynamic>))
+              .toList()
+          : <Timeline>[], // Return empty list if data is null
       message: json['message'] as String?,
     );
   }

@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:template/api/plan/dto/DeleteTrip.dart';
 import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/api/plan/dto/getSection.dart';
-import 'package:template/common/constants/api.dart';
 import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/common/utils/env.dart';
 import 'package:template/data/models/plan/plan.model.dart';
@@ -11,6 +10,8 @@ import 'package:template/api/plan/dto/ReqGetTimelineByTripCode.dart';
 import 'package:template/api/plan/dto/ResGetTimelineByTripCode.dart';
 import 'package:template/api/plan/dto/ReqCreateTimeline.dart';
 import 'package:template/api/plan/dto/ResCreateTimeline.dart';
+import 'package:template/api/plan/dto/ReqUpdateTimeline.dart';
+import 'package:template/api/plan/dto/ResUpdateTimeline.dart';
 
 class PlanApiProvider {
   String accessToken;
@@ -113,7 +114,7 @@ class PlanApiProvider {
 
     dynamic resData = res.data;
 
-    if (resData["response_code"] != "0000") {
+    if (resData["responseCode"] != "0000") {
       throw Exception(
           'Get timeline by trip code fail: ${resData["params"]["message"]}');
     }
@@ -161,6 +162,44 @@ class PlanApiProvider {
     } catch (err) {
       print('[CREATE_TIMELINE] Error: $err');
       throw Exception('Create timeline fail: $err');
+    }
+  }
+
+  Future<ResUpdateTimeline> updateTimeline({
+    required ReqUpdateTimeline reqUpdateTimeline,
+  }) async {
+    try {
+      print('[UPDATE_TIMELINE] Starting update timeline...');
+      print('[UPDATE_TIMELINE] Request: $reqUpdateTimeline');
+
+      final response = await dio.put(
+        '${EnvVariable.clientCustomerHost}/api/v1/trip/timeline/update',
+        data: reqUpdateTimeline.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      print('[UPDATE_TIMELINE] Response status: ${response.statusCode}');
+      print('[UPDATE_TIMELINE] Response data: ${response.data}');
+
+      dynamic resData = response.data;
+
+      if (resData["response_code"] != "0000") {
+        throw Exception(
+            'Update timeline fail: ${resData["params"]["message"]}');
+      }
+
+      ResUpdateTimeline timeline = ResUpdateTimeline.fromJson(resData);
+      print('[UPDATE_TIMELINE] Timeline updated successfully: $timeline');
+
+      return timeline;
+    } catch (err) {
+      print('[UPDATE_TIMELINE] Error: $err');
+      throw Exception('Update timeline fail: $err');
     }
   }
 }
