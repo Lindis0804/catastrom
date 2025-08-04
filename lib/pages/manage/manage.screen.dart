@@ -10,6 +10,8 @@ import 'package:template/pages/plans/screens/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/settings/screen/settings.screen.dart';
 import 'package:template/generated/assets.gen.dart';
+import 'package:template/pages/shop/shop.screen.dart';
+import 'package:template/pages/trip/trip.screen.dart';
 
 class Manage extends StatefulWidget {
   const Manage({super.key, required this.manageBloc});
@@ -38,7 +40,7 @@ class _ManageState extends State<Manage> {
   Widget build(BuildContext context) {
     final screens = [
       const HomeScreen(),
-      const PlansScreen(),
+      const TripScreen(),
       const NewfeedsScreen(),
       const ProfileScreen(),
       const NotificationsScreen(),

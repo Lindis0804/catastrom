@@ -40,6 +40,7 @@ class _NewPlanState extends State<NewPlan> {
       builder: (context, state) {
         List<SectionItem>? sections = state.sections;
         return Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
             title: const Text(PageTitle.createPlan),
             // actions: [
@@ -51,215 +52,213 @@ class _NewPlanState extends State<NewPlan> {
             //   ),
             // ],
           ),
-          body: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FormTextField(
-                            text: 'Tên chuyến đi',
-                            controller: _planNameController,
-                          ),
-                          const SizedBox(height: 5),
-                          FormTextField(
-                            text: 'Mô tả chuyến đi',
-                            controller: _tripIntentController,
-                          ),
-                          const SizedBox(height: 5),
-                          FormTextField(
-                            text: 'Một số yêu cầu cho chuyến đi',
-                            controller: _tripIntentDescController,
-                          ),
-                          const SizedBox(height: 5),
-                          FormTextField(
-                            text: 'Bắt đầu',
-                            controller: _startTimeController,
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.calendar_today),
-                              onPressed: () {
-                                CustomDateTimePicker.showDateTimePicker(
-                                  context,
-                                  (date, list) {
-                                    _startTimeController.text =
-                                        DateFormat('dd/MM/yyyy HH:mm')
-                                            .format(date);
-                                    setState(
-                                      () {
-                                        _startTime = date;
+          body: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FormTextField(
+                          label: 'Tên chuyến đi',
+                          controller: _planNameController,
+                        ),
+                        const SizedBox(height: 5),
+                        FormTextField(
+                          label: 'Mô tả chuyến đi',
+                          controller: _tripIntentController,
+                        ),
+                        const SizedBox(height: 5),
+                        FormTextField(
+                          label: 'Một số yêu cầu cho chuyến đi',
+                          controller: _tripIntentDescController,
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FormTextField(
+                                label: 'Bắt đầu',
+                                controller: _startTimeController,
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.calendar_today),
+                                  onPressed: () {
+                                    CustomDateTimePicker.showDateTimePicker(
+                                      context,
+                                      (date, list) {
+                                        _startTimeController.text =
+                                            DateFormat('dd/MM/yyyy HH:mm')
+                                                .format(date);
+                                        setState(
+                                          () {
+                                            _startTime = date;
+                                          },
+                                        );
                                       },
                                     );
                                   },
-                                );
-                                // widget.newPlanBloc.add(
-                                //   const SelectStartTimeEvent(),
-                                // );
-                              },
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          FormTextField(
-                            text: 'Kết thúc',
-                            controller: _endTimeController,
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.calendar_today),
-                              onPressed: () {
-                                CustomDateTimePicker.showDateTimePicker(
-                                  context,
-                                  (date, list) {
-                                    _endTimeController.text =
-                                        DateFormat('dd/MM/yyyy HH:mm')
-                                            .format(date);
-                                    setState(
-                                      () {
-                                        _endTime = date;
+                            const SizedBox(width: 7),
+                            Expanded(
+                              child: FormTextField(
+                                label: 'Kết thúc',
+                                controller: _endTimeController,
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.calendar_today),
+                                  onPressed: () {
+                                    CustomDateTimePicker.showDateTimePicker(
+                                      context,
+                                      (date, list) {
+                                        _endTimeController.text =
+                                            DateFormat('dd/MM/yyyy HH:mm')
+                                                .format(date);
+                                        setState(
+                                          () {
+                                            _endTime = date;
+                                          },
+                                        );
                                       },
                                     );
                                   },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        FormTextField(
+                          label: 'Số thành viên',
+                          controller: _numOfMember,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const ComponentTitle(title: 'Ngân sách (VND)'),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FormTextField(
+                                label: 'Min',
+                                controller: _minBudgetController,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            const SizedBox(width: 7),
+                            Expanded(
+                              child: FormTextField(
+                                label: 'Max',
+                                controller: _maxBudgetController,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        const ComponentTitle(title: 'Địa điểm'),
+                        const SizedBox(height: 2),
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return PickSectionsScreen(
+                                  selectedSections: state.sections,
+                                  getSelectedSections: (sectionList) {
+                                    widget.newPlanBloc.add(
+                                      SelectSectionListEvent(
+                                          selectedSections: sectionList),
+                                    );
+                                  },
                                 );
-                                // widget.newPlanBloc.add(
-                                //   const SelectStartTimeEvent(),
-                                // );
                               },
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8),
                             ),
+                            child: sections == null || sections.isEmpty
+                                ? const Text(
+                                    "Chọn tỉnh...",
+                                    style: TextStyle(color: Colors.grey),
+                                  )
+                                : Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: sections.map(
+                                      (item) {
+                                        return Chip(
+                                          label: Text(item.sectionName),
+                                          deleteIcon: const Icon(Icons.cancel,
+                                              size: 18),
+                                          onDeleted: () {
+                                            widget.newPlanBloc.add(
+                                              SelectSectionEvent(
+                                                isSelected: false,
+                                                section: item,
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ).toList(),
+                                  ),
                           ),
-                          const SizedBox(height: 5),
-                          FormTextField(
-                            text: 'Số thành viên',
-                            controller: _numOfMember,
-                            keyboardType: TextInputType.number,
-                          ),
-                          const ComponentTitle(title: 'Ngân sách (VND)'),
-                          const SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: FormTextField(
-                                  text: 'Min',
-                                  controller: _minBudgetController,
-                                  keyboardType: TextInputType.number,
-                                ),
-                              ),
-                              const SizedBox(width: 7),
-                              Expanded(
-                                child: FormTextField(
-                                  text: 'Max',
-                                  controller: _maxBudgetController,
-                                  keyboardType: TextInputType.number,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 5),
-                          const ComponentTitle(title: 'Địa điểm'),
-                          const SizedBox(height: 2),
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return PickSectionsScreen(
-                                    selectedSections: state.sections,
-                                    getSelectedSections: (sectionList) {
-                                      widget.newPlanBloc.add(
-                                        SelectSectionListEvent(
-                                            selectedSections: sectionList),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: sections == null || sections.isEmpty
-                                  ? const Text(
-                                      "Chọn tỉnh...",
-                                      style: TextStyle(color: Colors.grey),
-                                    )
-                                  : Wrap(
-                                      spacing: 6,
-                                      runSpacing: 6,
-                                      children: sections.map(
-                                        (item) {
-                                          return Chip(
-                                            label: Text(item.sectionName),
-                                            deleteIcon: const Icon(Icons.cancel,
-                                                size: 18),
-                                            onDeleted: () {
-                                              widget.newPlanBloc.add(
-                                                SelectSectionEvent(
-                                                  isSelected: false,
-                                                  section: item,
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ).toList(),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      BigCustomButton(
-                        text: 'Tạo lịch trình bằng AI',
-                        backgroundColor: Colors.white,
-                        borderColor: CustomColors.primary,
-                        textColor: CustomColors.primary,
-                        onPressed: () {},
-                      ),
-                      const SizedBox(width: 10),
-                      BigCustomButton(
-                        text: 'Lưu',
-                        onPressed: () {
-                          widget.newPlanBloc.add(
-                            CreatePlanEvent(
-                              reqCreateTrip: ReqCreateTrip(
-                                mainLocations: state.sections != null
-                                    ? state.sections!
-                                        .map((item) => item.sectionId)
-                                        .toList()
-                                    : [],
-                                tripName: _planNameController.text,
-                                tripIntent: _tripIntentController.text,
-                                tripIntentDescription:
-                                    _tripIntentDescController.text,
-                                numOfMembers:
-                                    int.tryParse(_numOfMember.text) ?? 1,
-                                startTime: _startTime,
-                                endTime: _endTime,
-                                minBudget: double.tryParse(
-                                        _minBudgetController.text) ??
-                                    0.0,
-                                maxBudget: double.tryParse(
-                                        _maxBudgetController.text) ??
-                                    0.0,
-                              ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    BigCustomButton(
+                      text: 'Tạo lịch trình bằng AI',
+                      backgroundColor: Colors.white,
+                      borderColor: CustomColors.primary,
+                      textColor: CustomColors.primary,
+                      onPressed: () {},
+                    ),
+                    const SizedBox(width: 10),
+                    BigCustomButton(
+                      text: 'Lưu',
+                      onPressed: () {
+                        widget.newPlanBloc.add(
+                          CreatePlanEvent(
+                            reqCreateTrip: ReqCreateTrip(
+                              mainLocations: state.sections != null
+                                  ? state.sections!
+                                      .map((item) => item.sectionId)
+                                      .toList()
+                                  : [],
+                              tripName: _planNameController.text,
+                              tripIntent: _tripIntentController.text,
+                              tripIntentDescription:
+                                  _tripIntentDescController.text,
+                              numOfMembers:
+                                  int.tryParse(_numOfMember.text) ?? 1,
+                              startTime: _startTime,
+                              endTime: _endTime,
+                              minBudget: double.tryParse(
+                                      _minBudgetController.text) ??
+                                  0.0,
+                              maxBudget: double.tryParse(
+                                      _maxBudgetController.text) ??
+                                  0.0,
                             ),
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ],
             ),
           ),
         );

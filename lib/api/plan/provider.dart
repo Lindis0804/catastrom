@@ -7,6 +7,10 @@ import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/common/utils/env.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/api/plan/dto/ReqParamsSearchTrip.dart';
+import 'package:template/api/plan/dto/ReqGetTimelineByTripCode.dart';
+import 'package:template/api/plan/dto/ResGetTimelineByTripCode.dart';
+import 'package:template/api/plan/dto/ReqCreateTimeline.dart';
+import 'package:template/api/plan/dto/ResCreateTimeline.dart';
 
 class PlanApiProvider {
   String accessToken;
@@ -46,6 +50,7 @@ class PlanApiProvider {
 
   Future<Plan> createPlan({required ReqCreateTrip reqCreateTrip}) async {
     dynamic input = reqCreateTrip.toJson();
+
     Response res = await dio.post(
       '${EnvVariable.clientCustomerHost}/api/v1/trip/create',
       data: input,
@@ -86,5 +91,76 @@ class PlanApiProvider {
       SectionItem(sectionId: '6', sectionName: 'Đà Nẵng'),
     ]);
     return sections;
+  }
+
+  Future<ResGetTimelineByTripCode> getTimelineByTripCode({
+    required ReqGetTimelineByTripCode reqGetTimelineByTripCode,
+  }) async {
+    print('[GET_TIMELINE_BY_TRIP_CODE] Starting request...');
+    print(
+        '[GET_TIMELINE_BY_TRIP_CODE] Trip code: ${reqGetTimelineByTripCode.tripCode}');
+
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/api/v1/trip/timeline/get-timeline-by-trip-code',
+      queryParameters: {
+        'code': reqGetTimelineByTripCode.tripCode,
+      },
+    );
+
+    print('[GET_TIMELINE_BY_TRIP_CODE] Response received');
+    print('[GET_TIMELINE_BY_TRIP_CODE] Response status: ${res.statusCode}');
+    print('[GET_TIMELINE_BY_TRIP_CODE] Response data: ${res.data}');
+
+    dynamic resData = res.data;
+
+    if (resData["response_code"] != "0000") {
+      throw Exception(
+          'Get timeline by trip code fail: ${resData["params"]["message"]}');
+    }
+
+    ResGetTimelineByTripCode timeline =
+        ResGetTimelineByTripCode.fromJson(resData);
+    print(
+        '[GET_TIMELINE_BY_TRIP_CODE] Timeline parsed successfully: $timeline');
+
+    return timeline;
+  }
+
+  Future<ResCreateTimeline> createTimeline({
+    required ReqCreateTimeline reqCreateTimeline,
+  }) async {
+    print('[CREATE_TIMELINE] Starting request...');
+    print('[CREATE_TIMELINE] Trip code: ${reqCreateTimeline.tripCode}');
+    print('[CREATE_TIMELINE] Location: ${reqCreateTimeline.locationCode}');
+    print('[CREATE_TIMELINE] Activity: ${reqCreateTimeline.activityCode}');
+
+    try {
+      final requestData = reqCreateTimeline.toJson();
+      print('[CREATE_TIMELINE] Request data: $requestData');
+
+      Response res = await dio.post(
+        '${EnvVariable.clientCustomerHost}/api/v1/trip/timeline/create',
+        data: requestData,
+      );
+
+      print('[CREATE_TIMELINE] Response received');
+      print('[CREATE_TIMELINE] Response status: ${res.statusCode}');
+      print('[CREATE_TIMELINE] Response data: ${res.data}');
+
+      dynamic resData = res.data;
+
+      if (resData["response_code"] != "0000") {
+        throw Exception(
+            'Create timeline fail: ${resData["params"]["message"]}');
+      }
+
+      ResCreateTimeline timeline = ResCreateTimeline.fromJson(resData);
+      print('[CREATE_TIMELINE] Timeline created successfully: $timeline');
+
+      return timeline;
+    } catch (err) {
+      print('[CREATE_TIMELINE] Error: $err');
+      throw Exception('Create timeline fail: $err');
+    }
   }
 }

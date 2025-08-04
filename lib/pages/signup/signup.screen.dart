@@ -97,7 +97,7 @@ class _SignupForm extends State<SignupForm> {
                         ),
                       ),
                       FormTextField(
-                        text: 'First Name',
+                        label: 'First Name',
                         errorMessage: wrongFirstNameMessage,
                         controller: _firstNameController,
                         onChanged: (text) => {
@@ -112,7 +112,7 @@ class _SignupForm extends State<SignupForm> {
                         },
                       ),
                       FormTextField(
-                        text: 'Last Name',
+                        label: 'Last Name',
                         errorMessage: wrongLastNameMessage,
                         controller: _lastNameController,
                         onChanged: (text) => {
@@ -124,10 +124,10 @@ class _SignupForm extends State<SignupForm> {
                                   : '';
                             },
                           ),
-                        },
+                        }, placeholder: '',
                       ),
                       FormTextField(
-                        text: 'Phone Number',
+                        label: 'Phone Number',
                         errorMessage: wrongPhoneNumberMessage,
                         controller: _phoneNumberController,
                         onChanged: (phoneNumber) => {
@@ -140,7 +140,7 @@ class _SignupForm extends State<SignupForm> {
                         },
                       ),
                       FormTextField(
-                        text: 'Username',
+                        label: 'Username',
                         errorMessage: wrongUsernameMessage,
                         controller: _usernameController,
                         onChanged: (username) {
@@ -156,7 +156,7 @@ class _SignupForm extends State<SignupForm> {
                       ),
                       FormTextField(
                         controller: _passwordController,
-                        text: 'Password',
+                        label: 'Password',
                         errorMessage: wrongPasswordMessage,
                         suffixIcon: IconButton(
                           icon: _passwordObscureText
@@ -189,7 +189,7 @@ class _SignupForm extends State<SignupForm> {
                       FormTextField(
                         controller: _confirmPasswordController,
                         isObscureText: _confirmPasswordObscureText,
-                        text: 'Confirm Password',
+                        label: 'Confirm Password',
                         errorMessage: wrongConfirmPasswordMessage,
                         suffixIcon: IconButton(
                           icon: _confirmPasswordObscureText

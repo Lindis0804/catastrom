@@ -21,7 +21,7 @@ dependencies:
   shared_preferences: ^2.0.8
   dio: ^4.0.0
   flutter_spinkit: ^5.2.0
-  intl: 
+  intl: ^0.18.0
   flutter_cupertino_datetime_picker:
   flutter_slidable:
   drift: ^2.26.1

@@ -77,7 +77,7 @@ class _SignInFormState extends State<SignInForm> {
                       ),
                     ),
                     FormTextField(
-                      text: 'Username',
+                      label: 'Username',
                       errorMessage: wrongUsernameMessage,
                       controller: _usernameController,
                       onChanged: (username) {
@@ -93,7 +93,7 @@ class _SignInFormState extends State<SignInForm> {
                     ),
                     FormTextField(
                       controller: _passwordController,
-                      text: 'Password',
+                      label: 'Password',
                       errorMessage: wrongPasswordMessage,
                       isObscureText: _passwordObscureText,
                       onChanged: (password) {

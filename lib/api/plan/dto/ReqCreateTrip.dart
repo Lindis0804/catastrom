@@ -71,17 +71,39 @@ class ResCreateTrip extends ReqCreateTrip {
 
   factory ResCreateTrip.fromDynamic(Map<String, dynamic> json) {
     List<String> mainLocations = List<String>.from(json['mainLocations'] ?? []);
-    double minBudget = json['minBudget'] ?? 0.0,
-        maxBudget = json['budget'] ?? 0.0;
-    String tripCode = json['tripCode'] ?? '',
-        createdBy = json['createdBy'] ?? '',
-        tripName = json['tripCode'] ?? '',
-        tripIntent = json['tripIntent'] ?? '',
-        tripIntentDescription = json['intentDescription'] ?? '';
-    DateTime startTime = DateTime.parse(json['startDate']),
-        endTime = DateTime.parse(json['endDate']);
-    int numOfMembers = int.tryParse('${json['numOfParticipants']}') ?? 1;
-    print(mainLocations);
+    double minBudget = (json['minBudget'] as num?)?.toDouble() ?? 0.0;
+    double maxBudget = (json['budget'] as num?)?.toDouble() ?? 0.0;
+
+    String tripCode = json['tripCode']?.toString() ?? '';
+    String createdBy = json['createdBy']?.toString() ?? '';
+    String tripName = json['tripName']?.toString() ?? '';  // Fixed: was json['tripCode']
+    String tripIntent = json['tripIntent']?.toString() ?? '';
+    String tripIntentDescription = json['intentDescription']?.toString() ?? '';
+
+    // Safe date parsing with fallbacks
+    DateTime startTime;
+    DateTime endTime;
+
+    try {
+      startTime = json['startDate'] != null
+          ? DateTime.parse(json['startDate'].toString())
+          : DateTime.now();
+    } catch (e) {
+      startTime = DateTime.now();
+    }
+
+    try {
+      endTime = json['endDate'] != null
+          ? DateTime.parse(json['endDate'].toString())
+          : DateTime.now();
+    } catch (e) {
+      endTime = DateTime.now();
+    }
+
+    int numOfMembers = int.tryParse(json['numOfParticipants']?.toString() ?? '1') ?? 1;
+
+    print('ResCreateTrip.fromDynamic parsed: tripName=$tripName, tripCode=$tripCode');
+
     return ResCreateTrip(
         tripCode: tripCode,
         createdBy: createdBy,

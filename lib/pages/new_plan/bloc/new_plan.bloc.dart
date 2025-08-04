@@ -44,12 +44,29 @@ class NewPlanBloc extends Bloc<NewPlanEvent, NewPlanState> {
         state.copyWith(createPlanStatus: LoadingStatus.loading),
       );
       final ReqCreateTrip reqCreateTrip = event.reqCreateTrip;
+      print('BLoC: Getting access token...');
       final String accessToken =
           await SharedPreferencesManager.getAccessToken();
-      final Plan createdTrip =
+      print(
+          'BLoC: Access token retrieved: ${accessToken.isNotEmpty ? "✓" : "✗"}');
+      print("Access Token: $accessToken");
+
+      if (accessToken.isEmpty) {
+        print('BLoC: Access token is empty, cannot proceed with API call.');
+        emitter(
+          state.copyWith(
+            createPlanStatus: LoadingStatus.error,
+            createPlanErrMsg: 'Access token is empty.',
+          ),
+        );
+        return;
+      }
+      print('BLoC: Creating API provider and calling createPlan...');
+      final createdTrip =
           await PlanApiProvider(accessToken: accessToken).createPlan(
         reqCreateTrip: reqCreateTrip,
       );
+      print('BLoC: API call successful, emitting loaded state...');
       emitter(
         state.copyWith(
           createPlanStatus: LoadingStatus.loaded,
@@ -57,6 +74,9 @@ class NewPlanBloc extends Bloc<NewPlanEvent, NewPlanState> {
         ),
       );
     } catch (e) {
+      print('BLoC: Error caught in _onCreatePlan: $e');
+      print('BLoC: Error type: ${e.runtimeType}');
+      print('BLoC: Stack trace: ${StackTrace.current}');
       emitter(
         state.copyWith(
           createPlanStatus: LoadingStatus.error,
