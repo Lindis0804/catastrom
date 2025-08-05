@@ -164,8 +164,9 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
     final tripCode = widget.tripCode;
     if (tripCode == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không tìm thấy mã chuyến đi')),
+      ErrorDialogUtils.showErrorToast(
+        context: context,
+        message: 'Không tìm thấy mã chuyến đi',
       );
       return;
     }
@@ -236,11 +237,12 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
             BlocConsumer<CreateTimelineBloc, CreateTimelineState>(
               listener: (context, state) {
                 if (state.createTimelineStatus == LoadingStatus.loaded) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text(isEditMode
-                            ? 'Cập nhật lịch trình thành công!'
-                            : 'Tạo lịch trình thành công!')),
+                  // Show success toast notification
+                  ErrorDialogUtils.showSuccessToast(
+                    context: context,
+                    message: isEditMode
+                        ? 'Cập nhật lịch trình thành công!'
+                        : 'Tạo lịch trình thành công!',
                   );
                   Navigator.pop(context, true); // Return success result
                 } else if (state.createTimelineStatus == LoadingStatus.error) {

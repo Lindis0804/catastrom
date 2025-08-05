@@ -45,6 +45,16 @@ ErrorDialogUtils.showErrorToast(
 );
 ```
 
+### Success Toast
+
+```dart
+// Show success toast notification
+ErrorDialogUtils.showSuccessToast(
+  context: context,
+  message: 'Operation completed successfully!',
+);
+```
+
 ### Full Error Feedback (Toast + Dialog)
 
 ```dart

@@ -77,13 +77,11 @@ class _ManageState extends State<Manage> {
           ),
           body: screens[state.pageIdx],
           floatingActionButtonLocation:
-          FloatingActionButtonLocation.centerDocked,
+              FloatingActionButtonLocation.centerDocked,
           floatingActionButton: FloatingActionButton(
             shape: const CircleBorder(),
             onPressed: () {
-              widget.manageBloc.add(
-                ChangePageIdxEvent(pageIdx: IManagePageIdx.CREATE_PLAN),
-              );
+              Navigator.of(context).pushNamed(AppRouters.newPlan);
             },
             backgroundColor: CustomColors.primary,
             elevation: 8,
@@ -233,28 +231,28 @@ class _ManageState extends State<Manage> {
 
 void _listener(BuildContext context, ManageState state) async {
   switch (state.pageIdx) {
-  // case IManagePageIdx.CREATE_PLAN:
-  //   ResCreateTrip? resCreateTrip = await Navigator.of(context)
-  //       .pushNamed(AppRouters.newPlan) as ResCreateTrip?;
-  //   if (!context.mounted) {
-  //     return;
-  //   }
-  //   if (resCreateTrip != null) {
-  //     context.read<ManageBloc>().emit(
-  //           state.copyWith(
-  //             pageManageStatus: EPageManageStatus.init,
-  //             pageIdx: IManagePageIdx.MY_PLANS,
-  //           ),
-  //         );
-  //   }
+    // case IManagePageIdx.CREATE_PLAN:
+    //   ResCreateTrip? resCreateTrip = await Navigator.of(context)
+    //       .pushNamed(AppRouters.newPlan) as ResCreateTrip?;
+    //   if (!context.mounted) {
+    //     return;
+    //   }
+    //   if (resCreateTrip != null) {
+    //     context.read<ManageBloc>().emit(
+    //           state.copyWith(
+    //             pageManageStatus: EPageManageStatus.init,
+    //             pageIdx: IManagePageIdx.MY_PLANS,
+    //           ),
+    //         );
+    //   }
 
-  //   context.read<ManageBloc>().emit(
-  //         state.copyWith(
-  //           pageManageStatus: EPageManageStatus.init,
-  //           pageIdx: IManagePageIdx.HOME_PAGE,
-  //         ),
-  //       );
-  //   break;
+    //   context.read<ManageBloc>().emit(
+    //         state.copyWith(
+    //           pageManageStatus: EPageManageStatus.init,
+    //           pageIdx: IManagePageIdx.HOME_PAGE,
+    //         ),
+    //       );
+    //   break;
     default:
   }
 }
@@ -282,7 +280,7 @@ class ManageScreen extends StatelessWidget {
   }
 }
 
-class CustomCircularNotchedRectangle extends CircularNotchedRectangle{
+class CustomCircularNotchedRectangle extends CircularNotchedRectangle {
   @override
   Path getOuterPath(Rect host, Rect? guest) {
     if (guest == null || !host.overlaps(guest)) {

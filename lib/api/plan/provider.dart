@@ -74,7 +74,7 @@ class PlanApiProvider {
         '${EnvVariable.clientCustomerHost}/api/v1/trip/delete',
         queryParameters: {'tripCode': reqDeleteTrip.tripCode});
     EDeleteTripStatus status;
-    if (res.data["responseCode"] == "0000") {
+    if (res.data['responseCode'] == "0000") {
       status = EDeleteTripStatus.SUCCESS;
     } else {
       status = EDeleteTripStatus.FAIL;
@@ -85,11 +85,11 @@ class PlanApiProvider {
   Future<ResGetSections> getSections(
       {required ReqGetSections reqGetSections}) async {
     ResGetSections sections = const ResGetSections(sections: [
-      SectionItem(sectionId: "1", sectionName: "Hà Tĩnh"),
-      SectionItem(sectionId: "2", sectionName: "Nghệ An"),
-      SectionItem(sectionId: "3", sectionName: "Quảng Bình"),
-      SectionItem(sectionId: "4", sectionName: "Quảng Trị"),
-      SectionItem(sectionId: "5", sectionName: "Thừa Thiên Huế"),
+      SectionItem(sectionId: '1', sectionName: 'Hà Tĩnh'),
+      SectionItem(sectionId: '2', sectionName: 'Nghệ An'),
+      SectionItem(sectionId: '3', sectionName: 'Quảng Bình'),
+      SectionItem(sectionId: '4', sectionName: 'Quảng Trị'),
+      SectionItem(sectionId: '5', sectionName: 'Thừa Thiên Huế'),
       SectionItem(sectionId: '6', sectionName: 'Đà Nẵng'),
     ]);
     return sections;
@@ -115,7 +115,7 @@ class PlanApiProvider {
 
     dynamic resData = res.data;
 
-    if (resData["responseCode"] != "0000") {
+    if (resData['responseCode'] != "0000") {
       throw Exception(
           'Get timeline by trip code fail: ${resData["params"]["message"]}');
     }
@@ -151,7 +151,7 @@ class PlanApiProvider {
 
       dynamic resData = res.data;
 
-      if (resData["response_code"] != "0000") {
+      if (resData['responseCode'] != "0000") {
         throw Exception(
             'Create timeline fail: ${resData["params"]["message"]}');
       }
@@ -189,7 +189,7 @@ class PlanApiProvider {
 
       dynamic resData = response.data;
 
-      if (resData["response_code"] != "0000") {
+      if (resData['responseCode'] != "0000") {
         throw Exception(
             'Update timeline fail: ${resData["params"]["message"]}');
       }
