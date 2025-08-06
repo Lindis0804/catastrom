@@ -1,6 +1,0 @@
-#include "Generated.xcconfig"
-
-FLUTTER_TARGET=lib/root/main_dev.dart
-ASSET_PREFIX=dev
-BUNDLE_NAME=$Trip Dev
-BUNDLE_DISPLAY_NAME=$Trip Dev

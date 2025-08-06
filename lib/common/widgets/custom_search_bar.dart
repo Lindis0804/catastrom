@@ -8,16 +8,18 @@ class CustomSearchBar extends StatefulWidget {
   final Color? iconColor;
   final double? height;
   final double? borderRadius;
+  final Function(String)? onChanged;
 
-  const CustomSearchBar({
-    Key? key,
-    this.hintText = 'Tìm kiếm',
-    required this.onSearch,
-    this.backgroundColor,
-    this.iconColor,
-    this.height = 50,
-    this.borderRadius = 25,
-  }) : super(key: key);
+  const CustomSearchBar(
+      {Key? key,
+      this.hintText = 'Tìm kiếm',
+      required this.onSearch,
+      this.backgroundColor,
+      this.iconColor,
+      this.height = 50,
+      this.borderRadius = 25,
+      this.onChanged})
+      : super(key: key);
 
   @override
   State<CustomSearchBar> createState() => _CustomSearchBarState();
@@ -51,6 +53,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
         children: [
           Expanded(
             child: TextField(
+              onChanged: widget.onChanged,
               controller: _controller,
               textInputAction: TextInputAction.search,
               onSubmitted: (value) => _handleSearch(),
