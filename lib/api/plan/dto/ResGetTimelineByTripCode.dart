@@ -1,4 +1,4 @@
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 
 class ResGetTimelineByTripCode {
   final List<Timeline> timelines;
@@ -16,7 +16,7 @@ class ResGetTimelineByTripCode {
               .map((item) => Timeline.fromJson(item as Map<String, dynamic>))
               .toList()
           : <Timeline>[], // Return empty list if data is null
-      message: json['message'] as String?,
+      message: json['message'] != null ? json['message'] as String? : null,
     );
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/widgets/custom_date_picker.dart';
@@ -37,7 +37,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
   final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _budgetPerPersonController =
       TextEditingController();
-  final TextEditingController _totalBudgetController = TextEditingController();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -46,7 +45,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
   String _destinationError = '';
   String _budgetPerPersonError = '';
-  String _totalBudgetError = '';
   String _startDateError = '';
   String _endDateError = '';
 
@@ -81,7 +79,7 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
     }
   }
 
-  String _getLocationDisplayName(String locationCode) {
+  String _getLocationDisplayName(String? locationCode) {
     // Convert location codes to display names (reusing logic from timeline_list_widget)
     switch (locationCode) {
       case 'HN001':
@@ -114,7 +112,7 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
       case 'FANTASY_PARK':
         return 'Công viên Fantasy';
       default:
-        return locationCode;
+        return '';
     }
   }
 
@@ -122,7 +120,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
   void dispose() {
     _destinationController.dispose();
     _budgetPerPersonController.dispose();
-    _totalBudgetController.dispose();
     super.dispose();
   }
 
@@ -134,10 +131,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
       _budgetPerPersonError = _budgetPerPersonController.text.trim().isEmpty
           ? 'Vui lòng nhập ngân sách/người'
-          : '';
-
-      _totalBudgetError = _totalBudgetController.text.trim().isEmpty
-          ? 'Vui lòng nhập tổng ngân sách'
           : '';
 
       _startDateError = _startDate == null ? 'Vui lòng chọn ngày bắt đầu' : '';
@@ -154,7 +147,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
     return _destinationError.isEmpty &&
         _budgetPerPersonError.isEmpty &&
-        _totalBudgetError.isEmpty &&
         _startDateError.isEmpty &&
         _endDateError.isEmpty;
   }
@@ -311,19 +303,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
                 onChanged: (value) {
                   if (_budgetPerPersonError.isNotEmpty) {
                     setState(() => _budgetPerPersonError = '');
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              FormTextField(
-                label: 'Tổng ngân sách (VND)',
-                controller: _totalBudgetController,
-                keyboardType: TextInputType.number,
-                errorMessage:
-                    _totalBudgetError.isEmpty ? '' : _totalBudgetError,
-                onChanged: (value) {
-                  if (_totalBudgetError.isNotEmpty) {
-                    setState(() => _totalBudgetError = '');
                   }
                 },
               ),

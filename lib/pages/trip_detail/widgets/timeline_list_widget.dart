@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/widgets/custom_empty_list.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
@@ -210,7 +210,7 @@ Chi tiết kỹ thuật:
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_getLocationDisplayName(timeline.locationCode)} - ${_getActivityDisplayName(timeline.activityCode)}',
+                      '${_getLocationDisplayName(timeline.locationCode ?? "")} - ${_getActivityDisplayName(timeline.activityCode ?? "")}',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -300,12 +300,12 @@ Chi tiết kỹ thuật:
   TimelineItem _convertTimelineToTimelineItem(Timeline timeline) {
     return TimelineItem(
       title:
-          '${_getLocationDisplayName(timeline.locationCode)} - ${_getActivityDisplayName(timeline.activityCode)}',
+          '${_getLocationDisplayName(timeline.locationCode ?? "")} - ${_getActivityDisplayName(timeline.activityCode ?? "")}',
       time:
           '${_formatTime(timeline.startTime)} - ${_formatTime(timeline.endTime)}',
       description: _getActivityDescription(
-          timeline.activityCode, timeline.subTimeLine.length),
-      cost: _getEstimatedCost(timeline.activityCode),
+          timeline.activityCode ?? '', timeline.subTimeLine.length),
+      cost: _getEstimatedCost(timeline.activityCode ?? ''),
       hasMapAction: true,
       hasDetailAction: timeline.subTimeLine.isNotEmpty,
     );

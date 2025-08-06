@@ -8,7 +8,7 @@ import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/api/plan/dto/ReqParamsSearchTrip.dart';
 import 'package:template/api/plan/dto/ReqGetTimelineByTripCode.dart';
 import 'package:template/api/plan/dto/ResGetTimelineByTripCode.dart';
-import 'package:template/api/plan/dto/ReqCreateTimeline.dart';
+import 'package:template/api/plan/dto/req_create_timeline.dart';
 import 'package:template/api/plan/dto/ResCreateTimeline.dart';
 import 'package:template/api/plan/dto/ReqUpdateTimeline.dart';
 import 'package:template/api/plan/dto/ResUpdateTimeline.dart';
@@ -49,8 +49,7 @@ class PlanApiProvider {
     return plans;
   }
 
-  Future<ResCreateTrip> createPlan(
-      {required ReqCreateTrip reqCreateTrip}) async {
+  Future<Plan> createPlan({required ReqCreateTrip reqCreateTrip}) async {
     dynamic input = reqCreateTrip.toJson();
 
     Response res = await dio.post(
@@ -63,7 +62,7 @@ class PlanApiProvider {
       throw Exception('Create trip fail.');
     }
     dynamic data = res.data['data'];
-    ResCreateTrip createdTrip = ResCreateTrip.fromDynamic(data);
+    Plan createdTrip = Plan.fromDynamic(data);
 
     return createdTrip;
   }
@@ -133,8 +132,6 @@ class PlanApiProvider {
   }) async {
     print('[CREATE_TIMELINE] Starting request...');
     print('[CREATE_TIMELINE] Trip code: ${reqCreateTimeline.tripCode}');
-    print('[CREATE_TIMELINE] Location: ${reqCreateTimeline.locationCode}');
-    print('[CREATE_TIMELINE] Activity: ${reqCreateTimeline.activityCode}');
 
     try {
       final requestData = reqCreateTimeline.toJson();
@@ -173,21 +170,19 @@ class PlanApiProvider {
       print('[UPDATE_TIMELINE] Starting update timeline...');
       print('[UPDATE_TIMELINE] Request: $reqUpdateTimeline');
 
-      final response = await dio.put(
+      // final response = await dio.put(
+      //   '${EnvVariable.clientCustomerHost}/api/v1/trip/timeline/update',
+      //   data: reqUpdateTimeline.toJson(),
+      // );
+      Response res = await dio.put(
         '${EnvVariable.clientCustomerHost}/api/v1/trip/timeline/update',
         data: reqUpdateTimeline.toJson(),
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $accessToken',
-          },
-        ),
       );
 
-      print('[UPDATE_TIMELINE] Response status: ${response.statusCode}');
-      print('[UPDATE_TIMELINE] Response data: ${response.data}');
+      print('[UPDATE_TIMELINE] Response status: ${res.statusCode}');
+      print('[UPDATE_TIMELINE] Response data: ${res.data}');
 
-      dynamic resData = response.data;
+      dynamic resData = res.data;
 
       if (resData['responseCode'] != "0000") {
         throw Exception(

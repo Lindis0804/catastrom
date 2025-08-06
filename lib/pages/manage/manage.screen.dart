@@ -1,9 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/common/constants/colors.dart';
-import 'package:template/common/enums/manage.enum.dart';
 import 'package:template/pages/home/screen/home.screen.dart';
 import 'package:template/pages/manage/bloc/manage.bloc.dart';
 import 'package:template/pages/manage/constants.dart';
@@ -11,11 +8,11 @@ import 'package:template/pages/newfeeds/newfeeds.screen.dart';
 import 'package:template/pages/notifications/screen/notifications.screen.dart';
 import 'package:template/pages/plans/screens/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
-import 'package:template/pages/shop/shop.screen.dart';
-import 'package:template/pages/trip/trip.screen.dart';
-import 'package:template/root/app_routers.dart';
 import 'package:template/pages/settings/screen/settings.screen.dart';
 import 'package:template/generated/assets.gen.dart';
+import 'package:template/pages/shop/shop.screen.dart';
+import 'package:template/pages/trip/trip.screen.dart';
+import 'dart:math' as math;
 
 class Manage extends StatefulWidget {
   const Manage({super.key, required this.manageBloc});
@@ -25,206 +22,80 @@ class Manage extends StatefulWidget {
   State<Manage> createState() => _ManageState();
 }
 
+BottomNavigationBarItem getCustomNavigationItem(
+    {required SvgGenImage icon,
+    required String label,
+    bool isSelected = false}) {
+  return BottomNavigationBarItem(
+    icon: icon.svg(
+      height: 24,
+      width: 24,
+      color: isSelected ? CustomColors.primary : CustomColors.gray,
+    ),
+    label: label,
+  );
+}
+
 class _ManageState extends State<Manage> {
   @override
   Widget build(BuildContext context) {
     final screens = [
       const HomeScreen(),
-      const PlansScreen(),
-      const ShopScreen(),
       const TripScreen(),
-      const ProfileScreen(),
       const NewfeedsScreen(),
       const ProfileScreen(),
       const NotificationsScreen(),
       const SettingsScreen(),
     ];
+    final items = <BottomNavigationBarItem>[];
 
     return BlocBuilder<ManageBloc, ManageState>(
       bloc: widget.manageBloc,
       builder: (context, state) {
         return Scaffold(
-          extendBodyBehindAppBar: true,
-          backgroundColor: Colors.transparent,
-          // appBar: AppBar(
-          //   backgroundColor: Colors.transparent,
-          //   leading: Builder(
-          //     builder: (context) {
-          //       return IconButton(
-          //         onPressed: () {
-          //           Scaffold.of(context).openDrawer();
-          //         },
-          //         icon: const Icon(
-          //           Icons.menu,
-          //           color: Colors.white,
-          //         ),
-          //       );
-          //     },
-          //   ),
-          //   actions: [
-          //     CustomImage.network(
-          //         imageUrl: state.user?.avatar ?? EnvVariable.defaultAvatar,
-          //         width: 30,
-          //         height: 30,
-          //         radius: 15),
-          //     const SizedBox(
-          //       width: 10,
-          //     )
-          //   ],
-          // ),
-          drawer: Drawer(
-            child: ListView(),
-          ),
           body: screens[state.pageIdx],
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: FloatingActionButton(
-            shape: const CircleBorder(),
-            onPressed: () {
-              Navigator.of(context).pushNamed(AppRouters.newPlan);
-            },
-            backgroundColor: CustomColors.primary,
-            elevation: 8,
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 40,
-            ),
-          ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.lightBlueAccent.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                  spreadRadius: 0,
-                ),
-                BoxShadow(
-                  color: Colors.lightBlueAccent.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                  spreadRadius: 0,
-                ),
+          bottomNavigationBar: Theme(
+            data: Theme.of(context)
+                .copyWith(iconTheme: const IconThemeData(color: Colors.black)),
+            child: BottomNavigationBar(
+              currentIndex: state.pageIdx,
+              selectedItemColor: CustomColors.primary,
+              items: <BottomNavigationBarItem>[
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.homePage,
+                    label: 'Trang chủ',
+                    isSelected: state.pageIdx == IManagePageIdx.HOME_PAGE),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.myPlan,
+                    label: 'Kế hoạch',
+                    isSelected: state.pageIdx == IManagePageIdx.MY_PLANS),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.favorite,
+                    label: 'Yêu thích',
+                    isSelected: state.pageIdx == IManagePageIdx.FAVORITE),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.profile,
+                    label: 'Cá nhân',
+                    isSelected: state.pageIdx == IManagePageIdx.PROFILE),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.notify,
+                    label: 'Thông báo',
+                    isSelected: state.pageIdx == IManagePageIdx.NOTIFICATIONS),
+                getCustomNavigationItem(
+                    icon: Assets.svgIcons.settings,
+                    label: 'Cài đặt',
+                    isSelected: state.pageIdx == IManagePageIdx.SETTINGS),
               ],
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              ),
-              child: BottomAppBar(
-                color: Colors.white,
-                shape: CustomCircularNotchedRectangle(),
-                notchMargin: 12,
-                elevation: 0,
-                child: SizedBox(
-                  height: 40,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildBottomNavItem(
-                        icon: Assets.svgIcons.homePage,
-                        label: 'Trang chủ',
-                        index: IManagePageIdx.HOME_PAGE,
-                        currentIndex: state.pageIdx,
-                        onTap: () => widget.manageBloc.add(
-                          ChangePageIdxEvent(pageIdx: IManagePageIdx.HOME_PAGE),
-                        ),
-                      ),
-                      _buildBottomNavItem(
-                        icon: Assets.svgIcons.favorite,
-                        label: 'Yêu thích',
-                        index: IManagePageIdx.FAVORITE,
-                        currentIndex: state.pageIdx,
-                        onTap: () => widget.manageBloc.add(
-                          ChangePageIdxEvent(pageIdx: IManagePageIdx.FAVORITE),
-                        ),
-                      ),
-                      const SizedBox(width: 40), // Khoảng trống cho FAB
-                      _buildBottomNavItem(
-                        icon: Assets.svgIcons.myPlan,
-                        label: 'Kế hoạch',
-                        index: IManagePageIdx.MY_PLANS,
-                        currentIndex: state.pageIdx,
-                        onTap: () => widget.manageBloc.add(
-                          ChangePageIdxEvent(pageIdx: IManagePageIdx.MY_PLANS),
-                        ),
-                      ),
-                      _buildBottomNavItem(
-                        icon: Assets.svgIcons.profile,
-                        label: 'Cá nhân',
-                        index: IManagePageIdx.PROFILE,
-                        currentIndex: state.pageIdx,
-                        onTap: () => widget.manageBloc.add(
-                          ChangePageIdxEvent(pageIdx: IManagePageIdx.PROFILE),
-                        ),
-                      ),
-                      // _buildBottomNavItem(
-                      //   icon: Assets.svgIcons.profile,
-                      //   label: 'Thông báo',
-                      //   index: IManagePageIdx.NOTIFICATIONS,
-                      //   currentIndex: state.pageIdx,
-                      //   onTap: () => widget.manageBloc.add(
-                      //     ChangePageIdxEvent(pageIdx: IManagePageIdx.NOTIFICATIONS),
-                      //   ),
-                      // ),
-                      // _buildBottomNavItem(
-                      //   icon: Assets.svgIcons.profile,
-                      //   label: 'Cài đặt',
-                      //   index: IManagePageIdx.SETTINGS,
-                      //   currentIndex: state.pageIdx,
-                      //   onTap: () => widget.manageBloc.add(
-                      //     ChangePageIdxEvent(pageIdx: IManagePageIdx.SETTINGS),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                ),
-              ),
+              backgroundColor: Colors.white,
+              onTap: (index) {
+                widget.manageBloc.add(
+                  ChangePageIdxEvent(pageIdx: index),
+                );
+              },
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildBottomNavItem({
-    required SvgGenImage icon,
-    required String label,
-    required int index,
-    required int currentIndex,
-    required VoidCallback onTap,
-  }) {
-    final isSelected = index == currentIndex;
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          icon.svg(
-            height: 24,
-            width: 24,
-            colorFilter: ColorFilter.mode(
-              isSelected ? CustomColors.primary : CustomColors.gray,
-              BlendMode.srcIn,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: isSelected ? CustomColors.primary : Colors.transparent,
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -265,9 +136,6 @@ class ManageScreen extends StatelessWidget {
     return BlocProvider<ManageBloc>(
       create: (_) => ManageBloc(),
       child: BlocListener<ManageBloc, ManageState>(
-        // listenWhen: ((previous, current) =>
-        //     previous.loadManagePageStatus != current.loadManagePageStatus ||
-        //     previous.pageManageStatus != current.pageManageStatus),
         listener: _listener,
         child: Builder(
           builder: (BuildContext context) => Scaffold(

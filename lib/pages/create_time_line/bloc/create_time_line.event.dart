@@ -21,16 +21,16 @@ class CreateTimelineSubmitEvent extends CreateTimelineEvent {
 class UpdateTimelineSubmitEvent extends CreateTimelineEvent {
   final int timelineId;
   final String tripCode;
-  final String locationCode;
-  final String activityCode;
+  final String? locationCode;
+  final String? activityCode;
   final DateTime startTime;
   final DateTime endTime;
 
   const UpdateTimelineSubmitEvent({
     required this.timelineId,
     required this.tripCode,
-    required this.locationCode,
-    required this.activityCode,
+    this.locationCode,
+    this.activityCode,
     required this.startTime,
     required this.endTime,
   });

@@ -5,7 +5,7 @@ import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/api/plan/provider.dart';
 import 'package:template/api/plan/dto/ReqGetTimelineByTripCode.dart';
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 
 part 'trip_detail.event.dart';
 part 'trip_detail.state.dart';
