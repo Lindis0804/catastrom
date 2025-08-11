@@ -46,7 +46,7 @@ class PlanApiProvider {
     List<Plan> plans = rawPlansData
         .map((dynamic planData) => Plan.fromDynamic(planData))
         .toList();
-    print('🏖 [GET_MY_PLANS] plans: $plans');
+    print('[GET_MY_PLANS] plans: $plans');
     return plans;
   }
 

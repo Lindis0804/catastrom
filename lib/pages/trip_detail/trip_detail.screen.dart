@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/place/provider.dart';
 import 'package:template/api/plan/dto/timeline.dart';
+import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/common/widgets/custom_tab_bar.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/data/models/plan/plan.model.dart';
@@ -48,7 +50,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
       // Refresh timeline list after successful deletion
       final tripCode =
           context.read<TripDetailBloc>().state.selectedPlan?.tripCode;
-      if (tripCode != null && context.mounted) {
+      if (tripCode != null && mounted) {
         context.read<TripDetailBloc>().add(
               GetTimelineByTripCode(tripCode: tripCode),
             );
@@ -111,6 +113,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             onAddPressed: () async {
               print('Navigate to create timeline');
               final tripCode = state.selectedPlan?.tripCode;
+              final bloc = context.read<TripDetailBloc>();
               final result = await Navigator.of(context).pushNamed(
                 AppRouters.createTimeline,
                 arguments: tripCode,
@@ -119,9 +122,9 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               // If timeline was created successfully, refresh the timeline list
               if (result == true && tripCode != null && mounted) {
                 print('Timeline created successfully, refreshing list');
-                context.read<TripDetailBloc>().add(
-                      GetTimelineByTripCode(tripCode: tripCode),
-                    );
+                bloc.add(
+                  GetTimelineByTripCode(tripCode: tripCode),
+                );
               }
             },
           );
@@ -146,6 +149,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               onAddItem: () async {
                 print('Thêm lịch trình mới từ empty state');
                 final tripCode = plan.tripCode;
+                final bloc = context.read<TripDetailBloc>();
                 final result = await Navigator.of(context).pushNamed(
                   AppRouters.createTimeline,
                   arguments: tripCode,
@@ -154,14 +158,15 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 // If timeline was created successfully, refresh the timeline list
                 if (result == true && mounted) {
                   print('Timeline created successfully, refreshing list');
-                  context.read<TripDetailBloc>().add(
-                        GetTimelineByTripCode(tripCode: tripCode),
-                      );
+                  bloc.add(
+                    GetTimelineByTripCode(tripCode: tripCode),
+                  );
                 }
               },
               onEditTimeline: (timeline) async {
                 print('Navigate to edit timeline: ${timeline.id}');
                 final tripCode = plan.tripCode;
+                final bloc = context.read<TripDetailBloc>();
                 final result = await Navigator.of(context).pushNamed(
                   AppRouters.createTimeline,
                   arguments: CreateTimelineArguments(
@@ -173,9 +178,9 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 // If timeline was updated successfully, refresh the timeline list
                 if (result == true && mounted) {
                   print('Timeline updated successfully, refreshing list');
-                  context.read<TripDetailBloc>().add(
-                        GetTimelineByTripCode(tripCode: tripCode),
-                      );
+                  bloc.add(
+                    GetTimelineByTripCode(tripCode: tripCode),
+                  );
                 }
               },
               onDeleteTimeline: (timeline) {

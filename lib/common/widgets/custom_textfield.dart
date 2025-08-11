@@ -16,6 +16,7 @@ class NormalTextfield extends StatefulWidget {
   final String placeholder;
   final Widget? suffixIcon; // Thay đổi từ IconButton? thành Widget?
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final bool isObscureText;
   final bool isError;
   final bool enabled;
@@ -30,6 +31,7 @@ class NormalTextfield extends StatefulWidget {
     required this.placeholder,
     this.suffixIcon,
     this.controller,
+    this.focusNode,
     this.isObscureText = false,
     this.isError = false,
     this.enabled = true,
@@ -44,19 +46,29 @@ class NormalTextfield extends StatefulWidget {
 }
 
 class _NormalTextfieldState extends State<NormalTextfield> {
-  final FocusNode _focusNode = FocusNode();
+  late FocusNode _focusNode;
   bool _isFocused = false;
+  bool _ownsFocusNode = false;
 
   @override
   void initState() {
     super.initState();
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+      _ownsFocusNode = false;
+    } else {
+      _focusNode = FocusNode();
+      _ownsFocusNode = true;
+    }
     _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
     _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
+    if (_ownsFocusNode) {
+      _focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -264,6 +276,7 @@ class FormTextField extends StatelessWidget {
   final String? placeholder;
   final Widget? suffixIcon; // Thay đổi từ IconButton? thành Widget?
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final bool isObscureText;
   final bool enabled;
   final String errorMessage;
@@ -278,6 +291,7 @@ class FormTextField extends StatelessWidget {
     this.placeholder,
     this.suffixIcon,
     this.controller,
+    this.focusNode,
     this.isObscureText = false,
     this.enabled = true,
     this.errorMessage = '',
@@ -301,6 +315,7 @@ class FormTextField extends StatelessWidget {
             placeholder: placeholder ?? (label ?? ''),
             suffixIcon: suffixIcon,
             controller: controller,
+            focusNode: focusNode,
             isError: _hasError,
             enabled: enabled,
             isObscureText: isObscureText,
@@ -338,6 +353,7 @@ class LabeledTextField extends StatelessWidget {
   final String? placeholder;
   final Widget? suffixIcon; // Thay đổi từ IconButton? thành Widget?
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final bool isObscureText;
   final bool enabled;
   final ValueChanged<String>? onChanged;
@@ -351,6 +367,7 @@ class LabeledTextField extends StatelessWidget {
     this.placeholder,
     this.suffixIcon,
     this.controller,
+    this.focusNode,
     this.isObscureText = false,
     this.enabled = true,
     this.onChanged,
@@ -366,6 +383,7 @@ class LabeledTextField extends StatelessWidget {
       placeholder: placeholder,
       suffixIcon: suffixIcon,
       controller: controller,
+      focusNode: focusNode,
       isObscureText: isObscureText,
       enabled: enabled,
       onChanged: onChanged,
@@ -383,6 +401,7 @@ extension TextFieldExtension on FormTextField {
       placeholder: placeholder,
       suffixIcon: suffixIcon,
       controller: controller,
+      focusNode: focusNode,
       isObscureText: isObscureText,
       enabled: enabled,
       errorMessage: errorMessage,
