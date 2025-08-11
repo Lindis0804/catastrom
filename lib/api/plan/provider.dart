@@ -12,6 +12,7 @@ import 'package:template/api/plan/dto/req_create_timeline.dart';
 import 'package:template/api/plan/dto/ResCreateTimeline.dart';
 import 'package:template/api/plan/dto/ReqUpdateTimeline.dart';
 import 'package:template/api/plan/dto/ResUpdateTimeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 
 class PlanApiProvider {
   String accessToken;
@@ -38,7 +39,7 @@ class PlanApiProvider {
     );
     dynamic resData = res.data;
     print('🏖 [GET_MY_PLANS] resData: $resData');
-    if (resData["responseCode"] != "0000") {
+    if (resData['responseCode'] != '0000') {
       throw Exception('Get my plans fail}');
     }
     List<dynamic> rawPlansData = resData['data']['content'];
@@ -73,7 +74,7 @@ class PlanApiProvider {
         '${EnvVariable.clientCustomerHost}/api/v1/trip/delete',
         queryParameters: {'tripCode': reqDeleteTrip.tripCode});
     EDeleteTripStatus status;
-    if (res.data['responseCode'] == "0000") {
+    if (res.data['responseCode'] == '0000') {
       status = EDeleteTripStatus.SUCCESS;
     } else {
       status = EDeleteTripStatus.FAIL;
@@ -114,7 +115,7 @@ class PlanApiProvider {
 
     dynamic resData = res.data;
 
-    if (resData['responseCode'] != "0000") {
+    if (resData['responseCode'] != '0000') {
       throw Exception(
           'Get timeline by trip code fail: ${resData["params"]["message"]}');
     }
@@ -196,6 +197,37 @@ class PlanApiProvider {
     } catch (err) {
       print('[UPDATE_TIMELINE] Error: $err');
       throw Exception('Update timeline fail: $err');
+    }
+  }
+
+  Future<Timeline> deleteTimeline({required int timelineId}) async {
+    try {
+      print('[DELETE_TIMELINE] Starting delete timeline...');
+      print('[DELETE_TIMELINE] Timeline ID: $timelineId');
+
+      Response res = await dio.delete(
+        '${EnvVariable.clientCustomerHost}/api/v1/trip/timeline/delete/$timelineId',
+      );
+
+      print('[DELETE_TIMELINE] Response status: ${res.statusCode}');
+      print('[DELETE_TIMELINE] Response data: ${res.data}');
+
+      dynamic resData = res.data;
+
+      if (resData['responseCode'] != '0000') {
+        throw Exception(
+            'Delete timeline fail: ${resData["params"]["message"]}');
+      }
+
+      // Parse the returned timeline data
+      Timeline deletedTimeline = Timeline.fromJson(resData['data']);
+      print(
+          '[DELETE_TIMELINE] Timeline deleted successfully: $deletedTimeline');
+
+      return deletedTimeline;
+    } catch (err) {
+      print('[DELETE_TIMELINE] Error: $err');
+      throw Exception('Delete timeline fail: $err');
     }
   }
 }

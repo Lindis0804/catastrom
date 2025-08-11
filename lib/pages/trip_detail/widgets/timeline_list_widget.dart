@@ -13,8 +13,9 @@ class TimelineListWidget extends StatelessWidget {
   final VoidCallback? onAddItem;
   final VoidCallback? onRetry;
   final Function(Timeline)? onEditTimeline;
-  final Function(BuildContext, String?)?
-      onShowErrorDialog; // New parameter for showing error dialogs
+  final Function(Timeline)? onDeleteTimeline;
+  final Function(String)? onDeleteError;
+  final Function()? onRefreshTimelines;
 
   const TimelineListWidget({
     Key? key,
@@ -24,7 +25,9 @@ class TimelineListWidget extends StatelessWidget {
     this.onAddItem,
     this.onRetry,
     this.onEditTimeline,
-    this.onShowErrorDialog,
+    this.onDeleteTimeline,
+    this.onDeleteError,
+    this.onRefreshTimelines,
   }) : super(key: key);
 
   @override
@@ -34,48 +37,74 @@ class TimelineListWidget extends StatelessWidget {
         return _buildSkeletonLoading();
 
       case LoadingStatus.error:
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              CustomEmptyList(
-                icon: Icons.error_outline,
-                title: 'Lỗi tải lịch trình',
-                subtitle: _parseTimelineError(timelineErrorMessage),
-                buttonText: 'Thử lại',
-                onButtonPressed: onRetry,
-              ),
-              const SizedBox(height: 12),
-              TextButton.icon(
-                onPressed: () => _showDetailedError(context),
-                icon: Icon(Icons.info_outline,
-                    size: 16, color: Colors.red.shade600),
-                label: Text(
-                  'Xem chi tiết lỗi',
-                  style: TextStyle(
-                    color: Colors.red.shade600,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+        return RefreshIndicator(
+          onRefresh: () async {
+            onRetry?.call();
+            // Add a small delay to show the refresh indicator
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    CustomEmptyList(
+                      icon: Icons.error_outline,
+                      title: 'Lỗi tải lịch trình',
+                      subtitle: _parseTimelineError(timelineErrorMessage),
+                      buttonText: 'Thử lại',
+                      onButtonPressed: onRetry,
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: () => _showDetailedError(context),
+                      icon: Icon(Icons.info_outline,
+                          size: 16, color: Colors.red.shade600),
+                      label: Text(
+                        'Xem chi tiết lỗi',
+                        style: TextStyle(
+                          color: Colors.red.shade600,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         );
 
       case LoadingStatus.loaded:
         if (timelines == null || timelines!.isEmpty) {
-          return CustomEmptyList(
-            icon: Icons.schedule_outlined,
-            title: 'Chưa có lịch trình',
-            subtitle:
-                'Thêm địa điểm và hoạt động để tạo lịch trình cho chuyến đi của bạn',
-            buttonText: 'Thêm lịch trình',
-            onButtonPressed: onAddItem,
+          return RefreshIndicator(
+            onRefresh: () async {
+              onRefreshTimelines?.call();
+              // Add a small delay to show the refresh indicator
+              await Future.delayed(const Duration(milliseconds: 500));
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: CustomEmptyList(
+                  icon: Icons.schedule_outlined,
+                  title: 'Chưa có lịch trình',
+                  subtitle:
+                      'Thêm địa điểm và hoạt động để tạo lịch trình cho chuyến đi của bạn',
+                  buttonText: 'Thêm lịch trình',
+                  onButtonPressed: onAddItem,
+                ),
+              ),
+            ),
           );
         }
 
-        return _buildTimelineList(context, timelines!);
+        return _buildTimelineListWithRefresh(context, timelines!);
 
       default:
         return _buildSkeletonLoading();
@@ -86,9 +115,21 @@ class TimelineListWidget extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: List.generate(
-        5, // Hiển thị 5 skeleton items
+        5,
         (index) => const TimelineSkeletonCell(),
       ),
+    );
+  }
+
+  Widget _buildTimelineListWithRefresh(
+      BuildContext context, List<Timeline> timelineList) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        onRefreshTimelines?.call();
+        // Add a small delay to show the refresh indicator
+        await Future.delayed(const Duration(milliseconds: 500));
+      },
+      child: _buildTimelineList(context, timelineList),
     );
   }
 
@@ -124,13 +165,13 @@ class TimelineListWidget extends StatelessWidget {
 
     // Create a detailed error message similar to the log format
     String detailedErrorMessage = '''
-[TRIP_DETAIL_BLOC] Error getting timeline: Exception: Get timeline by trip code fail: $technicalError
+    [TRIP_DETAIL_BLOC] Error getting timeline: Exception: Get timeline by trip code fail: $technicalError
 
-Chi tiết kỹ thuật:
-- Lỗi API: $technicalError
-- Thời gian: ${DateTime.now().toString()}
-- Hành động: Tải lịch trình cho chuyến đi
-''';
+    Chi tiết kỹ thuật:
+    - Lỗi API: $technicalError
+    - Thời gian: ${DateTime.now().toString()}
+    - Hành động: Tải lịch trình cho chuyến đi
+    ''';
 
     ErrorDialogUtils.showErrorDialog(
       context: context,
@@ -242,7 +283,7 @@ Chi tiết kỹ thuật:
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Đóng dialog
+                Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
                 padding:
@@ -259,8 +300,8 @@ Chi tiết kỹ thuật:
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Đóng dialog
-                _deleteTimeline(timeline);
+                Navigator.of(context).pop();
+                onDeleteTimeline?.call(timeline);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5775),
@@ -284,16 +325,6 @@ Chi tiết kỹ thuật:
         );
       },
     );
-  }
-
-  void _deleteTimeline(Timeline timeline) {
-    print('Deleting timeline with ID: ${timeline.id}');
-    // TODO: Implement actual delete API call
-    // Example:
-    // 1. Call delete API with timeline ID
-    // 2. Show loading indicator
-    // 3. Refresh timeline list on success
-    // 4. Show error message on failure
   }
 
   // Convert Timeline DTO to TimelineItem for compatibility with TimelineCell

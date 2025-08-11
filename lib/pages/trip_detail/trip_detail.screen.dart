@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 import 'package:template/common/widgets/custom_tab_bar.dart';
+import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/pages/create_time_line/models/create_timeline_arguments.dart';
 import 'package:template/pages/trip_detail/bloc/trip_detail.bloc.dart';
@@ -19,13 +21,47 @@ class TripDetailScreen extends StatefulWidget {
 }
 
 class _TripDetailScreenState extends State<TripDetailScreen> {
-  int _selectedTabIndex = 1; // Default to "Lịch trình" tab
+  int _selectedTabIndex = 1;
   final List<String> _tabs = ['To-do', 'Lịch trình', 'Xem lịch', 'Túi tiền'];
 
   void _onTabSelected(int index) {
     setState(() {
       _selectedTabIndex = index;
     });
+  }
+
+  void _deleteTimeline(Timeline timeline, BuildContext context) async {
+    try {
+      print('Deleting timeline with ID: ${timeline.id}');
+
+      // Dispatch delete event to BLoC
+      context.read<TripDetailBloc>().add(
+            DeleteTimeline(timelineId: timeline.id),
+          );
+
+      // Show success message
+      ErrorDialogUtils.showSuccessToast(
+        context: context,
+        message: 'Lịch trình đã được xóa thành công',
+      );
+
+      // Refresh timeline list after successful deletion
+      final tripCode =
+          context.read<TripDetailBloc>().state.selectedPlan?.tripCode;
+      if (tripCode != null && context.mounted) {
+        context.read<TripDetailBloc>().add(
+              GetTimelineByTripCode(tripCode: tripCode),
+            );
+      }
+    } catch (err) {
+      print('Error deleting timeline: $err');
+
+      // Show error message
+      ErrorDialogUtils.showErrorToast(
+        context: context,
+        message: 'Lỗi khi xóa lịch trình. Vui lòng thử lại.',
+      );
+    }
   }
 
   @override
@@ -96,11 +132,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
   Widget _buildTabContent(Plan plan) {
     switch (_selectedTabIndex) {
-      case 0: // To-do
+      case 0:
         return const Center(
           child: Text('To-do tab - Đang phát triển'),
         );
-      case 1: // Lịch trình
+      case 1:
         return BlocBuilder<TripDetailBloc, TripDetailState>(
           builder: (context, state) {
             return TimelineListWidget(
@@ -142,6 +178,26 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                       );
                 }
               },
+              onDeleteTimeline: (timeline) {
+                print('Delete timeline: ${timeline.id}');
+                _deleteTimeline(timeline, context);
+              },
+              onDeleteError: (errorMessage) {
+                print('Delete error: $errorMessage');
+                ErrorDialogUtils.showErrorToast(
+                  context: context,
+                  message: errorMessage,
+                );
+              },
+              onRefreshTimelines: () {
+                print('Refreshing timelines...');
+                final tripCode = plan.tripCode;
+                if (tripCode.isNotEmpty) {
+                  context.read<TripDetailBloc>().add(
+                        GetTimelineByTripCode(tripCode: tripCode),
+                      );
+                }
+              },
               onRetry: () {
                 // Retry loading timeline if there's an error
                 if (plan.tripCode.isNotEmpty) {
@@ -153,11 +209,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             );
           },
         );
-      case 2: // Xem lịch
+      case 2:
         return const Center(
           child: Text('Xem lịch tab - Đang phát triển'),
         );
-      case 3: // Túi tiền
+      case 3:
         return const Center(
           child: Text('Túi tiền tab - Đang phát triển'),
         );

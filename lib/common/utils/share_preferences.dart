@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:template/common/constants/keys.dart';
 import 'package:template/data/models/user/user.model.dart';
 
 class SPKeys {
