@@ -28,3 +28,12 @@ class GetTimelineByTripCode extends TripDetailEvent {
   @override
   List<Object?> get props => [tripCode];
 }
+
+class DeleteTimeline extends TripDetailEvent {
+  final int timelineId;
+
+  const DeleteTimeline({required this.timelineId});
+
+  @override
+  List<Object?> get props => [timelineId];
+}

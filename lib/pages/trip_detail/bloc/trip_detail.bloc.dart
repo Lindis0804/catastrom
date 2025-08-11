@@ -5,7 +5,7 @@ import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/api/plan/provider.dart';
 import 'package:template/api/plan/dto/ReqGetTimelineByTripCode.dart';
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 
 part 'trip_detail.event.dart';
 part 'trip_detail.state.dart';
@@ -15,6 +15,7 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
     on<SetSelectedPlan>(_onSetSelectedPlan);
     on<ClearSelectedPlan>(_onClearSelectedPlan);
     on<GetTimelineByTripCode>(_onGetTimelineByTripCode);
+    on<DeleteTimeline>(_onDeleteTimeline);
   }
 
   void _onSetSelectedPlan(
@@ -108,6 +109,57 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
         errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
       } else {
         errorMessage = 'Lỗi khi tải lịch trình. Vui lòng thử lại.';
+      }
+
+      emitter(
+        state.copyWith(
+          timelineStatus: LoadingStatus.error,
+          timelineErrorMessage: errorMessage,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleteTimeline(
+    DeleteTimeline event,
+    Emitter<TripDetailState> emitter,
+  ) async {
+    print('[TRIP_DETAIL_BLOC] Deleting timeline with ID: ${event.timelineId}');
+
+    emitter(
+      state.copyWith(
+        timelineStatus: LoadingStatus.loading,
+        timelineErrorMessage: null,
+      ),
+    );
+
+    try {
+      // Get access token
+      final String? accessToken =
+          await SharedPreferencesManager.getString(SPKeys.ACCESS_TOKEN);
+      if (accessToken == null) {
+        throw Exception('Access token not found');
+      }
+
+      // Call API to delete timeline
+      final deletedTimeline = await PlanApiProvider(accessToken: accessToken)
+          .deleteTimeline(timelineId: event.timelineId);
+
+      print(
+          '[TRIP_DETAIL_BLOC] Timeline deleted successfully: $deletedTimeline');
+
+      emitter(
+        state.copyWith(
+          timelineStatus: LoadingStatus.loaded,
+          timelineErrorMessage: null,
+        ),
+      );
+    } catch (err) {
+      print('[TRIP_DETAIL_BLOC] Error deleting timeline: $err');
+
+      String errorMessage = 'Lỗi khi xóa lịch trình. Vui lòng thử lại.';
+      if (err.toString().contains('Access token not found')) {
+        errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
       }
 
       emitter(

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:template/api/plan/dto/ReqCreateTrip.dart';
 import 'package:template/api/plan/dto/getSection.dart';
-import 'package:template/common/constants/colors.dart';
 import 'package:template/common/constants/page_title.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/utils/log.dart';

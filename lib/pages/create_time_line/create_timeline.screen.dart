@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/place/dto/location.dart';
+import 'package:template/api/place/provider.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
+import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/common/widgets/custom_date_picker.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
@@ -37,7 +42,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
   final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _budgetPerPersonController =
       TextEditingController();
-  final TextEditingController _totalBudgetController = TextEditingController();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -46,9 +50,17 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
   String _destinationError = '';
   String _budgetPerPersonError = '';
-  String _totalBudgetError = '';
   String _startDateError = '';
   String _endDateError = '';
+
+  // Search suggestions state
+  List<Location> _locationSuggestions = [];
+  bool _isSearching = false;
+  bool _showSuggestions = false;
+  Timer? _searchTimer;
+  final FocusNode _destinationFocusNode = FocusNode();
+  final GlobalKey _destinationFieldKey = GlobalKey();
+  final LayerLink _layerLink = LayerLink();
 
   bool get isEditMode => widget.timelineToEdit != null;
 
@@ -56,6 +68,20 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
   void initState() {
     super.initState();
     _initializeFormData();
+    _destinationFocusNode.addListener(_onFocusChanged);
+  }
+
+  void _onFocusChanged() {
+    if (!_destinationFocusNode.hasFocus) {
+      // Add small delay to allow user to tap on suggestions
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (mounted && !_destinationFocusNode.hasFocus) {
+          setState(() {
+            _showSuggestions = false;
+          });
+        }
+      });
+    }
   }
 
   void _initializeFormData() {
@@ -81,7 +107,7 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
     }
   }
 
-  String _getLocationDisplayName(String locationCode) {
+  String _getLocationDisplayName(String? locationCode) {
     // Convert location codes to display names (reusing logic from timeline_list_widget)
     switch (locationCode) {
       case 'HN001':
@@ -114,15 +140,91 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
       case 'FANTASY_PARK':
         return 'Công viên Fantasy';
       default:
-        return locationCode;
+        return '';
     }
+  }
+
+  void _onDestinationChanged(String value) {
+    // Cancel previous timer
+    _searchTimer?.cancel();
+
+    if (value.trim().isEmpty) {
+      setState(() {
+        _showSuggestions = false;
+        _locationSuggestions = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    // Clear previous error
+    if (_destinationError.isNotEmpty) {
+      setState(() => _destinationError = '');
+    }
+
+    // Set loading state
+    setState(() {
+      _isSearching = true;
+      _showSuggestions = true;
+    });
+
+    // Debounce search for 500ms
+    _searchTimer = Timer(const Duration(milliseconds: 500), () {
+      _searchLocations(value.trim());
+    });
+  }
+
+  void _searchLocations(String keyword) async {
+    try {
+      final suggestions = await _getLocationSuggestions(keyword);
+      if (mounted) {
+        setState(() {
+          _locationSuggestions = suggestions;
+          _isSearching = false;
+        });
+      }
+    } catch (error) {
+      print('Error fetching location suggestions: $error');
+      if (mounted) {
+        setState(() {
+          _locationSuggestions = [];
+          _isSearching = false;
+        });
+      }
+    }
+  }
+
+  void _selectLocation(Location location) {
+    setState(() {
+      _destinationController.text = location.locationName;
+      _showSuggestions = false;
+      _locationSuggestions = [];
+    });
+    _destinationFocusNode.unfocus();
+  }
+
+  Future<List<Location>> _getLocationSuggestions(String keyword) async {
+    final String? accessToken =
+        await SharedPreferencesManager.getString(SPKeys.ACCESS_TOKEN);
+    if (accessToken == null) {
+      throw Exception('Access token not found');
+    }
+    PlaceApiProvider placeApiProvider =
+        PlaceApiProvider(accessToken: accessToken);
+    final response = await placeApiProvider.getLocations(
+      keyword: keyword,
+    );
+
+    return response;
   }
 
   @override
   void dispose() {
     _destinationController.dispose();
     _budgetPerPersonController.dispose();
-    _totalBudgetController.dispose();
+    _destinationFocusNode.removeListener(_onFocusChanged);
+    _destinationFocusNode.dispose();
+    _searchTimer?.cancel();
     super.dispose();
   }
 
@@ -134,10 +236,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
       _budgetPerPersonError = _budgetPerPersonController.text.trim().isEmpty
           ? 'Vui lòng nhập ngân sách/người'
-          : '';
-
-      _totalBudgetError = _totalBudgetController.text.trim().isEmpty
-          ? 'Vui lòng nhập tổng ngân sách'
           : '';
 
       _startDateError = _startDate == null ? 'Vui lòng chọn ngày bắt đầu' : '';
@@ -154,7 +252,6 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
     return _destinationError.isEmpty &&
         _budgetPerPersonError.isEmpty &&
-        _totalBudgetError.isEmpty &&
         _startDateError.isEmpty &&
         _endDateError.isEmpty;
   }
@@ -164,8 +261,9 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
     final tripCode = widget.tripCode;
     if (tripCode == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không tìm thấy mã chuyến đi')),
+      ErrorDialogUtils.showErrorToast(
+        context: context,
+        message: 'Không tìm thấy mã chuyến đi',
       );
       return;
     }
@@ -211,6 +309,123 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
     }
   }
 
+  Widget _buildDestinationField() {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: Container(
+        key: _destinationFieldKey,
+        child: FormTextField(
+          label: 'Điểm đến',
+          controller: _destinationController,
+          focusNode: _destinationFocusNode,
+          errorMessage: _destinationError.isEmpty ? '' : _destinationError,
+          onChanged: _onDestinationChanged,
+          suffixIcon: _isSearching
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuggestionsOverlay() {
+    // Get the exact width of the destination field
+    double fieldWidth = MediaQuery.of(context).size.width - 32; // fallback
+
+    if (_destinationFieldKey.currentContext != null) {
+      final RenderBox renderBox =
+          _destinationFieldKey.currentContext!.findRenderObject() as RenderBox;
+      fieldWidth = renderBox.size.width;
+    }
+
+    return CompositedTransformFollower(
+      link: _layerLink,
+      targetAnchor: Alignment.bottomLeft,
+      followerAnchor: Alignment.topLeft,
+      offset: const Offset(0, 4), // Small gap between field and suggestions
+      child: Material(
+        elevation: 8,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: fieldWidth, // Match exact width of the text field
+          constraints: const BoxConstraints(maxHeight: 200),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: _buildSuggestionsContent(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuggestionsContent() {
+    if (_isSearching) {
+      return const SizedBox(
+        height: 100,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_locationSuggestions.isEmpty) {
+      return const SizedBox(
+        height: 60,
+        child: Center(
+          child: Text(
+            'Không tìm thấy địa điểm',
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      padding: EdgeInsets.zero,
+      itemCount: _locationSuggestions.length,
+      itemBuilder: (context, index) {
+        final location = _locationSuggestions[index];
+        return ListTile(
+          dense: true,
+          leading: const Icon(Icons.location_on, color: Colors.grey),
+          title: Text(
+            location.locationName,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          subtitle: location.address != null
+              ? Text(
+                  location.address!,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : null,
+          onTap: () => _selectLocation(location),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -236,11 +451,12 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
             BlocConsumer<CreateTimelineBloc, CreateTimelineState>(
               listener: (context, state) {
                 if (state.createTimelineStatus == LoadingStatus.loaded) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text(isEditMode
-                            ? 'Cập nhật lịch trình thành công!'
-                            : 'Tạo lịch trình thành công!')),
+                  // Show success toast notification
+                  ErrorDialogUtils.showSuccessToast(
+                    context: context,
+                    message: isEditMode
+                        ? 'Cập nhật lịch trình thành công!'
+                        : 'Tạo lịch trình thành công!',
                   );
                   Navigator.pop(context, true); // Return success result
                 } else if (state.createTimelineStatus == LoadingStatus.error) {
@@ -283,75 +499,68 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        body: GestureDetector(
+          onTap: () {
+            // Hide suggestions and unfocus when tapping outside
+            FocusScope.of(context).unfocus();
+          },
+          child: Stack(
             children: [
-              FormTextField(
-                label: 'Điểm đến',
-                controller: _destinationController,
-                errorMessage:
-                    _destinationError.isEmpty ? '' : _destinationError,
-                onChanged: (value) {
-                  if (_destinationError.isNotEmpty) {
-                    setState(() => _destinationError = '');
-                  }
-                },
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDestinationField(),
+                    const SizedBox(height: 16),
+                    FormTextField(
+                      label: 'Ngân sách/người (VND)',
+                      controller: _budgetPerPersonController,
+                      keyboardType: TextInputType.number,
+                      errorMessage: _budgetPerPersonError.isEmpty
+                          ? ''
+                          : _budgetPerPersonError,
+                      onChanged: (value) {
+                        if (_budgetPerPersonError.isNotEmpty) {
+                          setState(() => _budgetPerPersonError = '');
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    CustomDatePicker(
+                      label: 'Bắt đầu',
+                      placeholder: 'Chọn ngày bắt đầu',
+                      initialDate: _startDate,
+                      onDateChanged: (date) {
+                        setState(() {
+                          _startDate = date;
+                          if (_startDateError.isNotEmpty) _startDateError = '';
+                        });
+                      },
+                      errorMessage:
+                          _startDateError.isEmpty ? '' : _startDateError,
+                      isError: _startDateError.isNotEmpty,
+                    ),
+                    CustomDatePicker(
+                      label: 'Kết thúc',
+                      placeholder: 'Chọn ngày kết thúc',
+                      initialDate: _endDate,
+                      onDateChanged: (date) {
+                        setState(() {
+                          _endDate = date;
+                          if (_endDateError.isNotEmpty) _endDateError = '';
+                        });
+                      },
+                      errorMessage: _endDateError.isEmpty ? '' : _endDateError,
+                      isError: _endDateError.isNotEmpty,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              FormTextField(
-                label: 'Ngân sách/người (VND)',
-                controller: _budgetPerPersonController,
-                keyboardType: TextInputType.number,
-                errorMessage:
-                    _budgetPerPersonError.isEmpty ? '' : _budgetPerPersonError,
-                onChanged: (value) {
-                  if (_budgetPerPersonError.isNotEmpty) {
-                    setState(() => _budgetPerPersonError = '');
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              FormTextField(
-                label: 'Tổng ngân sách (VND)',
-                controller: _totalBudgetController,
-                keyboardType: TextInputType.number,
-                errorMessage:
-                    _totalBudgetError.isEmpty ? '' : _totalBudgetError,
-                onChanged: (value) {
-                  if (_totalBudgetError.isNotEmpty) {
-                    setState(() => _totalBudgetError = '');
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomDatePicker(
-                label: 'Bắt đầu',
-                placeholder: 'Chọn ngày bắt đầu',
-                initialDate: _startDate,
-                onDateChanged: (date) {
-                  setState(() {
-                    _startDate = date;
-                    if (_startDateError.isNotEmpty) _startDateError = '';
-                  });
-                },
-                errorMessage: _startDateError.isEmpty ? '' : _startDateError,
-                isError: _startDateError.isNotEmpty,
-              ),
-              CustomDatePicker(
-                label: 'Kết thúc',
-                placeholder: 'Chọn ngày kết thúc',
-                initialDate: _endDate,
-                onDateChanged: (date) {
-                  setState(() {
-                    _endDate = date;
-                    if (_endDateError.isNotEmpty) _endDateError = '';
-                  });
-                },
-                errorMessage: _endDateError.isEmpty ? '' : _endDateError,
-                isError: _endDateError.isNotEmpty,
-              ),
+              if (_showSuggestions)
+                Positioned.fill(
+                  child: _buildSuggestionsOverlay(),
+                ),
             ],
           ),
         ),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/place/provider.dart';
+import 'package:template/api/plan/dto/timeline.dart';
+import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/common/widgets/custom_tab_bar.dart';
+import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/pages/create_time_line/models/create_timeline_arguments.dart';
 import 'package:template/pages/trip_detail/bloc/trip_detail.bloc.dart';
@@ -19,13 +23,47 @@ class TripDetailScreen extends StatefulWidget {
 }
 
 class _TripDetailScreenState extends State<TripDetailScreen> {
-  int _selectedTabIndex = 1; // Default to "Lịch trình" tab
+  int _selectedTabIndex = 1;
   final List<String> _tabs = ['To-do', 'Lịch trình', 'Xem lịch', 'Túi tiền'];
 
   void _onTabSelected(int index) {
     setState(() {
       _selectedTabIndex = index;
     });
+  }
+
+  void _deleteTimeline(Timeline timeline, BuildContext context) async {
+    try {
+      print('Deleting timeline with ID: ${timeline.id}');
+
+      // Dispatch delete event to BLoC
+      context.read<TripDetailBloc>().add(
+            DeleteTimeline(timelineId: timeline.id),
+          );
+
+      // Show success message
+      ErrorDialogUtils.showSuccessToast(
+        context: context,
+        message: 'Lịch trình đã được xóa thành công',
+      );
+
+      // Refresh timeline list after successful deletion
+      final tripCode =
+          context.read<TripDetailBloc>().state.selectedPlan?.tripCode;
+      if (tripCode != null && mounted) {
+        context.read<TripDetailBloc>().add(
+              GetTimelineByTripCode(tripCode: tripCode),
+            );
+      }
+    } catch (err) {
+      print('Error deleting timeline: $err');
+
+      // Show error message
+      ErrorDialogUtils.showErrorToast(
+        context: context,
+        message: 'Lỗi khi xóa lịch trình. Vui lòng thử lại.',
+      );
+    }
   }
 
   @override
@@ -75,6 +113,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             onAddPressed: () async {
               print('Navigate to create timeline');
               final tripCode = state.selectedPlan?.tripCode;
+              final bloc = context.read<TripDetailBloc>();
               final result = await Navigator.of(context).pushNamed(
                 AppRouters.createTimeline,
                 arguments: tripCode,
@@ -83,9 +122,9 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               // If timeline was created successfully, refresh the timeline list
               if (result == true && tripCode != null && mounted) {
                 print('Timeline created successfully, refreshing list');
-                context.read<TripDetailBloc>().add(
-                      GetTimelineByTripCode(tripCode: tripCode),
-                    );
+                bloc.add(
+                  GetTimelineByTripCode(tripCode: tripCode),
+                );
               }
             },
           );
@@ -96,11 +135,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
   Widget _buildTabContent(Plan plan) {
     switch (_selectedTabIndex) {
-      case 0: // To-do
+      case 0:
         return const Center(
           child: Text('To-do tab - Đang phát triển'),
         );
-      case 1: // Lịch trình
+      case 1:
         return BlocBuilder<TripDetailBloc, TripDetailState>(
           builder: (context, state) {
             return TimelineListWidget(
@@ -110,6 +149,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               onAddItem: () async {
                 print('Thêm lịch trình mới từ empty state');
                 final tripCode = plan.tripCode;
+                final bloc = context.read<TripDetailBloc>();
                 final result = await Navigator.of(context).pushNamed(
                   AppRouters.createTimeline,
                   arguments: tripCode,
@@ -118,14 +158,15 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 // If timeline was created successfully, refresh the timeline list
                 if (result == true && mounted) {
                   print('Timeline created successfully, refreshing list');
-                  context.read<TripDetailBloc>().add(
-                        GetTimelineByTripCode(tripCode: tripCode),
-                      );
+                  bloc.add(
+                    GetTimelineByTripCode(tripCode: tripCode),
+                  );
                 }
               },
               onEditTimeline: (timeline) async {
                 print('Navigate to edit timeline: ${timeline.id}');
                 final tripCode = plan.tripCode;
+                final bloc = context.read<TripDetailBloc>();
                 final result = await Navigator.of(context).pushNamed(
                   AppRouters.createTimeline,
                   arguments: CreateTimelineArguments(
@@ -137,6 +178,26 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 // If timeline was updated successfully, refresh the timeline list
                 if (result == true && mounted) {
                   print('Timeline updated successfully, refreshing list');
+                  bloc.add(
+                    GetTimelineByTripCode(tripCode: tripCode),
+                  );
+                }
+              },
+              onDeleteTimeline: (timeline) {
+                print('Delete timeline: ${timeline.id}');
+                _deleteTimeline(timeline, context);
+              },
+              onDeleteError: (errorMessage) {
+                print('Delete error: $errorMessage');
+                ErrorDialogUtils.showErrorToast(
+                  context: context,
+                  message: errorMessage,
+                );
+              },
+              onRefreshTimelines: () {
+                print('Refreshing timelines...');
+                final tripCode = plan.tripCode;
+                if (tripCode.isNotEmpty) {
                   context.read<TripDetailBloc>().add(
                         GetTimelineByTripCode(tripCode: tripCode),
                       );
@@ -153,11 +214,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             );
           },
         );
-      case 2: // Xem lịch
+      case 2:
         return const Center(
           child: Text('Xem lịch tab - Đang phát triển'),
         );
-      case 3: // Túi tiền
+      case 3:
         return const Center(
           child: Text('Túi tiền tab - Đang phát triển'),
         );

@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/plan/dto/ReqCreateTimeline.dart';
+import 'package:template/api/plan/dto/req_create_timeline.dart';
 import 'package:template/api/plan/dto/ReqUpdateTimeline.dart';
 import 'package:template/api/plan/provider.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
@@ -32,14 +32,14 @@ class CreateTimelineBloc
 
       print('[CREATE_TIMELINE_BLOC] Access token retrieved');
 
-      // Create timeline request
+      // Create timeline request with the new structure
       final reqCreateTimeline = ReqCreateTimeline(
         tripCode: event.tripCode,
         locationCode: event.locationCode,
         activityCode: event.activityCode,
         startTime: event.startTime,
         endTime: event.endTime,
-        subTimelines: [], // Empty list for now, can be extended later
+        subTimeLine: [],
       );
 
       print('[CREATE_TIMELINE_BLOC] Request created: $reqCreateTimeline');
@@ -86,13 +86,13 @@ class CreateTimelineBloc
 
       // Create timeline update request
       final reqUpdateTimeline = ReqUpdateTimeline(
-        timelineId: event.timelineId,
+        id: event.timelineId,
         tripCode: event.tripCode,
         locationCode: event.locationCode,
         activityCode: event.activityCode,
         startTime: event.startTime,
         endTime: event.endTime,
-        subTimelines: [], // Empty list for now, can be extended later
+        subTimeline: [], // Empty list for now, can be extended later
       );
 
       print(

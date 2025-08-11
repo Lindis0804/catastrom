@@ -1,4 +1,4 @@
-import 'package:template/api/plan/dto/Timeline.dart';
+import 'package:template/api/plan/dto/timeline.dart';
 
 class ResUpdateTimeline {
   final Timeline timeline;
