@@ -69,17 +69,12 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
         throw Exception('Access token not found');
       }
 
-      print('[TRIP_DETAIL_BLOC] Access token retrieved, calling API...');
-
       // Create request
       final request = ReqGetTimelineByTripCode(tripCode: event.tripCode);
 
       // Call API
       final response = await PlanApiProvider(accessToken: accessToken)
           .getTimelineByTripCode(reqGetTimelineByTripCode: request);
-
-      print(
-          '[TRIP_DETAIL_BLOC] Timeline API call successful, timelines count: ${response.timelines.length}');
 
       // Always emit loaded state, even if timelines list is empty
       emitter(
@@ -148,12 +143,35 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
       print(
           '[TRIP_DETAIL_BLOC] Timeline deleted successfully: $deletedTimeline');
 
-      emitter(
-        state.copyWith(
-          timelineStatus: LoadingStatus.loaded,
-          timelineErrorMessage: null,
-        ),
-      );
+      // After successful delete, automatically refresh the timeline list
+      final tripCode = state.selectedPlan?.tripCode;
+      if (tripCode != null) {
+        print('[TRIP_DETAIL_BLOC] Refreshing timeline list after delete');
+
+        // Create request
+        final request = ReqGetTimelineByTripCode(tripCode: tripCode);
+
+        // Fetch updated timeline list
+        final response = await PlanApiProvider(accessToken: accessToken)
+            .getTimelineByTripCode(reqGetTimelineByTripCode: request);
+
+        // Emit success state with updated timeline list
+        emitter(
+          state.copyWith(
+            timelines: response.timelines,
+            timelineStatus: LoadingStatus.loaded,
+            timelineErrorMessage: null,
+          ),
+        );
+      } else {
+        // If no trip code available, just emit success
+        emitter(
+          state.copyWith(
+            timelineStatus: LoadingStatus.loaded,
+            timelineErrorMessage: null,
+          ),
+        );
+      }
     } catch (err) {
       print('[TRIP_DETAIL_BLOC] Error deleting timeline: $err');
 

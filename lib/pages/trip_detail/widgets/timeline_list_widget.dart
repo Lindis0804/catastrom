@@ -14,7 +14,6 @@ class TimelineListWidget extends StatelessWidget {
   final VoidCallback? onRetry;
   final Function(Timeline)? onEditTimeline;
   final Function(Timeline)? onDeleteTimeline;
-  final Function(String)? onDeleteError;
   final Function()? onRefreshTimelines;
 
   const TimelineListWidget({
@@ -26,7 +25,6 @@ class TimelineListWidget extends StatelessWidget {
     this.onRetry,
     this.onEditTimeline,
     this.onDeleteTimeline,
-    this.onDeleteError,
     this.onRefreshTimelines,
   }) : super(key: key);
 
@@ -54,7 +52,7 @@ class TimelineListWidget extends StatelessWidget {
                     CustomEmptyList(
                       icon: Icons.error_outline,
                       title: 'Lỗi tải lịch trình',
-                      subtitle: _parseTimelineError(timelineErrorMessage),
+                      subtitle: timelineErrorMessage,
                       buttonText: 'Thử lại',
                       onButtonPressed: onRetry,
                     ),
@@ -183,35 +181,6 @@ class TimelineListWidget extends StatelessWidget {
     );
   }
 
-  /// Parse timeline error messages to user-friendly text
-  String _parseTimelineError(String? errorMessage) {
-    if (errorMessage == null || errorMessage.isEmpty) {
-      return 'Có lỗi xảy ra khi tải lịch trình';
-    }
-
-    final lowercaseError = errorMessage.toLowerCase();
-
-    if (lowercaseError.contains('query did not return a unique result')) {
-      return 'Dữ liệu lịch trình bị trùng lặp. Vui lòng liên hệ hỗ trợ để khắc phục.';
-    } else if (lowercaseError.contains('table') &&
-        lowercaseError.contains('doesn\'t exist')) {
-      return 'Hệ thống đang bảo trì. Vui lòng thử lại sau.';
-    } else if (lowercaseError.contains('network') ||
-        lowercaseError.contains('connection')) {
-      return 'Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.';
-    } else if (lowercaseError.contains('timeout')) {
-      return 'Kết nối quá chậm. Vui lòng thử lại.';
-    } else if (lowercaseError.contains('not found') ||
-        lowercaseError.contains('404')) {
-      return 'Không tìm thấy lịch trình cho chuyến đi này.';
-    } else if (lowercaseError.contains('access token') ||
-        lowercaseError.contains('authentication')) {
-      return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
-    } else {
-      return 'Có lỗi xảy ra khi tải lịch trình. Vui lòng thử lại.';
-    }
-  }
-
   void _showDeleteConfirmation(BuildContext context, Timeline timeline) {
     showDialog(
       context: context,
@@ -251,7 +220,7 @@ class TimelineListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_getLocationDisplayName(timeline.locationCode ?? "")} - ${_getActivityDisplayName(timeline.activityCode ?? "")}',
+                      '${timeline.locationCode ?? ''} - ${timeline.activityCode ?? ''}',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -330,13 +299,11 @@ class TimelineListWidget extends StatelessWidget {
   // Convert Timeline DTO to TimelineItem for compatibility with TimelineCell
   TimelineItem _convertTimelineToTimelineItem(Timeline timeline) {
     return TimelineItem(
-      title:
-          '${_getLocationDisplayName(timeline.locationCode ?? "")} - ${_getActivityDisplayName(timeline.activityCode ?? "")}',
+      title: timeline.locationCode ?? '',
       time:
           '${_formatTime(timeline.startTime)} - ${_formatTime(timeline.endTime)}',
-      description: _getActivityDescription(
-          timeline.activityCode ?? '', timeline.subTimeLine.length),
-      cost: _getEstimatedCost(timeline.activityCode ?? ''),
+      description: '',
+      cost: '',
       hasMapAction: true,
       hasDetailAction: timeline.subTimeLine.isNotEmpty,
     );
@@ -344,102 +311,5 @@ class TimelineListWidget extends StatelessWidget {
 
   String _formatTime(DateTime dateTime) {
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}, ${dateTime.day}/${dateTime.month}/${dateTime.year}';
-  }
-
-  String _getLocationDisplayName(String locationCode) {
-    // Convert location codes to display names
-    switch (locationCode) {
-      case 'HN001':
-      case 'NOI_BAI':
-        return 'Nội Bài, Hà Nội';
-      case 'DA_NANG':
-        return 'Đà Nẵng';
-      case 'HOI_AN':
-        return 'Hội An';
-      case 'DA_NANG_BEACH':
-        return 'Bãi biển Đà Nẵng';
-      case 'BA_NA_HILLS':
-        return 'Bà Nà Hills';
-      case 'CITY_CENTER':
-        return 'Trung tâm thành phố';
-      case 'OLD_QUARTER':
-        return 'Phố cổ Hội An';
-      case 'JAPANESE_BRIDGE':
-        return 'Chùa Cầu';
-      case 'NIGHT_MARKET':
-        return 'Chợ đêm';
-      case 'SEAFOOD_RESTAURANT':
-        return 'Nhà hàng hải sản';
-      case 'CABLE_CAR':
-        return 'Cáp treo';
-      case 'GOLDEN_BRIDGE':
-        return 'Cầu Vàng';
-      case 'FRENCH_VILLAGE':
-        return 'Làng Pháp';
-      case 'FANTASY_PARK':
-        return 'Công viên Fantasy';
-      default:
-        return locationCode;
-    }
-  }
-
-  String _getActivityDisplayName(String activityCode) {
-    switch (activityCode) {
-      case 'FLIGHT':
-        return 'Bay';
-      case 'HOTEL':
-        return 'Khách sạn';
-      case 'SIGHTSEEING':
-        return 'Tham quan';
-      case 'DINING':
-        return 'Ăn uống';
-      case 'ADVENTURE':
-        return 'Phiêu lưu';
-      case 'CHECK_IN':
-        return 'Check-in';
-      case 'BOARDING':
-        return 'Lên máy bay';
-      case 'WALKING_TOUR':
-        return 'Đi bộ tham quan';
-      case 'PHOTO_TAKING':
-        return 'Chụp ảnh';
-      case 'SHOPPING':
-        return 'Mua sắm';
-      case 'DINNER':
-        return 'Ăn tối';
-      case 'TRANSPORTATION':
-        return 'Di chuyển';
-      case 'LUNCH':
-        return 'Ăn trưa';
-      case 'GAMES':
-        return 'Trò chơi';
-      default:
-        return activityCode;
-    }
-  }
-
-  String _getActivityDescription(String activityCode, int subTimelineCount) {
-    String baseDescription = _getActivityDisplayName(activityCode);
-    if (subTimelineCount > 0) {
-      baseDescription += ' ($subTimelineCount hoạt động)';
-    }
-    return baseDescription;
-  }
-
-  String _getEstimatedCost(String activityCode) {
-    switch (activityCode) {
-      case 'FLIGHT':
-        return '1.500.000 - 3.000.000 VND';
-      case 'HOTEL':
-        return '800.000 - 1.500.000 VND';
-      case 'SIGHTSEEING':
-        return '200.000 - 500.000 VND';
-      case 'DINING':
-        return '300.000 - 800.000 VND';
-      case 'ADVENTURE':
-        return '500.000 - 1.200.000 VND';
-      default:
-        return '100.000 - 500.000 VND';
-    }
   }
 }

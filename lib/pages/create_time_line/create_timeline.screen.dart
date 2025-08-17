@@ -43,15 +43,18 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
   final TextEditingController _budgetPerPersonController =
       TextEditingController();
 
-  DateTime? _startDate;
-  DateTime? _endDate;
-  TimeOfDay? _startTime;
-  TimeOfDay? _endTime;
+  // DateTime? _startDate;
+  // DateTime? _endDate;
+  // TimeOfDay? _startTime;
+  // TimeOfDay? _endTime;
+
+  DateTime? _startTime;
+  DateTime? _endTime;
 
   String _destinationError = '';
   String _budgetPerPersonError = '';
-  String _startDateError = '';
-  String _endDateError = '';
+  String _startTimeError = '';
+  String _endTimeError = '';
 
   // Search suggestions state
   List<Location> _locationSuggestions = [];
@@ -89,58 +92,24 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
       final timeline = widget.timelineToEdit!;
 
       // Initialize form fields with existing timeline data
-      _destinationController.text =
-          _getLocationDisplayName(timeline.locationCode);
+      _destinationController.text = timeline.locationCode!;
 
       // Initialize date and time
-      _startDate = DateTime(timeline.startTime.year, timeline.startTime.month,
-          timeline.startTime.day);
-      _endDate = DateTime(
-          timeline.endTime.year, timeline.endTime.month, timeline.endTime.day);
-      _startTime = TimeOfDay(
-          hour: timeline.startTime.hour, minute: timeline.startTime.minute);
-      _endTime = TimeOfDay(
-          hour: timeline.endTime.hour, minute: timeline.endTime.minute);
+      _startTime = DateTime(
+          timeline.startTime.year,
+          timeline.startTime.month,
+          timeline.startTime.day,
+          timeline.startTime.hour,
+          timeline.startTime.minute);
+      _endTime = DateTime(timeline.endTime.year, timeline.endTime.month,
+          timeline.endTime.day, timeline.endTime.hour, timeline.endTime.minute);
+      // _startTime = TimeOfDay(
+      //     hour: timeline.startTime.hour, minute: timeline.startTime.minute);
+      // _endTime = TimeOfDay(
+      //     hour: timeline.endTime.hour, minute: timeline.endTime.minute);
 
       print(
           '[EDIT_MODE] Initialized form with timeline data: ${timeline.locationCode}');
-    }
-  }
-
-  String _getLocationDisplayName(String? locationCode) {
-    // Convert location codes to display names (reusing logic from timeline_list_widget)
-    switch (locationCode) {
-      case 'HN001':
-      case 'NOI_BAI':
-        return 'Nội Bài, Hà Nội';
-      case 'DA_NANG':
-        return 'Đà Nẵng';
-      case 'HOI_AN':
-        return 'Hội An';
-      case 'DA_NANG_BEACH':
-        return 'Bãi biển Đà Nẵng';
-      case 'BA_NA_HILLS':
-        return 'Bà Nà Hills';
-      case 'CITY_CENTER':
-        return 'Trung tâm thành phố';
-      case 'OLD_QUARTER':
-        return 'Phố cổ Hội An';
-      case 'JAPANESE_BRIDGE':
-        return 'Chùa Cầu';
-      case 'NIGHT_MARKET':
-        return 'Chợ đêm';
-      case 'SEAFOOD_RESTAURANT':
-        return 'Nhà hàng hải sản';
-      case 'CABLE_CAR':
-        return 'Cáp treo';
-      case 'GOLDEN_BRIDGE':
-        return 'Cầu Vàng';
-      case 'FRENCH_VILLAGE':
-        return 'Làng Pháp';
-      case 'FANTASY_PARK':
-        return 'Công viên Fantasy';
-      default:
-        return '';
     }
   }
 
@@ -234,26 +203,26 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
           ? 'Vui lòng nhập điểm đến'
           : '';
 
-      _budgetPerPersonError = _budgetPerPersonController.text.trim().isEmpty
-          ? 'Vui lòng nhập ngân sách/người'
-          : '';
+      // _budgetPerPersonError = _budgetPerPersonController.text.trim().isEmpty
+      //     ? 'Vui lòng nhập ngân sách/người'
+      //     : '';
 
-      _startDateError = _startDate == null ? 'Vui lòng chọn ngày bắt đầu' : '';
+      _startTimeError = _startTime == null ? 'Vui lòng chọn ngày bắt đầu' : '';
 
-      _endDateError = _endDate == null ? 'Vui lòng chọn ngày kết thúc' : '';
+      _endTimeError = _endTime == null ? 'Vui lòng chọn ngày kết thúc' : '';
 
       // Validate end date is after start date
-      if (_startDate != null &&
-          _endDate != null &&
-          _endDate!.isBefore(_startDate!)) {
-        _endDateError = 'Ngày kết thúc phải sau ngày bắt đầu';
+      if (_startTime != null &&
+          _endTime != null &&
+          _endTime!.isBefore(_startTime!)) {
+        _endTimeError = 'Ngày kết thúc phải sau ngày bắt đầu';
       }
     });
 
     return _destinationError.isEmpty &&
         _budgetPerPersonError.isEmpty &&
-        _startDateError.isEmpty &&
-        _endDateError.isEmpty;
+        _startTimeError.isEmpty &&
+        _endTimeError.isEmpty;
   }
 
   void _handleSave(CreateTimelineBloc bloc) {
@@ -270,17 +239,17 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
 
     // Combine date and time
     final startDateTime = DateTime(
-      _startDate!.year,
-      _startDate!.month,
-      _startDate!.day,
+      _startTime!.year,
+      _startTime!.month,
+      _startTime!.day,
       _startTime?.hour ?? 0,
       _startTime?.minute ?? 0,
     );
 
     final endDateTime = DateTime(
-      _endDate!.year,
-      _endDate!.month,
-      _endDate!.day,
+      _endTime!.year,
+      _endTime!.month,
+      _endTime!.day,
       _endTime?.hour ?? 23,
       _endTime?.minute ?? 59,
     );
@@ -512,47 +481,47 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildDestinationField(),
-                    const SizedBox(height: 16),
-                    FormTextField(
-                      label: 'Ngân sách/người (VND)',
-                      controller: _budgetPerPersonController,
-                      keyboardType: TextInputType.number,
-                      errorMessage: _budgetPerPersonError.isEmpty
-                          ? ''
-                          : _budgetPerPersonError,
-                      onChanged: (value) {
-                        if (_budgetPerPersonError.isNotEmpty) {
-                          setState(() => _budgetPerPersonError = '');
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
+                    // const SizedBox(height: 16),
+                    // FormTextField(
+                    //   label: 'Ngân sách/người (VND)',
+                    //   controller: _budgetPerPersonController,
+                    //   keyboardType: TextInputType.number,
+                    //   errorMessage: _budgetPerPersonError.isEmpty
+                    //       ? ''
+                    //       : _budgetPerPersonError,
+                    //   onChanged: (value) {
+                    //     if (_budgetPerPersonError.isNotEmpty) {
+                    //       setState(() => _budgetPerPersonError = '');
+                    //     }
+                    //   },
+                    // ),
+
                     CustomDatePicker(
                       label: 'Bắt đầu',
                       placeholder: 'Chọn ngày bắt đầu',
-                      initialDate: _startDate,
+                      initialDate: _startTime,
                       onDateChanged: (date) {
                         setState(() {
-                          _startDate = date;
-                          if (_startDateError.isNotEmpty) _startDateError = '';
+                          _startTime = date;
+                          if (_startTimeError.isNotEmpty) _startTimeError = '';
                         });
                       },
                       errorMessage:
-                          _startDateError.isEmpty ? '' : _startDateError,
-                      isError: _startDateError.isNotEmpty,
+                          _startTimeError.isEmpty ? '' : _startTimeError,
+                      isError: _startTimeError.isNotEmpty,
                     ),
                     CustomDatePicker(
                       label: 'Kết thúc',
                       placeholder: 'Chọn ngày kết thúc',
-                      initialDate: _endDate,
+                      initialDate: _endTime,
                       onDateChanged: (date) {
                         setState(() {
-                          _endDate = date;
-                          if (_endDateError.isNotEmpty) _endDateError = '';
+                          _endTime = date;
+                          if (_endTimeError.isNotEmpty) _endTimeError = '';
                         });
                       },
-                      errorMessage: _endDateError.isEmpty ? '' : _endDateError,
-                      isError: _endDateError.isNotEmpty,
+                      errorMessage: _endTimeError.isEmpty ? '' : _endTimeError,
+                      isError: _endTimeError.isNotEmpty,
                     ),
                   ],
                 ),

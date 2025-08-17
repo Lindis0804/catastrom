@@ -63,26 +63,13 @@ class TimelineCell extends StatelessWidget {
               backgroundColor: const Color(0xFFFF5775),
               foregroundColor: Colors.white,
               icon: Icons.delete,
-              // borderRadius: const BorderRadius.only(
-              //   topRight: Radius.circular(8),
-              //   bottomRight: Radius.circular(8),
-              // ),
             ),
           ],
         ),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          decoration: const BoxDecoration(
             color: Colors.white,
-            // borderRadius: BorderRadius.circular(8),
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.grey.withOpacity(0.1),
-            //     spreadRadius: 1,
-            //     blurRadius: 3,
-            //     offset: const Offset(0, 1),
-            //   ),
-            // ],
           ),
           child: _buildTimelineContent(),
         ),
@@ -172,17 +159,17 @@ class TimelineCell extends StatelessWidget {
                     ),
                   ),
 
-                  // Cost
-                  if (item.cost.isNotEmpty) ...[
-                    Text(
-                      item.cost,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  // // Cost
+                  // if (item.cost.isNotEmpty) ...[
+                  //   Text(
+                  //     item.cost,
+                  //     style: const TextStyle(
+                  //       fontSize: 10,
+                  //       color: Colors.black87,
+                  //       fontWeight: FontWeight.w500,
+                  //     ),
+                  //   ),
+                  // ],
 
                   if (item.hasMapAction || item.hasDetailAction) ...[
                     const SizedBox(height: 8),

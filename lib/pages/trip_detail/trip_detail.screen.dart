@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/place/provider.dart';
 import 'package:template/api/plan/dto/timeline.dart';
-import 'package:template/common/utils/share_preferences.dart';
+import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/widgets/custom_tab_bar.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/data/models/plan/plan.model.dart';
@@ -41,20 +40,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             DeleteTimeline(timelineId: timeline.id),
           );
 
-      // Show success message
-      ErrorDialogUtils.showSuccessToast(
-        context: context,
-        message: 'Lịch trình đã được xóa thành công',
-      );
-
-      // Refresh timeline list after successful deletion
-      final tripCode =
-          context.read<TripDetailBloc>().state.selectedPlan?.tripCode;
-      if (tripCode != null && mounted) {
-        context.read<TripDetailBloc>().add(
-              GetTimelineByTripCode(tripCode: tripCode),
-            );
-      }
+      // Note: Success message and refresh will be handled after delete completes
     } catch (err) {
       print('Error deleting timeline: $err');
 
@@ -70,40 +56,63 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocBuilder<TripDetailBloc, TripDetailState>(
-        builder: (context, state) {
-          final plan = state.selectedPlan;
-
-          if (plan == null) {
-            return const Scaffold(
-              body: Center(
-                child: Text('Không có dữ liệu chuyến đi'),
-              ),
+      body: BlocListener<TripDetailBloc, TripDetailState>(
+        listenWhen: (previous, current) {
+          // Only listen when timelineStatus changes from loading to loaded/error
+          return previous.timelineStatus == LoadingStatus.loading &&
+              current.timelineStatus != LoadingStatus.loading;
+        },
+        listener: (context, state) {
+          if (state.timelineStatus == LoadingStatus.loaded) {
+            // Show success message - the BLoC already refreshes the timeline list automatically
+            ErrorDialogUtils.showSuccessToast(
+              context: context,
+              message: 'Lịch trình đã được xóa thành công',
+            );
+          } else if (state.timelineStatus == LoadingStatus.error) {
+            // Show error message for any timeline operation
+            ErrorDialogUtils.showErrorToast(
+              context: context,
+              message: state.timelineErrorMessage ??
+                  'Lỗi khi thực hiện thao tác. Vui lòng thử lại.',
             );
           }
-
-          return Column(
-            children: [
-              // Header
-              TripDetailHeader(plan: plan),
-
-              // Tab Bar
-              Container(
-                color: Colors.white,
-                child: CustomTabBar(
-                  tabs: _tabs,
-                  selectedIndex: _selectedTabIndex,
-                  onTabSelected: _onTabSelected,
-                ),
-              ),
-
-              // Content
-              Expanded(
-                child: _buildTabContent(plan),
-              ),
-            ],
-          );
         },
+        child: BlocBuilder<TripDetailBloc, TripDetailState>(
+          builder: (context, state) {
+            final plan = state.selectedPlan;
+
+            if (plan == null) {
+              return const Scaffold(
+                body: Center(
+                  child: Text('Không có dữ liệu chuyến đi'),
+                ),
+              );
+            }
+
+            return Column(
+              children: [
+                // Header
+                TripDetailHeader(plan: plan),
+
+                // Tab Bar
+                Container(
+                  color: Colors.white,
+                  child: CustomTabBar(
+                    tabs: _tabs,
+                    selectedIndex: _selectedTabIndex,
+                    onTabSelected: _onTabSelected,
+                  ),
+                ),
+
+                // Content
+                Expanded(
+                  child: _buildTabContent(plan),
+                ),
+              ],
+            );
+          },
+        ),
       ),
       floatingActionButton: BlocBuilder<TripDetailBloc, TripDetailState>(
         builder: (context, state) {
@@ -147,7 +156,6 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               timelineStatus: state.timelineStatus,
               timelineErrorMessage: state.timelineErrorMessage,
               onAddItem: () async {
-                print('Thêm lịch trình mới từ empty state');
                 final tripCode = plan.tripCode;
                 final bloc = context.read<TripDetailBloc>();
                 final result = await Navigator.of(context).pushNamed(
@@ -157,14 +165,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
                 // If timeline was created successfully, refresh the timeline list
                 if (result == true && mounted) {
-                  print('Timeline created successfully, refreshing list');
                   bloc.add(
                     GetTimelineByTripCode(tripCode: tripCode),
                   );
                 }
               },
               onEditTimeline: (timeline) async {
-                print('Navigate to edit timeline: ${timeline.id}');
                 final tripCode = plan.tripCode;
                 final bloc = context.read<TripDetailBloc>();
                 final result = await Navigator.of(context).pushNamed(
@@ -177,25 +183,15 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
                 // If timeline was updated successfully, refresh the timeline list
                 if (result == true && mounted) {
-                  print('Timeline updated successfully, refreshing list');
                   bloc.add(
                     GetTimelineByTripCode(tripCode: tripCode),
                   );
                 }
               },
               onDeleteTimeline: (timeline) {
-                print('Delete timeline: ${timeline.id}');
                 _deleteTimeline(timeline, context);
               },
-              onDeleteError: (errorMessage) {
-                print('Delete error: $errorMessage');
-                ErrorDialogUtils.showErrorToast(
-                  context: context,
-                  message: errorMessage,
-                );
-              },
               onRefreshTimelines: () {
-                print('Refreshing timelines...');
                 final tripCode = plan.tripCode;
                 if (tripCode.isNotEmpty) {
                   context.read<TripDetailBloc>().add(
@@ -204,7 +200,6 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 }
               },
               onRetry: () {
-                // Retry loading timeline if there's an error
                 if (plan.tripCode.isNotEmpty) {
                   context.read<TripDetailBloc>().add(
                         GetTimelineByTripCode(tripCode: plan.tripCode),
