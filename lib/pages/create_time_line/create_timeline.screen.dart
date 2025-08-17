@@ -354,7 +354,7 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
         elevation: 8,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          width: fieldWidth, // Match exact width of the text field
+          width: fieldWidth,
           constraints: const BoxConstraints(maxHeight: 200),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -410,12 +410,12 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
           leading: const Icon(Icons.location_on, color: Colors.grey),
           title: Text(
             location.locationName,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
           ),
           subtitle: location.address != null
               ? Text(
                   location.address!,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 )
