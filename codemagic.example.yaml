@@ -1,0 +1,119 @@
+workflows:
+  android-workflow-production:
+    name: Android Workflow Production
+    environment:
+      android_signing:
+    	- frameit
+      groups:
+    	- frame_it_google_credential
+      vars:
+        PACKAGE_NAME: "spoon.app.frame_it"
+        GOOGLE_PLAY_TRACK: internal
+      flutter: 3.35.1
+      ndk: r21d
+    cache:
+      cache_paths:
+    	- ~/.pub-cache
+    	- ~/.gradle/caches
+    	- ~/Library/Caches/CocoaPods
+    triggering:
+      events:
+    	- push
+      branch_patterns:
+    	- pattern: 'main'
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+  	- name: Set up local.properties
+        script: | 
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+  	- name: Echo Flutter version
+        script: | 
+          flutter --version
+  	- name: Get Flutter packages
+        script: | 
+          flutter pub get
+      # - name: Flutter analyze
+      #   script: | 
+      #     flutter analyze
+      # - name: Flutter unit tests
+      #   script: | 
+      #     flutter test
+      #   ignore_failure: true
+
+  	- name: Build AAB with Flutter
+        script: | 
+          BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 2))      
+          flutter build aab --release \
+        	--build-number=$BUILD_NUMBER \
+        	--flavor prod \
+    artifacts:
+  	- build/**/outputs/**/*.apk
+  	- build/**/outputs/**/*.aab
+    publishing:
+      email:
+        recipients:
+      	- tranthong.zipper@gmail.com
+        notify:
+          success: true
+          failure: false
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: $GOOGLE_PLAY_TRACK
+        submit_as_draft: true
+
+  android-workflow-staging:
+    name: Android Workflow Staging
+    environment:
+      android_signing:
+    	- frameit
+      groups:
+    	- frame_it_firebase_staging
+      vars:
+       # 
+        GOOGLE_PLAY_TRACK: internal
+        PACKAGE_NAME: "spoon.app.dev.frame_it"
+      flutter: 3.35.1
+      ndk: r21d
+    cache:
+      cache_paths:
+    	- ~/.pub-cache
+    	- ~/.gradle/caches
+    	- ~/Library/Caches/CocoaPods
+    triggering:
+      events:
+    	- push
+      branch_patterns:
+    	- pattern: 'dev'
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+  	- name: Set up local.properties
+        script: | 
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+  	- name: Echo Flutter version
+        script: | 
+          flutter --version
+  	- name: Get Flutter packages
+        script: | 
+          flutter pub get
+  	- name: Build APK with Flutter
+        script: | 
+          flutter build apk --release \
+        	--flavor staging \
+    artifacts:
+  	- build/**/outputs/**/*staging*.apk
+    publishing:
+      email:
+        recipients:
+      	- tranthong.zipper@gmail.com
+        notify:
+          success: false
+          failure: true
+      firebase:
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        android:
+          app_id: 1:531098154341:android:2f9720a25660b450855d8c
+          artifact_type: 'apk'

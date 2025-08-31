@@ -1,0 +1,41 @@
+workflows:
+  android-firebase-staging:
+    name: Android Firebase Staging
+    environment:
+      android_signing:
+        - dolatrip-keystore   # Keystore bạn đã upload trong Codemagic
+      groups:
+        - dolatrip   # chứa FIREBASE_SERVICE_ACCOUNT
+      flutter: 3.35.1
+      ndk: r21d
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+        - ~/.gradle/caches
+        - ~/Library/Caches/CocoaPods
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'dev'
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+      - name: Set up local.properties
+        script: | 
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Build APK for Staging
+        script: flutter build apk --release --t lib/main.dart
+    artifacts:
+      - build/**/outputs/**/*staging*.apk
+    publishing:
+      firebase:
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        android:
+          app_id: $FIREBASE_APP_ID  # lấy trong Firebase Console
+          artifact_type: 'apk'
