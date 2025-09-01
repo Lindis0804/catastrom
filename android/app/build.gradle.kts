@@ -70,6 +70,7 @@ android {
             //signingConfig = signingConfigs.getByName("debug")
             // thêm vào ngày 1/9/2025, add own signing config for the release build
             isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
         }
     }
