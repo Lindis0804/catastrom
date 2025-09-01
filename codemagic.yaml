@@ -32,7 +32,7 @@ workflows:
       - name: Build APK for Staging
         script: flutter build apk --release --target lib/root/main.dart 
     artifacts:
-      - build/**/outputs/**/*staging*.apk
+      - build/**/outputs/apk/release/*release*.apk
     publishing:
       firebase:
         firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
