@@ -1,5 +1,12 @@
-import java.util.Properties
-import java.io.FileInputStream
+import java.io.File
+import java.util.*
+
+val keystoreProperties =
+    Properties().apply {
+        var file = File("key.properties")
+        if (file.exists()) load(file.reader())
+    }
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -16,6 +23,7 @@ android {
     namespace = "com.hieuld.template"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
+    val appVersionCode = (System.getenv()["NEW_BUILD_NUMBER"] ?: "1")?.toInt()
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -33,27 +41,35 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        versionCode = appVersionCode
         versionName = flutter.versionName
     }
 
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String
+            if (System.getenv()["CI"].toBoolean()) { // CI=true is exported by Codemagic
+                storeFile = file(System.getenv()["CM_KEYSTORE_PATH"])
+                storePassword = System.getenv()["CM_KEYSTORE_PASSWORD"]
+                keyAlias = System.getenv()["CM_KEY_ALIAS"]
+                keyPassword = System.getenv()["CM_KEY_PASSWORD"]
+            } else {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
         }
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             // comment dòng này ngày 1/9/2025
             // dòng này là dòng mặc định
             //signingConfig = signingConfigs.getByName("debug")
             // thêm vào ngày 1/9/2025, add own signing config for the release build
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
         }
     }
