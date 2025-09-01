@@ -39,3 +39,5 @@ workflows:
         android:
           app_id: $FIREBASE_APP_ID  # lấy trong Firebase Console
           artifact_type: 'apk'
+          groups:
+           - Android
