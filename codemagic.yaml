@@ -30,7 +30,7 @@ workflows:
         script: flutter pub get
 
       - name: Build APK for Staging
-        script: flutter build apk --release --t lib/main.dart
+        script: flutter build apk --release --target lib/root/main.dart 
     artifacts:
       - build/**/outputs/**/*staging*.apk
     publishing:
