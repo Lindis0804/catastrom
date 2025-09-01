@@ -13,6 +13,7 @@ workflows:
         - ~/.pub-cache
         - ~/.gradle/caches
         - ~/Library/Caches/CocoaPods
+        - $ANDROID_SDK_ROOT/ndk
     triggering:
       events:
         - push
