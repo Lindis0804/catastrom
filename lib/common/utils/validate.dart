@@ -1,9 +1,10 @@
 bool validateUserName(String name) {
-  RegExp regex = RegExp(r'^(?=.*[a-zA-Z])(?=.*[\d])[a-zA-Z\d\s!@#$]{8,}$');
-  if (regex.hasMatch(name)) {
-    return true;
-  }
-  return false;
+  // RegExp regex = RegExp(r'^(?=.*[a-zA-Z])(?=.*[\d])[a-zA-Z\d\s!@#$]{8,}$');
+  // if (regex.hasMatch(name)) {
+  //   return true;
+  // }
+  // return false;
+  return true;
 }
 
 bool validateName(String name) {
@@ -30,4 +31,12 @@ bool validatePhoneNumber(String phoneNumber) {
     return true;
   }
   return false;
+}
+
+bool validateAmount(String amount) {
+  RegExp regex = RegExp(r'^\d+(\.\d{1,2})?$');
+  if (!regex.hasMatch(amount)) {
+    return false;
+  }
+  return double.parse(amount) > 0;
 }

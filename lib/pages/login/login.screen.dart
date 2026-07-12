@@ -69,7 +69,7 @@ class _SignInFormState extends State<SignInForm> {
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
                       child: const Text(
-                        'Welcome to DoLa Trip',
+                        'Welcome to Wellytics',
                         style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 25,

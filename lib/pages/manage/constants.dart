@@ -4,5 +4,6 @@ abstract class IManagePageIdx {
       FAVORITE = 2,
       PROFILE = 3,
       SETTINGS = 5,
-      NOTIFICATIONS = 4;
+      NOTIFICATIONS = 4,
+      PAYMENT_TRANSACTIONS = 6;
 }

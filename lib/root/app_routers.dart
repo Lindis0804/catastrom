@@ -4,6 +4,8 @@ import 'package:template/pages/forgot_password/forgot_password.screen.dart';
 import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
 import 'package:template/pages/new_plan/screen/new_plan.screen.dart';
+import 'package:template/pages/payment_transactions/screen/add_transactions.screen.dart';
+import 'package:template/pages/payment_transactions/screen/payment_transactions.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
@@ -24,6 +26,8 @@ abstract class AppRouters {
   static const String newPlan = '/new-plan';
   static const String tripDetail = '/trip-detail';
   static const String createTimeline = '/create-timeline';
+  static const String paymentTransactions = '/payment-transactions';
+  static const String addTransactions = '/add-transactions';
 
   static Route? onGenRoutes(RouteSettings setting) {
     switch (setting.name) {
@@ -50,6 +54,16 @@ abstract class AppRouters {
 
       case newPlan:
         return MaterialPageRoute(builder: (_) => const NewPlanScreen());
+
+      case paymentTransactions:
+        return MaterialPageRoute(
+          builder: (_) => const PaymentTransactionsScreen(),
+        );
+
+      case addTransactions:
+        return MaterialPageRoute(
+          builder: (_) => const AddTransactionsScreen(),
+        );
 
       case tripDetail:
         final tripDetailBloc = setting.arguments as TripDetailBloc?;

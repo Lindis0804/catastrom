@@ -6,6 +6,7 @@ import 'package:template/pages/manage/bloc/manage.bloc.dart';
 import 'package:template/pages/manage/constants.dart';
 import 'package:template/pages/newfeeds/newfeeds.screen.dart';
 import 'package:template/pages/notifications/screen/notifications.screen.dart';
+import 'package:template/pages/payment_transactions/screen/payment_transactions.screen.dart';
 import 'package:template/pages/plans/screens/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/settings/screen/settings.screen.dart';
@@ -41,8 +42,7 @@ class _ManageState extends State<Manage> {
   Widget build(BuildContext context) {
     final screens = [
       const HomeScreen(),
-      const TripScreen(),
-      const NewfeedsScreen(),
+      const PaymentTransactionsScreen(),
       const ProfileScreen(),
       const NotificationsScreen(),
       const SettingsScreen(),
@@ -65,14 +65,24 @@ class _ManageState extends State<Manage> {
                     icon: Assets.svgIcons.homePage,
                     label: 'Trang chủ',
                     isSelected: state.pageIdx == IManagePageIdx.HOME_PAGE),
-                getCustomNavigationItem(
-                    icon: Assets.svgIcons.myPlan,
-                    label: 'Kế hoạch',
-                    isSelected: state.pageIdx == IManagePageIdx.MY_PLANS),
-                getCustomNavigationItem(
-                    icon: Assets.svgIcons.favorite,
-                    label: 'Yêu thích',
-                    isSelected: state.pageIdx == IManagePageIdx.FAVORITE),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.receipt_long,
+                    size: 24,
+                    color: state.pageIdx == IManagePageIdx.PAYMENT_TRANSACTIONS
+                        ? CustomColors.primary
+                        : CustomColors.gray,
+                  ),
+                  label: 'Thu chi',
+                ),
+                // getCustomNavigationItem(
+                //     icon: Assets.svgIcons.myPlan,
+                //     label: 'Kế hoạch',
+                //     isSelected: state.pageIdx == IManagePageIdx.MY_PLANS),
+                // getCustomNavigationItem(
+                //     icon: Assets.svgIcons.favorite,
+                //     label: 'Yêu thích',
+                //     isSelected: state.pageIdx == IManagePageIdx.FAVORITE),
                 getCustomNavigationItem(
                     icon: Assets.svgIcons.profile,
                     label: 'Cá nhân',
