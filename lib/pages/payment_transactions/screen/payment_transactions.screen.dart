@@ -163,11 +163,50 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
                                 ),
                         ),
                 ),
+                if (!state.getTransactionsStatus.isLoading &&
+                    state.transactions != null &&
+                    state.transactions!.isNotEmpty)
+                  _PaginationControls(bloc: widget.bloc, state: state),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _PaginationControls extends StatelessWidget {
+  const _PaginationControls({required this.bloc, required this.state});
+
+  final PaymentTransactionsBloc bloc;
+  final PaymentTransactionsState state;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: state.pageIdx > 0
+                ? () => bloc.add(ChangePageEvent(pageIdx: state.pageIdx - 1))
+                : null,
+          ),
+          Text(
+            'Trang ${state.pageIdx + 1}',
+            style: const TextStyle(fontSize: 13, color: CustomColors.textLabel),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: state.hasMoreTransactions
+                ? () => bloc.add(ChangePageEvent(pageIdx: state.pageIdx + 1))
+                : null,
+          ),
+        ],
+      ),
     );
   }
 }

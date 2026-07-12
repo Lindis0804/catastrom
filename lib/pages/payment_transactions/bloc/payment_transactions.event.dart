@@ -35,3 +35,8 @@ class DeleteTransactionEvent extends PaymentTransactionsEvent {
   final int id;
   const DeleteTransactionEvent({required this.id});
 }
+
+class ChangePageEvent extends PaymentTransactionsEvent {
+  final int pageIdx;
+  const ChangePageEvent({required this.pageIdx});
+}

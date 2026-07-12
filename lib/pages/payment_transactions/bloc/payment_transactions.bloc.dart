@@ -12,6 +12,8 @@ part 'payment_transactions.state.dart';
 
 class PaymentTransactionsBloc
     extends Bloc<PaymentTransactionsEvent, PaymentTransactionsState> {
+  static const int _pageSize = 6;
+
   PaymentTransactionsBloc() : super(PaymentTransactionsState.initialize()) {
     on<Inititalize>(_onInitialize);
     on<LoadTransactions>(_onLoadTransactions);
@@ -20,6 +22,7 @@ class PaymentTransactionsBloc
     on<ToAddTransactionsEvent>(_onToAddTransactions);
     on<BackFromAddTransactionsEvent>(_onBackFromAddTransactions);
     on<DeleteTransactionEvent>(_onDeleteTransaction);
+    on<ChangePageEvent>(_onChangePage);
 
     add(const Inititalize());
   }
@@ -64,38 +67,13 @@ class PaymentTransactionsBloc
             );
           }
         }(),
-        () async {
-          try {
-            List<Transaction> transactions =
-                await paymentApiProvider.getTransactions(
-              dateFrom: state.dateFrom,
-              dateTo: state.dateTo,
-              categoryIds: state.selectedFilterCategories.isEmpty
-                  ? null
-                  : state.selectedFilterCategories.map((c) => c.id).toList(),
-            );
-            transactions.sort((a, b) => b.transDate.compareTo(a.transDate));
-            emitter(
-              state.copyWith(
-                transactions: transactions,
-                getTransactionsStatus: LoadingStatus.loaded,
-              ),
-            );
-          } catch (err) {
-            emitter(
-              state.copyWith(
-                getTransactionsStatus: LoadingStatus.error,
-                getTransactionsErrMsg: 'Get transactions fail: $err',
-              ),
-            );
-          }
-        }(),
+        _fetchTransactionsPage(0, emitter),
       ],
     );
   }
 
-  void _onLoadTransactions(
-    PaymentTransactionsEvent event,
+  Future<void> _fetchTransactionsPage(
+    int pageIdx,
     Emitter<PaymentTransactionsState> emitter,
   ) async {
     emitter(
@@ -110,12 +88,16 @@ class PaymentTransactionsBloc
         categoryIds: state.selectedFilterCategories.isEmpty
             ? null
             : state.selectedFilterCategories.map((c) => c.id).toList(),
+        pageIdx: pageIdx,
+        limit: _pageSize,
       );
       transactions.sort((a, b) => b.transDate.compareTo(a.transDate));
       emitter(
         state.copyWith(
           transactions: transactions,
           getTransactionsStatus: LoadingStatus.loaded,
+          pageIdx: pageIdx,
+          hasMoreTransactions: transactions.length >= _pageSize,
         ),
       );
     } catch (err) {
@@ -126,6 +108,23 @@ class PaymentTransactionsBloc
         ),
       );
     }
+  }
+
+  void _onLoadTransactions(
+    PaymentTransactionsEvent event,
+    Emitter<PaymentTransactionsState> emitter,
+  ) async {
+    await _fetchTransactionsPage(0, emitter);
+  }
+
+  void _onChangePage(
+    ChangePageEvent event,
+    Emitter<PaymentTransactionsState> emitter,
+  ) async {
+    if (event.pageIdx < 0 || event.pageIdx == state.pageIdx) {
+      return;
+    }
+    await _fetchTransactionsPage(event.pageIdx, emitter);
   }
 
   void _onToggleFilter(

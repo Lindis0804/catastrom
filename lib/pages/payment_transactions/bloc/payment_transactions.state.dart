@@ -10,6 +10,8 @@ class PaymentTransactionsState extends Equatable {
   final List<Category> selectedFilterCategories;
   final DateTime dateFrom, dateTo;
   final bool isFilterExpanded;
+  final int pageIdx;
+  final bool hasMoreTransactions;
   final String? getTransactionsErrMsg,
       getCategoriesErrMsg,
       deleteTransactionErrMsg;
@@ -25,6 +27,8 @@ class PaymentTransactionsState extends Equatable {
     required this.dateFrom,
     required this.dateTo,
     this.isFilterExpanded = false,
+    this.pageIdx = 0,
+    this.hasMoreTransactions = true,
     this.getTransactionsErrMsg,
     this.getCategoriesErrMsg,
     this.deleteTransactionErrMsg,
@@ -49,6 +53,8 @@ class PaymentTransactionsState extends Equatable {
     DateTime? dateFrom,
     DateTime? dateTo,
     bool? isFilterExpanded,
+    int? pageIdx,
+    bool? hasMoreTransactions,
     String? getTransactionsErrMsg,
     String? getCategoriesErrMsg,
     String? deleteTransactionErrMsg,
@@ -66,6 +72,8 @@ class PaymentTransactionsState extends Equatable {
       dateFrom: dateFrom ?? this.dateFrom,
       dateTo: dateTo ?? this.dateTo,
       isFilterExpanded: isFilterExpanded ?? this.isFilterExpanded,
+      pageIdx: pageIdx ?? this.pageIdx,
+      hasMoreTransactions: hasMoreTransactions ?? this.hasMoreTransactions,
       getTransactionsErrMsg: getTransactionsErrMsg ?? this.getTransactionsErrMsg,
       getCategoriesErrMsg: getCategoriesErrMsg ?? this.getCategoriesErrMsg,
       deleteTransactionErrMsg:
@@ -85,6 +93,8 @@ class PaymentTransactionsState extends Equatable {
         dateFrom,
         dateTo,
         isFilterExpanded,
+        pageIdx,
+        hasMoreTransactions,
         getTransactionsErrMsg,
         getCategoriesErrMsg,
         deleteTransactionErrMsg,
