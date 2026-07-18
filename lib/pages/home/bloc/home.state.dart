@@ -5,30 +5,47 @@ class HomeState extends Equatable {
 
   final LoadingStatus getUserStatus,
       getRecommenedPlacesStatus,
-      getMyPlansStatus;
+      getMyPlansStatus,
+      getMonthlyTotalsStatus;
   final User? user;
   final List<RecommendedPlace>? recommendedPlaces;
   final List<Plan>? myPlans;
-  final String? getUserErrMsg, getRecommendedPlacesErrMsg, getMyPlansErrMsg;
+  final DateTime monthFrom, monthTo;
+  final ESortOrder sortOrder;
+  final List<MonthlyTotal>? monthlyTotals;
+  final String? getUserErrMsg,
+      getRecommendedPlacesErrMsg,
+      getMyPlansErrMsg,
+      getMonthlyTotalsErrMsg;
 
   const HomeState(
       {this.homeStatus = HomeStatus.init,
       this.getUserStatus = LoadingStatus.initialize,
       this.getRecommenedPlacesStatus = LoadingStatus.initialize,
       this.getMyPlansStatus = LoadingStatus.initialize,
+      this.getMonthlyTotalsStatus = LoadingStatus.initialize,
       this.user,
       this.recommendedPlaces,
       this.myPlans,
+      required this.monthFrom,
+      required this.monthTo,
+      this.sortOrder = ESortOrder.asc,
+      this.monthlyTotals,
       this.getUserErrMsg,
       this.getRecommendedPlacesErrMsg,
-      this.getMyPlansErrMsg});
+      this.getMyPlansErrMsg,
+      this.getMonthlyTotalsErrMsg});
 
   factory HomeState.initialize() {
-    return const HomeState(
+    DateTime now = DateTime.now();
+    return HomeState(
         homeStatus: HomeStatus.init,
         getUserStatus: LoadingStatus.initialize,
         getRecommenedPlacesStatus: LoadingStatus.initialize,
-        getMyPlansStatus: LoadingStatus.initialize);
+        getMyPlansStatus: LoadingStatus.initialize,
+        getMonthlyTotalsStatus: LoadingStatus.initialize,
+        monthFrom: DateTime(now.year, now.month - 1),
+        monthTo: DateTime(now.year, now.month));
   }
 
   HomeState copyWith(
@@ -36,25 +53,39 @@ class HomeState extends Equatable {
       LoadingStatus? getUserStatus,
       LoadingStatus? getRecommenedPlacesStatus,
       LoadingStatus? getMyPlansStatus,
+      LoadingStatus? getMonthlyTotalsStatus,
       User? user,
       List<RecommendedPlace>? recommendedPlaces,
       List<Plan>? myPlans,
+      DateTime? monthFrom,
+      DateTime? monthTo,
+      ESortOrder? sortOrder,
+      List<MonthlyTotal>? monthlyTotals,
       String? getUserErrMsg,
       String? getRecommendedPlacesErrMsg,
-      String? getMyPlansErrMsg}) {
+      String? getMyPlansErrMsg,
+      String? getMonthlyTotalsErrMsg}) {
     return HomeState(
         homeStatus: homeStatus ?? this.homeStatus,
         getUserStatus: getUserStatus ?? this.getUserStatus,
         getRecommenedPlacesStatus:
             getRecommenedPlacesStatus ?? this.getRecommenedPlacesStatus,
         getMyPlansStatus: getMyPlansStatus ?? this.getMyPlansStatus,
+        getMonthlyTotalsStatus:
+            getMonthlyTotalsStatus ?? this.getMonthlyTotalsStatus,
         user: user ?? this.user,
         recommendedPlaces: recommendedPlaces ?? this.recommendedPlaces,
         myPlans: myPlans ?? this.myPlans,
+        monthFrom: monthFrom ?? this.monthFrom,
+        monthTo: monthTo ?? this.monthTo,
+        sortOrder: sortOrder ?? this.sortOrder,
+        monthlyTotals: monthlyTotals ?? this.monthlyTotals,
         getUserErrMsg: getUserErrMsg ?? this.getUserErrMsg,
         getRecommendedPlacesErrMsg:
             getRecommendedPlacesErrMsg ?? this.getRecommendedPlacesErrMsg,
-        getMyPlansErrMsg: getMyPlansErrMsg ?? this.getMyPlansErrMsg);
+        getMyPlansErrMsg: getMyPlansErrMsg ?? this.getMyPlansErrMsg,
+        getMonthlyTotalsErrMsg:
+            getMonthlyTotalsErrMsg ?? this.getMonthlyTotalsErrMsg);
   }
 
   @override
@@ -63,11 +94,17 @@ class HomeState extends Equatable {
         getUserStatus,
         getRecommenedPlacesStatus,
         getMyPlansStatus,
+        getMonthlyTotalsStatus,
         user,
         recommendedPlaces,
         myPlans,
+        monthFrom,
+        monthTo,
+        sortOrder,
+        monthlyTotals,
         getUserErrMsg,
         getRecommendedPlacesErrMsg,
-        getMyPlansErrMsg
+        getMyPlansErrMsg,
+        getMonthlyTotalsErrMsg
       ];
 }

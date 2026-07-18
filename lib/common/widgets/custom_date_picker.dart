@@ -116,6 +116,8 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
         });
         widget.onDateChanged?.call(date);
       },
+      dateFormat: widget.dateFormat,
+      initialDateTime: _selectedDate,
     );
   }
 

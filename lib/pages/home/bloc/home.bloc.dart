@@ -1,12 +1,15 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/payment/provider.dart';
 import 'package:template/api/place/dto/recommended_place.dart';
 import 'package:template/api/place/provider.dart';
 import 'package:template/api/plan/dto/ReqParamsSearchTrip.dart';
 import 'package:template/api/plan/provider.dart';
 import 'package:template/common/enums/home.enum.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
+import 'package:template/common/enums/sort_order.enum.dart';
 import 'package:template/common/utils/share_preferences.dart';
+import 'package:template/data/models/payment/monthly_total.model.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/data/models/user/user.model.dart';
 
@@ -16,6 +19,8 @@ part 'home.state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeState.initialize()) {
     on<Inititalize>(_onInitialize);
+    on<ChangeMonthFilterEvent>(_onChangeMonthFilter);
+    on<ChangeSortOrderEvent>(_onChangeSortOrder);
 
     add(
       const Inititalize(),
@@ -98,7 +103,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                     getMyPlansStatus: LoadingStatus.error),
               );
             }
-          }()
+          }(),
+          _fetchMonthlyTotals(emitter),
         ],
       );
     } catch (err) {
@@ -107,5 +113,56 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             getUserErrMsg: '$err', getUserStatus: LoadingStatus.error),
       );
     }
+  }
+
+  Future<void> _fetchMonthlyTotals(Emitter<HomeState> emitter) async {
+    emitter(
+      state.copyWith(getMonthlyTotalsStatus: LoadingStatus.loading),
+    );
+    try {
+      String accessToken = await SharedPreferencesManager.getAccessToken();
+      List<MonthlyTotal> monthlyTotals =
+          await PaymentApiProvider(accessToken: accessToken).getTotalByMonth(
+        from: state.monthFrom,
+        to: state.monthTo,
+        order: state.sortOrder.apiValue,
+      );
+      emitter(
+        state.copyWith(
+          monthlyTotals: monthlyTotals,
+          getMonthlyTotalsStatus: LoadingStatus.loaded,
+        ),
+      );
+    } catch (err) {
+      emitter(
+        state.copyWith(
+          getMonthlyTotalsStatus: LoadingStatus.error,
+          getMonthlyTotalsErrMsg: 'Get monthly totals fail: $err',
+        ),
+      );
+    }
+  }
+
+  void _onChangeMonthFilter(
+    ChangeMonthFilterEvent event,
+    Emitter<HomeState> emitter,
+  ) async {
+    emitter(
+      state.copyWith(
+        monthFrom: event.monthFrom,
+        monthTo: event.monthTo,
+      ),
+    );
+    await _fetchMonthlyTotals(emitter);
+  }
+
+  void _onChangeSortOrder(
+    ChangeSortOrderEvent event,
+    Emitter<HomeState> emitter,
+  ) async {
+    emitter(
+      state.copyWith(sortOrder: event.order),
+    );
+    await _fetchMonthlyTotals(emitter);
   }
 }
