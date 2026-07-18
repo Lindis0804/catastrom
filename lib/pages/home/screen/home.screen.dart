@@ -245,7 +245,7 @@ class _CurrentMonthSpentCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Số tiền đã chi tiêu tháng này',
+                'Số tiền đã chi tiêu tháng này (k VND)',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,

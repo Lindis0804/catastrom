@@ -58,8 +58,11 @@ class _ManageState extends State<Manage> {
             data: Theme.of(context)
                 .copyWith(iconTheme: const IconThemeData(color: Colors.black)),
             child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               currentIndex: state.pageIdx,
               selectedItemColor: CustomColors.primary,
+              unselectedItemColor: CustomColors.gray,
+              showUnselectedLabels: true,
               items: <BottomNavigationBarItem>[
                 getCustomNavigationItem(
                     icon: Assets.svgIcons.homePage,

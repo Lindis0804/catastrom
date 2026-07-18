@@ -11,6 +11,7 @@ class App extends StatelessWidget {
       title: F.title,
       theme: ThemeData(
         primarySwatch: Colors.green,
+        fontFamily: 'AvertaStdCY',
       ),
       onGenerateRoute: AppRouters.onGenRoutes,
       initialRoute: AppRouters.splash,
