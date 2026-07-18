@@ -27,10 +27,10 @@ class SplashScreen extends StatelessWidget {
         Navigator.of(context).pushReplacementNamed(AppRouters.home);
         break;
       case SplashStatus.unauthenticated:
-        Navigator.of(context).pushReplacementNamed(AppRouters.login);
+        Navigator.of(context).pushReplacementNamed(AppRouters.home);
         break;
       default:
-        Navigator.of(context).pushReplacementNamed(AppRouters.login);
+        Navigator.of(context).pushReplacementNamed(AppRouters.home);
         break;
     }
   }
@@ -44,9 +44,10 @@ class _SplashScreenView extends StatelessWidget {
         body: Center(
           child: Container(
             decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: Assets.images.splashImage.provider(),
-                    fit: BoxFit.fitHeight)),
+              image: DecorationImage(
+                  image: Assets.images.splashImage.provider(),
+                  fit: BoxFit.fitHeight),
+            ),
           ),
         ),
       );

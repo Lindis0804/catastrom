@@ -1,13 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/api/auth/provider.dart';
-import 'package:template/api/auth/response.dart';
-import 'package:template/common/constants/keys.dart';
 import 'package:template/common/enums/login_status.enum.dart';
 import 'package:equatable/equatable.dart';
-import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/common/utils/share_preferences.dart';
-import 'package:template/pages/login/dto/LoginUser.dto.dart';
 part 'login.event.dart';
 part 'login.state.dart';
 
@@ -78,20 +72,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       String password = loginEvent.password;
       bool rememberMe = loginEvent.rememberMe;
 
-      LoginUser loginUserData = LoginUser(
-          username: username, password: password, rememberMe: rememberMe);
-      Dio dio = DioUtils.getDioClient();
-      AuthApiProvider authApiProvider = AuthApiProvider(dio: dio);
-      ResLogin resLogin = await authApiProvider.login(data: loginUserData);
+      // LoginUser loginUserData = LoginUser(
+      //     username: username, password: password, rememberMe: rememberMe);
+      // Dio dio = DioUtils.getDioClient();
+      // AuthApiProvider authApiProvider = AuthApiProvider(dio: dio);
+      // ResLogin resLogin = await authApiProvider.login(data: loginUserData);
 
-      await SharedPreferencesManager.saveString(
-          SPKeys.ACCESS_TOKEN, resLogin.accessToken);
-      await SharedPreferencesManager.saveString(
-          SPKeys.USER_PROFILE, resLogin.strUser);
-      SharedPreferencesManager.saveString(
-          SPKeys.REFRESH_TOKEN, resLogin.refreshToken);
+      // await SharedPreferencesManager.saveString(
+      //     SPKeys.ACCESS_TOKEN, resLogin.accessToken);
+      // await SharedPreferencesManager.saveString(
+      //     SPKeys.USER_PROFILE, resLogin.strUser);
+      // SharedPreferencesManager.saveString(
+      //     SPKeys.REFRESH_TOKEN, resLogin.refreshToken);
 
-      print('Login successful, access token: ${resLogin.accessToken}');
+      // print('Login successful, access token: ${resLogin.accessToken}');
       add(
         const MoveToHome(),
       );
