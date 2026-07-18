@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:template/api/payment/provider.dart';
 import 'package:template/api/place/dto/recommended_place.dart';
 import 'package:template/api/place/provider.dart';
@@ -105,6 +106,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             }
           }(),
           _fetchMonthlyTotals(emitter),
+          _fetchCurrentMonthSpent(emitter),
         ],
       );
     } catch (err) {
@@ -138,6 +140,44 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         state.copyWith(
           getMonthlyTotalsStatus: LoadingStatus.error,
           getMonthlyTotalsErrMsg: 'Get monthly totals fail: $err',
+        ),
+      );
+    }
+  }
+
+  Future<void> _fetchCurrentMonthSpent(Emitter<HomeState> emitter) async {
+    emitter(
+      state.copyWith(getCurrentMonthSpentStatus: LoadingStatus.loading),
+    );
+    try {
+      String accessToken = await SharedPreferencesManager.getAccessToken();
+      DateTime now = DateTime.now();
+      DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+      List<MonthlyTotal> monthlyTotals =
+          await PaymentApiProvider(accessToken: accessToken).getTotalByMonth(
+        from: firstDayOfMonth,
+        to: now,
+        order: 'DESC',
+      );
+      MonthlyTotal currentMonthTotal = monthlyTotals.isNotEmpty
+          ? monthlyTotals.first
+          : MonthlyTotal(
+              month: DateFormat('MM/yyyy').format(now),
+              total: 0,
+              dateFrom: DateFormat('dd/MM/yyyy').format(firstDayOfMonth),
+              dateTo: DateFormat('dd/MM/yyyy').format(now),
+            );
+      emitter(
+        state.copyWith(
+          currentMonthTotal: currentMonthTotal,
+          getCurrentMonthSpentStatus: LoadingStatus.loaded,
+        ),
+      );
+    } catch (err) {
+      emitter(
+        state.copyWith(
+          getCurrentMonthSpentStatus: LoadingStatus.error,
+          getCurrentMonthSpentErrMsg: 'Get current month spent fail: $err',
         ),
       );
     }

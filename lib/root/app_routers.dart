@@ -4,8 +4,10 @@ import 'package:template/pages/forgot_password/forgot_password.screen.dart';
 import 'package:template/pages/manage/manage.screen.dart';
 import 'package:template/pages/login/login.screen.dart';
 import 'package:template/pages/new_plan/screen/new_plan.screen.dart';
+import 'package:template/pages/payment_transactions/models/spending_statement_arguments.dart';
 import 'package:template/pages/payment_transactions/screen/add_transactions.screen.dart';
 import 'package:template/pages/payment_transactions/screen/payment_transactions.screen.dart';
+import 'package:template/pages/payment_transactions/screen/spending_statement.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/signup/signup.screen.dart';
 import 'package:template/pages/splash/splash.screen.dart';
@@ -28,6 +30,7 @@ abstract class AppRouters {
   static const String createTimeline = '/create-timeline';
   static const String paymentTransactions = '/payment-transactions';
   static const String addTransactions = '/add-transactions';
+  static const String spendingStatement = '/spending-statement';
 
   static Route? onGenRoutes(RouteSettings setting) {
     switch (setting.name) {
@@ -63,6 +66,13 @@ abstract class AppRouters {
       case addTransactions:
         return MaterialPageRoute(
           builder: (_) => const AddTransactionsScreen(),
+        );
+
+      case spendingStatement:
+        final args = setting.arguments as SpendingStatementArguments;
+        return MaterialPageRoute(
+          builder: (_) =>
+              SpendingStatementScreen(monthlyTotal: args.monthlyTotal),
         );
 
       case tripDetail:

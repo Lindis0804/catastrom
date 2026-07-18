@@ -14,7 +14,13 @@ class PaymentTransactionsBloc
     extends Bloc<PaymentTransactionsEvent, PaymentTransactionsState> {
   static const int _pageSize = 6;
 
-  PaymentTransactionsBloc() : super(PaymentTransactionsState.initialize()) {
+  PaymentTransactionsBloc({DateTime? initialDateFrom, DateTime? initialDateTo})
+      : super(
+          PaymentTransactionsState.initialize(
+            dateFrom: initialDateFrom,
+            dateTo: initialDateTo,
+          ),
+        ) {
     on<Inititalize>(_onInitialize);
     on<LoadTransactions>(_onLoadTransactions);
     on<ToggleFilterEvent>(_onToggleFilter);

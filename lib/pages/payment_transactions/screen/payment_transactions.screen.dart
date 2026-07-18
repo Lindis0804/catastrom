@@ -15,8 +15,15 @@ import 'package:template/pages/payment_transactions/widgets/transaction_list_ite
 import 'package:template/root/app_routers.dart';
 
 class PaymentTransactions extends StatefulWidget {
-  const PaymentTransactions({super.key, required this.bloc});
+  const PaymentTransactions({
+    super.key,
+    required this.bloc,
+    this.lockDateRange = false,
+    this.embedded = false,
+  });
   final PaymentTransactionsBloc bloc;
+  final bool lockDateRange;
+  final bool embedded;
 
   @override
   State<PaymentTransactions> createState() => _PaymentTransactionsState();
@@ -28,6 +35,9 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
     return BlocBuilder<PaymentTransactionsBloc, PaymentTransactionsState>(
       bloc: widget.bloc,
       builder: (context, state) {
+        if (widget.embedded) {
+          return _buildBody(state);
+        }
         return Scaffold(
           appBar: AppBar(
             title: const Text('Quản lý thu chi'),
@@ -41,137 +51,149 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
               ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        widget.bloc.add(const ToggleFilterEvent());
-                      },
-                      icon: const Icon(Icons.filter_list_rounded),
-                      label: const Text('Filter'),
-                    ),
-                  ],
-                ),
-                if (state.isFilterExpanded) ...[
-                  CategorySearchPicker(
-                    selectedCategories: state.selectedFilterCategories,
-                    onChanged: (categories) {
-                      widget.bloc.add(
-                        FilterChanged(
-                          categories: categories,
-                          dateFrom: state.dateFrom,
-                          dateTo: state.dateTo,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomDatePicker(
-                          label: 'Từ ngày',
-                          placeholder: 'Từ ngày',
-                          dateFormat: 'dd/MM/yyyy',
-                          initialDate: state.dateFrom,
-                          onDateChanged: (date) {
-                            widget.bloc.add(
-                              FilterChanged(
-                                categories: state.selectedFilterCategories,
-                                dateFrom: date,
-                                dateTo: state.dateTo,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: CustomDatePicker(
-                          label: 'Đến ngày',
-                          placeholder: 'Đến ngày',
-                          dateFormat: 'dd/MM/yyyy',
-                          initialDate: state.dateTo,
-                          onDateChanged: (date) {
-                            widget.bloc.add(
-                              FilterChanged(
-                                categories: state.selectedFilterCategories,
-                                dateFrom: state.dateFrom,
-                                dateTo: date,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 8),
-                Expanded(
-                  child: state.getTransactionsStatus.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : RefreshIndicator(
-                          onRefresh: () => _onRefresh(widget.bloc),
-                          child: (state.transactions == null ||
-                                  state.transactions!.isEmpty)
-                              ? ListView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  children: const [
-                                    CustomEmptyList(
-                                      icon: Icons.receipt_long_outlined,
-                                      title: 'Không có giao dịch nào',
-                                    ),
-                                  ],
-                                )
-                              : ListView.separated(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  itemBuilder: (context, idx) {
-                                    final transaction =
-                                        state.transactions![idx];
-                                    return Slidable(
-                                      endActionPane: ActionPane(
-                                        motion: const StretchMotion(),
-                                        children: [
-                                          SlidableAction(
-                                            onPressed: (context) =>
-                                                _confirmDeleteTransaction(
-                                              context,
-                                              widget.bloc,
-                                              transaction.id!,
-                                            ),
-                                            backgroundColor:
-                                                CustomColors.error,
-                                            icon: Icons.delete_rounded,
-                                            label: 'Xoá',
-                                          ),
-                                        ],
-                                      ),
-                                      child: TransactionListItem(
-                                        transaction: transaction,
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (context, idx) =>
-                                      const CustomListSeparator(),
-                                  itemCount: state.transactions!.length,
-                                ),
-                        ),
-                ),
-                if (!state.getTransactionsStatus.isLoading &&
-                    state.transactions != null &&
-                    state.transactions!.isNotEmpty)
-                  _PaginationControls(bloc: widget.bloc, state: state),
-              ],
-            ),
-          ),
+          body: _buildBody(state),
         );
       },
+    );
+  }
+
+  Widget _buildBody(PaymentTransactionsState state) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  widget.bloc.add(const ToggleFilterEvent());
+                },
+                icon: const Icon(Icons.filter_list_rounded),
+                label: const Text('Filter'),
+              ),
+              if (widget.embedded) ...[
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.add_rounded),
+                  tooltip: 'Add transaction',
+                  onPressed: () {
+                    widget.bloc.add(const ToAddTransactionsEvent());
+                  },
+                ),
+              ],
+            ],
+          ),
+          if (state.isFilterExpanded) ...[
+            CategorySearchPicker(
+              selectedCategories: state.selectedFilterCategories,
+              onChanged: (categories) {
+                widget.bloc.add(
+                  FilterChanged(
+                    categories: categories,
+                    dateFrom: state.dateFrom,
+                    dateTo: state.dateTo,
+                  ),
+                );
+              },
+            ),
+            if (!widget.lockDateRange) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomDatePicker(
+                      label: 'Từ ngày',
+                      placeholder: 'Từ ngày',
+                      dateFormat: 'dd/MM/yyyy',
+                      initialDate: state.dateFrom,
+                      onDateChanged: (date) {
+                        widget.bloc.add(
+                          FilterChanged(
+                            categories: state.selectedFilterCategories,
+                            dateFrom: date,
+                            dateTo: state.dateTo,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: CustomDatePicker(
+                      label: 'Đến ngày',
+                      placeholder: 'Đến ngày',
+                      dateFormat: 'dd/MM/yyyy',
+                      initialDate: state.dateTo,
+                      onDateChanged: (date) {
+                        widget.bloc.add(
+                          FilterChanged(
+                            categories: state.selectedFilterCategories,
+                            dateFrom: state.dateFrom,
+                            dateTo: date,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+          const SizedBox(height: 8),
+          Expanded(
+            child: state.getTransactionsStatus.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: () => _onRefresh(widget.bloc),
+                    child: (state.transactions == null ||
+                            state.transactions!.isEmpty)
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: const [
+                              CustomEmptyList(
+                                icon: Icons.receipt_long_outlined,
+                                title: 'Không có giao dịch nào',
+                              ),
+                            ],
+                          )
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemBuilder: (context, idx) {
+                              final transaction = state.transactions![idx];
+                              return Slidable(
+                                endActionPane: ActionPane(
+                                  motion: const StretchMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      onPressed: (context) =>
+                                          _confirmDeleteTransaction(
+                                        context,
+                                        widget.bloc,
+                                        transaction.id!,
+                                      ),
+                                      backgroundColor: CustomColors.error,
+                                      icon: Icons.delete_rounded,
+                                      label: 'Xoá',
+                                    ),
+                                  ],
+                                ),
+                                child: TransactionListItem(
+                                  transaction: transaction,
+                                ),
+                              );
+                            },
+                            separatorBuilder: (context, idx) =>
+                                const CustomListSeparator(),
+                            itemCount: state.transactions!.length,
+                          ),
+                  ),
+          ),
+          if (!state.getTransactionsStatus.isLoading &&
+              state.transactions != null &&
+              (state.pageIdx > 0 || state.hasMoreTransactions))
+            _PaginationControls(bloc: widget.bloc, state: state),
+        ],
+      ),
     );
   }
 }
@@ -261,12 +283,26 @@ void _navigationListener(
 }
 
 class PaymentTransactionsScreen extends StatelessWidget {
-  const PaymentTransactionsScreen({super.key});
+  const PaymentTransactionsScreen({
+    super.key,
+    this.initialDateFrom,
+    this.initialDateTo,
+    this.lockDateRange = false,
+    this.embedded = false,
+  });
+
+  final DateTime? initialDateFrom;
+  final DateTime? initialDateTo;
+  final bool lockDateRange;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<PaymentTransactionsBloc>(
-      create: (_) => PaymentTransactionsBloc(),
+      create: (_) => PaymentTransactionsBloc(
+        initialDateFrom: initialDateFrom,
+        initialDateTo: initialDateTo,
+      ),
       child: MultiBlocListener(
         listeners: [
           BlocListener<PaymentTransactionsBloc, PaymentTransactionsState>(
@@ -318,6 +354,8 @@ class PaymentTransactionsScreen extends StatelessWidget {
         child: Builder(
           builder: (BuildContext context) => PaymentTransactions(
             bloc: context.read<PaymentTransactionsBloc>(),
+            lockDateRange: lockDateRange,
+            embedded: embedded,
           ),
         ),
       ),
