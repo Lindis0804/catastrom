@@ -8,10 +8,22 @@ import 'package:template/data/models/payment/category.model.dart';
 import 'package:template/data/models/payment/transaction.model.dart';
 import 'package:template/pages/payment_transactions/widgets/category_search_picker.dart';
 
+List<Category> _categoriesFromTransaction(Transaction transaction) {
+  List<int> ids = transaction.categoryList ?? [];
+  List<String> names = transaction.categories;
+  int length = ids.length < names.length ? ids.length : names.length;
+  return List.generate(
+    length,
+    (i) => Category(id: ids[i], code: '', description: names[i]),
+  );
+}
+
 void showAddTransactionSheet(
   BuildContext context, {
+  Transaction? initialTransaction,
   required ValueChanged<Transaction> onSave,
 }) {
+  bool isEditing = initialTransaction != null;
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -19,14 +31,66 @@ void showAddTransactionSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     builder: (context) {
-      TextEditingController amountController = TextEditingController();
-      TextEditingController descriptionController = TextEditingController();
-      DateTime? selectedDate;
-      List<Category> selectedCategories = [];
+      TextEditingController amountController = TextEditingController(
+        text: isEditing ? initialTransaction.transAmount.toString() : null,
+      );
+      TextEditingController descriptionController = TextEditingController(
+        text: isEditing ? initialTransaction.description : null,
+      );
+      DateTime? selectedDate = isEditing ? initialTransaction.transDate : null;
+      List<Category> selectedCategories =
+          isEditing ? _categoriesFromTransaction(initialTransaction) : [];
       String amountErrMsg = '';
 
       return StatefulBuilder(
         builder: (context, setModalState) {
+          void handleSave() {
+            String amountText = amountController.text.replaceAll(',', '');
+            bool isAmountValid =
+                amountText.isNotEmpty && validateAmount(amountText);
+            if (!isAmountValid || selectedDate == null) {
+              setModalState(() {
+                amountErrMsg = isAmountValid ? '' : 'Số tiền không hợp lệ';
+              });
+              return;
+            }
+            onSave(
+              Transaction(
+                id: isEditing ? initialTransaction.id : null,
+                description: descriptionController.text,
+                transAmount: num.parse(amountText),
+                transDate: selectedDate!,
+                categoryList: selectedCategories.map((c) => c.id).toList(),
+                categories:
+                    selectedCategories.map((c) => c.description).toList(),
+              ),
+            );
+            Navigator.of(context).pop();
+          }
+
+          Widget saveButtons = isEditing
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: CustomOutlinedButton(
+                        text: 'Cancel',
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: BigCustomButton(
+                        text: 'OK',
+                        onPressed: handleSave,
+                      ),
+                    ),
+                  ],
+                )
+              : BigCustomButton(
+                  text: 'Lưu',
+                  onPressed: handleSave,
+                );
+
           return Padding(
             padding: EdgeInsets.only(
               left: 16,
@@ -48,10 +112,10 @@ void showAddTransactionSheet(
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Add transaction',
-                        style:
-                            TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      Text(
+                        isEditing ? 'Sửa giao dịch' : 'Add transaction',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -60,7 +124,8 @@ void showAddTransactionSheet(
                     label: 'Số tiền',
                     placeholder: 'Nhập số tiền',
                     controller: amountController,
-                    keyboardType: TextInputType.number,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     errorMessage: amountErrMsg,
                     onChanged: (value) {
                       setModalState(() {
@@ -105,35 +170,7 @@ void showAddTransactionSheet(
                     maxLines: 4,
                   ),
                   const SizedBox(height: 8),
-                  BigCustomButton(
-                    text: 'Lưu',
-                    onPressed: () {
-                      String amountText =
-                          amountController.text.replaceAll(',', '');
-                      bool isAmountValid =
-                          amountText.isNotEmpty && validateAmount(amountText);
-                      if (!isAmountValid || selectedDate == null) {
-                        setModalState(() {
-                          amountErrMsg =
-                              isAmountValid ? '' : 'Số tiền không hợp lệ';
-                        });
-                        return;
-                      }
-                      onSave(
-                        Transaction(
-                          description: descriptionController.text,
-                          transAmount: num.parse(amountText),
-                          transDate: selectedDate!,
-                          categoryList:
-                              selectedCategories.map((c) => c.id).toList(),
-                          categories: selectedCategories
-                              .map((c) => c.description)
-                              .toList(),
-                        ),
-                      );
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                  saveButtons,
                 ],
               ),
             ),

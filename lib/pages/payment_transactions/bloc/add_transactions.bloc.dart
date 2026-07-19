@@ -16,6 +16,7 @@ class AddTransactionsBloc
     on<Inititalize>(_onInitialize);
     on<AddTempTransactionEvent>(_onAddTempTransaction);
     on<RemoveTempTransactionEvent>(_onRemoveTempTransaction);
+    on<EditTempTransactionEvent>(_onEditTempTransaction);
     on<SubmitTransactionsEvent>(_onSubmitTransactions);
 
     add(const Inititalize());
@@ -70,6 +71,17 @@ class AddTransactionsBloc
   ) {
     List<Transaction> tempTransactions = [...state.tempTransactions]
       ..removeAt(event.index);
+    emitter(
+      state.copyWith(tempTransactions: tempTransactions),
+    );
+  }
+
+  void _onEditTempTransaction(
+    EditTempTransactionEvent event,
+    Emitter<AddTransactionsState> emitter,
+  ) {
+    List<Transaction> tempTransactions = [...state.tempTransactions];
+    tempTransactions[event.index] = event.transaction;
     emitter(
       state.copyWith(tempTransactions: tempTransactions),
     );

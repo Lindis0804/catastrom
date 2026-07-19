@@ -18,6 +18,12 @@ class RemoveTempTransactionEvent extends AddTransactionsEvent {
   const RemoveTempTransactionEvent({required this.index});
 }
 
+class EditTempTransactionEvent extends AddTransactionsEvent {
+  final int index;
+  final Transaction transaction;
+  const EditTempTransactionEvent({required this.index, required this.transaction});
+}
+
 class SubmitTransactionsEvent extends AddTransactionsEvent {
   const SubmitTransactionsEvent();
 }

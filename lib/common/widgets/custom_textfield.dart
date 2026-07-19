@@ -174,7 +174,9 @@ class _NormalTextfieldState extends State<NormalTextfield> {
   }
 
   List<TextInputFormatter> _getInputFormatters() {
-    if (widget.keyboardType == TextInputType.number) {
+    if (widget.keyboardType == TextInputType.number ||
+        widget.keyboardType ==
+            const TextInputType.numberWithOptions(decimal: true)) {
       return [NumberInputFormatter()];
     }
     return [];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/payment_transactions.enum.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_empty_list.dart';
@@ -52,14 +54,46 @@ class _AddTransactionsState extends State<AddTransactions> {
                     subtitle: 'Nhấn nút "+" để thêm giao dịch',
                   )
                 : ListView.separated(
-                    itemBuilder: (context, idx) => TransactionListItem(
-                      transaction: state.tempTransactions[idx],
-                      onDelete: () {
-                        widget.bloc.add(
-                          RemoveTempTransactionEvent(index: idx),
-                        );
-                      },
-                    ),
+                    itemBuilder: (context, idx) {
+                      final transaction = state.tempTransactions[idx];
+                      return Slidable(
+                        endActionPane: ActionPane(
+                          motion: const StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) {
+                                showAddTransactionSheet(
+                                  context,
+                                  initialTransaction: transaction,
+                                  onSave: (updated) {
+                                    widget.bloc.add(
+                                      EditTempTransactionEvent(
+                                        index: idx,
+                                        transaction: updated,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              backgroundColor: CustomColors.primary,
+                              icon: Icons.edit_rounded,
+                              label: 'Sửa',
+                            ),
+                            SlidableAction(
+                              onPressed: (context) {
+                                widget.bloc.add(
+                                  RemoveTempTransactionEvent(index: idx),
+                                );
+                              },
+                              backgroundColor: CustomColors.error,
+                              icon: Icons.delete_rounded,
+                              label: 'Xoá',
+                            ),
+                          ],
+                        ),
+                        child: TransactionListItem(transaction: transaction),
+                      );
+                    },
                     separatorBuilder: (context, idx) =>
                         const CustomListSeparator(),
                     itemCount: state.tempTransactions.length,

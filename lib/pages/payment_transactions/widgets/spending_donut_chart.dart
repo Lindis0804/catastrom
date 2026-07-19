@@ -29,7 +29,7 @@ class _DonutChartPainter extends CustomPainter {
   _DonutChartPainter({required this.items});
 
   static const double _strokeWidth = 28;
-  static const double _gapDegrees = 3;
+  static const double _gapDegrees = 0;
 
   @override
   void paint(Canvas canvas, Size size) {
