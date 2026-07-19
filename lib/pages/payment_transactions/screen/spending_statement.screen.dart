@@ -159,7 +159,7 @@ class _SpendingByCategoryBody extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Tổng số tiền',
+                      'Tổng số tiền (k VND)',
                       style: TextStyle(
                         fontSize: 13,
                         color: CustomColors.textLabel,
@@ -244,8 +244,7 @@ class _SpendingByCategoryBody extends StatelessWidget {
                         child: (state.summary == null ||
                                 state.summary!.amountByCategory.isEmpty)
                             ? ListView(
-                                physics:
-                                    const AlwaysScrollableScrollPhysics(),
+                                physics: const AlwaysScrollableScrollPhysics(),
                                 children: const [
                                   CustomEmptyList(
                                     icon: Icons.pie_chart_outline,
@@ -254,8 +253,7 @@ class _SpendingByCategoryBody extends StatelessWidget {
                                 ],
                               )
                             : ListView.separated(
-                                physics:
-                                    const AlwaysScrollableScrollPhysics(),
+                                physics: const AlwaysScrollableScrollPhysics(),
                                 itemBuilder: (context, idx) {
                                   final category =
                                       state.summary!.amountByCategory[idx];

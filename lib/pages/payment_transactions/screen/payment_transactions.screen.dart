@@ -1,19 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/enums/payment_transactions.enum.dart';
 import 'package:template/common/widgets/custom_date_picker.dart';
 import 'package:template/common/widgets/custom_empty_list.dart';
-import 'package:template/common/widgets/custom_list_separator.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/common/widgets/top_notification.dart';
 import 'package:template/data/models/payment/category.model.dart';
+import 'package:template/data/models/payment/transaction.model.dart';
 import 'package:template/pages/payment_transactions/bloc/payment_transactions.bloc.dart';
 import 'package:template/pages/payment_transactions/widgets/category_search_picker.dart';
 import 'package:template/pages/payment_transactions/widgets/transaction_list_item.dart';
 import 'package:template/root/app_routers.dart';
+
+// Flattens a transDate-sorted list into date-header + transaction rows for
+// ListView.builder (transactions are already sorted DESC by transDate, so
+// this only needs to detect when the date changes, not resort anything).
+List<Object> _groupTransactionsByDate(List<Transaction> transactions) {
+  List<Object> rows = [];
+  DateTime? lastDate;
+  for (final transaction in transactions) {
+    DateTime dateOnly = DateTime(
+      transaction.transDate.year,
+      transaction.transDate.month,
+      transaction.transDate.day,
+    );
+    if (lastDate == null || dateOnly != lastDate) {
+      rows.add(dateOnly);
+      lastDate = dateOnly;
+    }
+    rows.add(transaction);
+  }
+  return rows;
+}
 
 class PaymentTransactions extends StatefulWidget {
   const PaymentTransactions({
@@ -150,47 +172,7 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
                 ? const Center(child: CircularProgressIndicator())
                 : RefreshIndicator(
                     onRefresh: () => _onRefresh(widget.bloc),
-                    child: (state.transactions == null ||
-                            state.transactions!.isEmpty)
-                        ? ListView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            children: const [
-                              CustomEmptyList(
-                                icon: Icons.receipt_long_outlined,
-                                title: 'Không có giao dịch nào',
-                              ),
-                            ],
-                          )
-                        : ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            itemBuilder: (context, idx) {
-                              final transaction = state.transactions![idx];
-                              return Slidable(
-                                endActionPane: ActionPane(
-                                  motion: const StretchMotion(),
-                                  children: [
-                                    SlidableAction(
-                                      onPressed: (context) =>
-                                          _confirmDeleteTransaction(
-                                        context,
-                                        widget.bloc,
-                                        transaction.id!,
-                                      ),
-                                      backgroundColor: CustomColors.error,
-                                      icon: Icons.delete_rounded,
-                                      label: 'Xoá',
-                                    ),
-                                  ],
-                                ),
-                                child: TransactionListItem(
-                                  transaction: transaction,
-                                ),
-                              );
-                            },
-                            separatorBuilder: (context, idx) =>
-                                const CustomListSeparator(),
-                            itemCount: state.transactions!.length,
-                          ),
+                    child: _buildTransactionsList(state),
                   ),
           ),
           if (!state.getTransactionsStatus.isLoading &&
@@ -199,6 +181,64 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
             _PaginationControls(bloc: widget.bloc, state: state),
         ],
       ),
+    );
+  }
+
+  Widget _buildTransactionsList(PaymentTransactionsState state) {
+    if (state.transactions == null || state.transactions!.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          CustomEmptyList(
+            icon: Icons.receipt_long_outlined,
+            title: 'Không có giao dịch nào',
+          ),
+        ],
+      );
+    }
+
+    List<Object> rows = _groupTransactionsByDate(state.transactions!);
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: rows.length,
+      itemBuilder: (context, idx) {
+        final row = rows[idx];
+        if (row is DateTime) {
+          return Padding(
+            padding: EdgeInsets.only(top: idx == 0 ? 0 : 12, bottom: 6),
+            child: Text(
+              DateFormat('dd/MM/yyyy').format(row),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: CustomColors.textLabel,
+              ),
+            ),
+          );
+        }
+        final transaction = row as Transaction;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Slidable(
+            endActionPane: ActionPane(
+              motion: const StretchMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (context) => _confirmDeleteTransaction(
+                    context,
+                    widget.bloc,
+                    transaction.id!,
+                  ),
+                  backgroundColor: CustomColors.error,
+                  icon: Icons.delete_rounded,
+                  label: 'Xoá',
+                ),
+              ],
+            ),
+            child: TransactionListItem(transaction: transaction),
+          ),
+        );
+      },
     );
   }
 }
