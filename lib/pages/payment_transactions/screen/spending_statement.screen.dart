@@ -12,6 +12,9 @@ import 'package:template/data/models/payment/monthly_total.model.dart';
 import 'package:template/pages/payment_transactions/bloc/spending_by_category.bloc.dart';
 import 'package:template/pages/payment_transactions/screen/payment_transactions.screen.dart';
 import 'package:template/pages/payment_transactions/widgets/amount_by_category_item.dart';
+import 'package:template/pages/payment_transactions/widgets/category_transactions_sheet.dart';
+import 'package:template/pages/payment_transactions/widgets/spending_donut_chart.dart';
+import 'package:template/pages/payment_transactions/widgets/spending_donut_legend.dart';
 
 class SpendingStatementScreen extends StatefulWidget {
   const SpendingStatementScreen({super.key, required this.monthlyTotal});
@@ -175,6 +178,26 @@ class _SpendingByCategoryBody extends StatelessWidget {
                   ],
                 ),
               ),
+              if (state.summary != null &&
+                  state.summary!.amountByCategory.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: SpendingDonutChart(
+                        items: state.summary!.amountByCategory,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SpendingDonutLegend(
+                        items: state.summary!.amountByCategory,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
@@ -233,10 +256,27 @@ class _SpendingByCategoryBody extends StatelessWidget {
                             : ListView.separated(
                                 physics:
                                     const AlwaysScrollableScrollPhysics(),
-                                itemBuilder: (context, idx) =>
-                                    AmountByCategoryItem(
-                                  item: state.summary!.amountByCategory[idx],
-                                ),
+                                itemBuilder: (context, idx) {
+                                  final category =
+                                      state.summary!.amountByCategory[idx];
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(8),
+                                      onTap: () {
+                                        showCategoryTransactionsSheet(
+                                          context,
+                                          category: category,
+                                          dateFrom: bloc.dateFrom,
+                                          dateTo: bloc.dateTo,
+                                        );
+                                      },
+                                      child: AmountByCategoryItem(
+                                        item: category,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 separatorBuilder: (context, idx) =>
                                     const CustomListSeparator(),
                                 itemCount:

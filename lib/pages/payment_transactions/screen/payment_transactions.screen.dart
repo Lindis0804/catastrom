@@ -9,6 +9,7 @@ import 'package:template/common/widgets/custom_empty_list.dart';
 import 'package:template/common/widgets/custom_list_separator.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/common/widgets/top_notification.dart';
+import 'package:template/data/models/payment/category.model.dart';
 import 'package:template/pages/payment_transactions/bloc/payment_transactions.bloc.dart';
 import 'package:template/pages/payment_transactions/widgets/category_search_picker.dart';
 import 'package:template/pages/payment_transactions/widgets/transaction_list_item.dart';
@@ -20,10 +21,12 @@ class PaymentTransactions extends StatefulWidget {
     required this.bloc,
     this.lockDateRange = false,
     this.embedded = false,
+    this.showFilterBar = true,
   });
   final PaymentTransactionsBloc bloc;
   final bool lockDateRange;
   final bool embedded;
+  final bool showFilterBar;
 
   @override
   State<PaymentTransactions> createState() => _PaymentTransactionsState();
@@ -62,81 +65,83 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          Row(
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  widget.bloc.add(const ToggleFilterEvent());
-                },
-                icon: const Icon(Icons.filter_list_rounded),
-                label: const Text('Filter'),
-              ),
-              if (widget.embedded) ...[
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.add_rounded),
-                  tooltip: 'Add transaction',
+          if (widget.showFilterBar) ...[
+            Row(
+              children: [
+                TextButton.icon(
                   onPressed: () {
-                    widget.bloc.add(const ToAddTransactionsEvent());
+                    widget.bloc.add(const ToggleFilterEvent());
                   },
+                  icon: const Icon(Icons.filter_list_rounded),
+                  label: const Text('Filter'),
                 ),
-              ],
-            ],
-          ),
-          if (state.isFilterExpanded) ...[
-            CategorySearchPicker(
-              selectedCategories: state.selectedFilterCategories,
-              onChanged: (categories) {
-                widget.bloc.add(
-                  FilterChanged(
-                    categories: categories,
-                    dateFrom: state.dateFrom,
-                    dateTo: state.dateTo,
-                  ),
-                );
-              },
-            ),
-            if (!widget.lockDateRange) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDatePicker(
-                      label: 'Từ ngày',
-                      placeholder: 'Từ ngày',
-                      dateFormat: 'dd/MM/yyyy',
-                      initialDate: state.dateFrom,
-                      onDateChanged: (date) {
-                        widget.bloc.add(
-                          FilterChanged(
-                            categories: state.selectedFilterCategories,
-                            dateFrom: date,
-                            dateTo: state.dateTo,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: CustomDatePicker(
-                      label: 'Đến ngày',
-                      placeholder: 'Đến ngày',
-                      dateFormat: 'dd/MM/yyyy',
-                      initialDate: state.dateTo,
-                      onDateChanged: (date) {
-                        widget.bloc.add(
-                          FilterChanged(
-                            categories: state.selectedFilterCategories,
-                            dateFrom: state.dateFrom,
-                            dateTo: date,
-                          ),
-                        );
-                      },
-                    ),
+                if (widget.embedded) ...[
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.add_rounded),
+                    tooltip: 'Add transaction',
+                    onPressed: () {
+                      widget.bloc.add(const ToAddTransactionsEvent());
+                    },
                   ),
                 ],
+              ],
+            ),
+            if (state.isFilterExpanded) ...[
+              CategorySearchPicker(
+                selectedCategories: state.selectedFilterCategories,
+                onChanged: (categories) {
+                  widget.bloc.add(
+                    FilterChanged(
+                      categories: categories,
+                      dateFrom: state.dateFrom,
+                      dateTo: state.dateTo,
+                    ),
+                  );
+                },
               ),
+              if (!widget.lockDateRange) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomDatePicker(
+                        label: 'Từ ngày',
+                        placeholder: 'Từ ngày',
+                        dateFormat: 'dd/MM/yyyy',
+                        initialDate: state.dateFrom,
+                        onDateChanged: (date) {
+                          widget.bloc.add(
+                            FilterChanged(
+                              categories: state.selectedFilterCategories,
+                              dateFrom: date,
+                              dateTo: state.dateTo,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: CustomDatePicker(
+                        label: 'Đến ngày',
+                        placeholder: 'Đến ngày',
+                        dateFormat: 'dd/MM/yyyy',
+                        initialDate: state.dateTo,
+                        onDateChanged: (date) {
+                          widget.bloc.add(
+                            FilterChanged(
+                              categories: state.selectedFilterCategories,
+                              dateFrom: state.dateFrom,
+                              dateTo: date,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ],
           const SizedBox(height: 8),
@@ -287,14 +292,20 @@ class PaymentTransactionsScreen extends StatelessWidget {
     super.key,
     this.initialDateFrom,
     this.initialDateTo,
+    this.initialCategories,
     this.lockDateRange = false,
     this.embedded = false,
+    this.showFilterBar = true,
+    this.pageSize = 6,
   });
 
   final DateTime? initialDateFrom;
   final DateTime? initialDateTo;
+  final List<Category>? initialCategories;
   final bool lockDateRange;
   final bool embedded;
+  final bool showFilterBar;
+  final int pageSize;
 
   @override
   Widget build(BuildContext context) {
@@ -302,6 +313,8 @@ class PaymentTransactionsScreen extends StatelessWidget {
       create: (_) => PaymentTransactionsBloc(
         initialDateFrom: initialDateFrom,
         initialDateTo: initialDateTo,
+        initialCategories: initialCategories,
+        pageSize: pageSize,
       ),
       child: MultiBlocListener(
         listeners: [
@@ -356,6 +369,7 @@ class PaymentTransactionsScreen extends StatelessWidget {
             bloc: context.read<PaymentTransactionsBloc>(),
             lockDateRange: lockDateRange,
             embedded: embedded,
+            showFilterBar: showFilterBar,
           ),
         ),
       ),

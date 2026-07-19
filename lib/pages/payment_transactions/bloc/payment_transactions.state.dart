@@ -37,11 +37,13 @@ class PaymentTransactionsState extends Equatable {
   factory PaymentTransactionsState.initialize({
     DateTime? dateFrom,
     DateTime? dateTo,
+    List<Category>? categories,
   }) {
     DateTime now = DateTime.now();
     return PaymentTransactionsState(
       dateFrom: dateFrom ?? now.subtract(const Duration(days: 10)),
       dateTo: dateTo ?? now,
+      selectedFilterCategories: categories ?? const [],
     );
   }
 
