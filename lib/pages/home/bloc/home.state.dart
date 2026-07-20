@@ -7,7 +7,8 @@ class HomeState extends Equatable {
       getRecommenedPlacesStatus,
       getMyPlansStatus,
       getMonthlyTotalsStatus,
-      getCurrentMonthSpentStatus;
+      getCurrentMonthSpentStatus,
+      getDailyTotalsStatus;
   final User? user;
   final List<RecommendedPlace>? recommendedPlaces;
   final List<Plan>? myPlans;
@@ -15,11 +16,13 @@ class HomeState extends Equatable {
   final ESortOrder sortOrder;
   final List<MonthlyTotal>? monthlyTotals;
   final MonthlyTotal? currentMonthTotal;
+  final List<TotalByDate>? dailyTotals;
   final String? getUserErrMsg,
       getRecommendedPlacesErrMsg,
       getMyPlansErrMsg,
       getMonthlyTotalsErrMsg,
-      getCurrentMonthSpentErrMsg;
+      getCurrentMonthSpentErrMsg,
+      getDailyTotalsErrMsg;
 
   const HomeState(
       {this.homeStatus = HomeStatus.init,
@@ -28,6 +31,7 @@ class HomeState extends Equatable {
       this.getMyPlansStatus = LoadingStatus.initialize,
       this.getMonthlyTotalsStatus = LoadingStatus.initialize,
       this.getCurrentMonthSpentStatus = LoadingStatus.initialize,
+      this.getDailyTotalsStatus = LoadingStatus.initialize,
       this.user,
       this.recommendedPlaces,
       this.myPlans,
@@ -36,11 +40,13 @@ class HomeState extends Equatable {
       this.sortOrder = ESortOrder.asc,
       this.monthlyTotals,
       this.currentMonthTotal,
+      this.dailyTotals,
       this.getUserErrMsg,
       this.getRecommendedPlacesErrMsg,
       this.getMyPlansErrMsg,
       this.getMonthlyTotalsErrMsg,
-      this.getCurrentMonthSpentErrMsg});
+      this.getCurrentMonthSpentErrMsg,
+      this.getDailyTotalsErrMsg});
 
   factory HomeState.initialize() {
     DateTime now = DateTime.now();
@@ -51,6 +57,7 @@ class HomeState extends Equatable {
         getMyPlansStatus: LoadingStatus.initialize,
         getMonthlyTotalsStatus: LoadingStatus.initialize,
         getCurrentMonthSpentStatus: LoadingStatus.initialize,
+        getDailyTotalsStatus: LoadingStatus.initialize,
         monthFrom: DateTime(now.year, now.month - 1),
         monthTo: DateTime(now.year, now.month));
   }
@@ -62,6 +69,7 @@ class HomeState extends Equatable {
       LoadingStatus? getMyPlansStatus,
       LoadingStatus? getMonthlyTotalsStatus,
       LoadingStatus? getCurrentMonthSpentStatus,
+      LoadingStatus? getDailyTotalsStatus,
       User? user,
       List<RecommendedPlace>? recommendedPlaces,
       List<Plan>? myPlans,
@@ -70,11 +78,13 @@ class HomeState extends Equatable {
       ESortOrder? sortOrder,
       List<MonthlyTotal>? monthlyTotals,
       MonthlyTotal? currentMonthTotal,
+      List<TotalByDate>? dailyTotals,
       String? getUserErrMsg,
       String? getRecommendedPlacesErrMsg,
       String? getMyPlansErrMsg,
       String? getMonthlyTotalsErrMsg,
-      String? getCurrentMonthSpentErrMsg}) {
+      String? getCurrentMonthSpentErrMsg,
+      String? getDailyTotalsErrMsg}) {
     return HomeState(
         homeStatus: homeStatus ?? this.homeStatus,
         getUserStatus: getUserStatus ?? this.getUserStatus,
@@ -85,6 +95,7 @@ class HomeState extends Equatable {
             getMonthlyTotalsStatus ?? this.getMonthlyTotalsStatus,
         getCurrentMonthSpentStatus:
             getCurrentMonthSpentStatus ?? this.getCurrentMonthSpentStatus,
+        getDailyTotalsStatus: getDailyTotalsStatus ?? this.getDailyTotalsStatus,
         user: user ?? this.user,
         recommendedPlaces: recommendedPlaces ?? this.recommendedPlaces,
         myPlans: myPlans ?? this.myPlans,
@@ -93,6 +104,7 @@ class HomeState extends Equatable {
         sortOrder: sortOrder ?? this.sortOrder,
         monthlyTotals: monthlyTotals ?? this.monthlyTotals,
         currentMonthTotal: currentMonthTotal ?? this.currentMonthTotal,
+        dailyTotals: dailyTotals ?? this.dailyTotals,
         getUserErrMsg: getUserErrMsg ?? this.getUserErrMsg,
         getRecommendedPlacesErrMsg:
             getRecommendedPlacesErrMsg ?? this.getRecommendedPlacesErrMsg,
@@ -100,7 +112,8 @@ class HomeState extends Equatable {
         getMonthlyTotalsErrMsg:
             getMonthlyTotalsErrMsg ?? this.getMonthlyTotalsErrMsg,
         getCurrentMonthSpentErrMsg:
-            getCurrentMonthSpentErrMsg ?? this.getCurrentMonthSpentErrMsg);
+            getCurrentMonthSpentErrMsg ?? this.getCurrentMonthSpentErrMsg,
+        getDailyTotalsErrMsg: getDailyTotalsErrMsg ?? this.getDailyTotalsErrMsg);
   }
 
   @override
@@ -111,6 +124,7 @@ class HomeState extends Equatable {
         getMyPlansStatus,
         getMonthlyTotalsStatus,
         getCurrentMonthSpentStatus,
+        getDailyTotalsStatus,
         user,
         recommendedPlaces,
         myPlans,
@@ -119,10 +133,12 @@ class HomeState extends Equatable {
         sortOrder,
         monthlyTotals,
         currentMonthTotal,
+        dailyTotals,
         getUserErrMsg,
         getRecommendedPlacesErrMsg,
         getMyPlansErrMsg,
         getMonthlyTotalsErrMsg,
-        getCurrentMonthSpentErrMsg
+        getCurrentMonthSpentErrMsg,
+        getDailyTotalsErrMsg
       ];
 }

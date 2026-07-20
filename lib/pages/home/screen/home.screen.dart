@@ -9,6 +9,7 @@ import 'package:template/common/widgets/custom_empty_list.dart';
 import 'package:template/common/widgets/custom_list_separator.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/data/models/payment/monthly_total.model.dart';
+import 'package:template/pages/home/widgets/daily_totals_bar_chart.dart';
 import 'package:template/pages/payment_transactions/models/spending_statement_arguments.dart';
 import 'package:template/root/app_routers.dart';
 
@@ -55,6 +56,11 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         },
+                ),
+                const SizedBox(height: 12),
+                DailyTotalsBarChart(
+                  items: state.dailyTotals ?? const [],
+                  isLoading: state.getDailyTotalsStatus.isLoading,
                 ),
                 const SizedBox(height: 12),
                 Row(

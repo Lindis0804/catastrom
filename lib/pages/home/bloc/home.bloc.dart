@@ -11,6 +11,7 @@ import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/enums/sort_order.enum.dart';
 import 'package:template/common/utils/share_preferences.dart';
 import 'package:template/data/models/payment/monthly_total.model.dart';
+import 'package:template/data/models/payment/total_by_date.model.dart';
 import 'package:template/data/models/plan/plan.model.dart';
 import 'package:template/data/models/user/user.model.dart';
 
@@ -107,6 +108,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }(),
           _fetchMonthlyTotals(emitter),
           _fetchCurrentMonthSpent(emitter),
+          _fetchDailyTotals(emitter),
         ],
       );
     } catch (err) {
@@ -178,6 +180,36 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         state.copyWith(
           getCurrentMonthSpentStatus: LoadingStatus.error,
           getCurrentMonthSpentErrMsg: 'Get current month spent fail: $err',
+        ),
+      );
+    }
+  }
+
+  Future<void> _fetchDailyTotals(Emitter<HomeState> emitter) async {
+    emitter(
+      state.copyWith(getDailyTotalsStatus: LoadingStatus.loading),
+    );
+    try {
+      String accessToken = await SharedPreferencesManager.getAccessToken();
+      DateTime dateTo = DateTime.now();
+      DateTime dateFrom = dateTo.subtract(const Duration(days: 6));
+      List<TotalByDate> dailyTotals =
+          await PaymentApiProvider(accessToken: accessToken).getTotalByDate(
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+        orderValue: 'ASC',
+      );
+      emitter(
+        state.copyWith(
+          dailyTotals: dailyTotals,
+          getDailyTotalsStatus: LoadingStatus.loaded,
+        ),
+      );
+    } catch (err) {
+      emitter(
+        state.copyWith(
+          getDailyTotalsStatus: LoadingStatus.error,
+          getDailyTotalsErrMsg: 'Get daily totals fail: $err',
         ),
       );
     }

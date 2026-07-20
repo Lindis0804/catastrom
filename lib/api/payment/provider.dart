@@ -5,6 +5,7 @@ import 'package:template/common/utils/env.dart';
 import 'package:template/data/models/payment/category.model.dart';
 import 'package:template/data/models/payment/monthly_total.model.dart';
 import 'package:template/data/models/payment/spending_by_category_summary.model.dart';
+import 'package:template/data/models/payment/total_by_date.model.dart';
 import 'package:template/data/models/payment/transaction.model.dart';
 
 class PaymentApiProvider {
@@ -135,5 +136,28 @@ class PaymentApiProvider {
       throw Exception('Get total by category fail: ${resData['error']}');
     }
     return SpendingByCategorySummary.fromDynamic(resData['data']);
+  }
+
+  Future<List<TotalByDate>> getTotalByDate({
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    String orderValue = 'ASC',
+  }) async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/doc/total-by-date',
+      queryParameters: {
+        'dateFrom': DateFormat('dd/MM/yyyy').format(dateFrom),
+        'dateTo': DateFormat('dd/MM/yyyy').format(dateTo),
+        'orderValue': orderValue,
+      },
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception('Get total by date fail: ${resData['error']}');
+    }
+    List<dynamic> rawTotalsData = resData['data'];
+    return rawTotalsData
+        .map((dynamic rawTotal) => TotalByDate.fromDynamic(rawTotal))
+        .toList();
   }
 }
