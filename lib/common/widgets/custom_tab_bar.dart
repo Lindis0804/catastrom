@@ -4,12 +4,14 @@ class TabItem extends StatelessWidget {
   final String title;
   final bool isActive;
   final VoidCallback? onTap;
+  final Color activeColor;
 
   const TabItem({
     Key? key,
     required this.title,
     this.isActive = false,
     this.onTap,
+    this.activeColor = Colors.black,
   }) : super(key: key);
 
   @override
@@ -21,7 +23,7 @@ class TabItem extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isActive ? Colors.black : Colors.transparent,
+              color: isActive ? activeColor : Colors.transparent,
               width: 2,
             ),
           ),
@@ -32,7 +34,7 @@ class TabItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
+              color: isActive ? activeColor : Colors.black,
             ),
           ),
         ),
@@ -46,12 +48,14 @@ class CustomTabBar extends StatelessWidget {
   final List<String> tabs;
   final int selectedIndex;
   final Function(int) onTabSelected;
+  final Color activeColor;
 
   const CustomTabBar({
     Key? key,
     required this.tabs,
     required this.selectedIndex,
     required this.onTabSelected,
+    this.activeColor = Colors.black,
   }) : super(key: key);
 
   @override
@@ -65,6 +69,7 @@ class CustomTabBar extends StatelessWidget {
             title: tab,
             isActive: index == selectedIndex,
             onTap: () => onTabSelected(index),
+            activeColor: activeColor,
           ),
         );
       }).toList(),

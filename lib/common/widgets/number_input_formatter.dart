@@ -14,8 +14,10 @@ class NumberInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    // Loại bỏ tất cả ký tự không phải số và dấu chấm để lấy giá trị thực
-    String digitsOnly = newValue.text.replaceAll(RegExp(r'[^\d.]'), '');
+    // Coi dấu phẩy được gõ vào như dấu chấm thập phân, rồi loại bỏ tất cả
+    // ký tự không phải số và dấu chấm để lấy giá trị thực
+    String digitsOnly =
+        newValue.text.replaceAll(',', '.').replaceAll(RegExp(r'[^\d.]'), '');
 
     // Nếu không có số nào, return old value
     if (digitsOnly.isEmpty) {

@@ -6,12 +6,10 @@ import 'package:template/pages/payment_transactions/widgets/category_color.dart'
 
 class TransactionListItem extends StatelessWidget {
   final Transaction transaction;
-  final VoidCallback? onDelete;
 
   const TransactionListItem({
     super.key,
     required this.transaction,
-    this.onDelete,
   });
 
   @override
@@ -48,14 +46,6 @@ class TransactionListItem extends StatelessWidget {
                   color: CustomColors.primary,
                 ),
               ),
-              if (onDelete != null) ...[
-                const SizedBox(width: 4),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, size: 20),
-                  color: CustomColors.error,
-                  onPressed: onDelete,
-                ),
-              ],
             ],
           ),
           const SizedBox(height: 6),

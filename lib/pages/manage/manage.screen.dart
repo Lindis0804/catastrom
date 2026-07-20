@@ -4,15 +4,11 @@ import 'package:template/common/constants/colors.dart';
 import 'package:template/pages/home/screen/home.screen.dart';
 import 'package:template/pages/manage/bloc/manage.bloc.dart';
 import 'package:template/pages/manage/constants.dart';
-import 'package:template/pages/newfeeds/newfeeds.screen.dart';
 import 'package:template/pages/notifications/screen/notifications.screen.dart';
 import 'package:template/pages/payment_transactions/screen/payment_transactions.screen.dart';
-import 'package:template/pages/plans/screens/plans.screen.dart';
 import 'package:template/pages/profile/profile.screen.dart';
 import 'package:template/pages/settings/screen/settings.screen.dart';
 import 'package:template/generated/assets.gen.dart';
-import 'package:template/pages/shop/shop.screen.dart';
-import 'package:template/pages/trip/trip.screen.dart';
 import 'dart:math' as math;
 
 class Manage extends StatefulWidget {
@@ -58,8 +54,11 @@ class _ManageState extends State<Manage> {
             data: Theme.of(context)
                 .copyWith(iconTheme: const IconThemeData(color: Colors.black)),
             child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               currentIndex: state.pageIdx,
               selectedItemColor: CustomColors.primary,
+              unselectedItemColor: CustomColors.gray,
+              showUnselectedLabels: true,
               items: <BottomNavigationBarItem>[
                 getCustomNavigationItem(
                     icon: Assets.svgIcons.homePage,
@@ -75,14 +74,6 @@ class _ManageState extends State<Manage> {
                   ),
                   label: 'Thu chi',
                 ),
-                // getCustomNavigationItem(
-                //     icon: Assets.svgIcons.myPlan,
-                //     label: 'Kế hoạch',
-                //     isSelected: state.pageIdx == IManagePageIdx.MY_PLANS),
-                // getCustomNavigationItem(
-                //     icon: Assets.svgIcons.favorite,
-                //     label: 'Yêu thích',
-                //     isSelected: state.pageIdx == IManagePageIdx.FAVORITE),
                 getCustomNavigationItem(
                     icon: Assets.svgIcons.profile,
                     label: 'Cá nhân',
@@ -112,28 +103,6 @@ class _ManageState extends State<Manage> {
 
 void _listener(BuildContext context, ManageState state) async {
   switch (state.pageIdx) {
-    // case IManagePageIdx.CREATE_PLAN:
-    //   ResCreateTrip? resCreateTrip = await Navigator.of(context)
-    //       .pushNamed(AppRouters.newPlan) as ResCreateTrip?;
-    //   if (!context.mounted) {
-    //     return;
-    //   }
-    //   if (resCreateTrip != null) {
-    //     context.read<ManageBloc>().emit(
-    //           state.copyWith(
-    //             pageManageStatus: EPageManageStatus.init,
-    //             pageIdx: IManagePageIdx.MY_PLANS,
-    //           ),
-    //         );
-    //   }
-
-    //   context.read<ManageBloc>().emit(
-    //         state.copyWith(
-    //           pageManageStatus: EPageManageStatus.init,
-    //           pageIdx: IManagePageIdx.HOME_PAGE,
-    //         ),
-    //       );
-    //   break;
     default:
   }
 }

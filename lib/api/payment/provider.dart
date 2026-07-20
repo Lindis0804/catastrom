@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:template/common/utils/dio.utils.dart';
 import 'package:template/common/utils/env.dart';
 import 'package:template/data/models/payment/category.model.dart';
+import 'package:template/data/models/payment/monthly_total.model.dart';
+import 'package:template/data/models/payment/spending_by_category_summary.model.dart';
+import 'package:template/data/models/payment/total_by_date.model.dart';
 import 'package:template/data/models/payment/transaction.model.dart';
 
 class PaymentApiProvider {
@@ -28,7 +31,7 @@ class PaymentApiProvider {
         'pageIdx': pageIdx,
         'limit': limit,
         if (categoryIds != null && categoryIds.isNotEmpty)
-          'categoryIds': categoryIds.join(','),
+          'category': categoryIds.join(','),
       },
     );
     dynamic resData = res.data;
@@ -86,5 +89,75 @@ class PaymentApiProvider {
     if (resData['status'] != 200) {
       throw Exception(resData['error'] ?? 'Delete transaction failed');
     }
+  }
+
+  Future<List<MonthlyTotal>> getTotalByMonth({
+    required DateTime from,
+    required DateTime to,
+    required String order,
+  }) async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/doc/total-by-month',
+      queryParameters: {
+        'from': DateFormat('MM/yyyy').format(from),
+        'to': DateFormat('MM/yyyy').format(to),
+        'saveAmount': false,
+        'order': order,
+      },
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception('Get total by month fail: ${resData['error']}');
+    }
+    List<dynamic> rawMonthlyTotalsData = resData['data'];
+    return rawMonthlyTotalsData
+        .map((dynamic rawMonthlyTotal) =>
+            MonthlyTotal.fromDynamic(rawMonthlyTotal))
+        .toList();
+  }
+
+  Future<SpendingByCategorySummary> getTotalByCategory({
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    String orderType = 'amount',
+    String orderValue = 'DESC',
+  }) async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/doc/total-by-category',
+      queryParameters: {
+        'dateFrom': DateFormat('dd/MM/yyyy').format(dateFrom),
+        'dateTo': DateFormat('dd/MM/yyyy').format(dateTo),
+        'orderType': orderType,
+        'orderValue': orderValue,
+      },
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception('Get total by category fail: ${resData['error']}');
+    }
+    return SpendingByCategorySummary.fromDynamic(resData['data']);
+  }
+
+  Future<List<TotalByDate>> getTotalByDate({
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    String orderValue = 'ASC',
+  }) async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/doc/total-by-date',
+      queryParameters: {
+        'dateFrom': DateFormat('dd/MM/yyyy').format(dateFrom),
+        'dateTo': DateFormat('dd/MM/yyyy').format(dateTo),
+        'orderValue': orderValue,
+      },
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception('Get total by date fail: ${resData['error']}');
+    }
+    List<dynamic> rawTotalsData = resData['data'];
+    return rawTotalsData
+        .map((dynamic rawTotal) => TotalByDate.fromDynamic(rawTotal))
+        .toList();
   }
 }

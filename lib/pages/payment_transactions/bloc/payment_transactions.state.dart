@@ -34,11 +34,16 @@ class PaymentTransactionsState extends Equatable {
     this.deleteTransactionErrMsg,
   });
 
-  factory PaymentTransactionsState.initialize() {
+  factory PaymentTransactionsState.initialize({
+    DateTime? dateFrom,
+    DateTime? dateTo,
+    List<Category>? categories,
+  }) {
     DateTime now = DateTime.now();
     return PaymentTransactionsState(
-      dateFrom: now.subtract(const Duration(days: 10)),
-      dateTo: now,
+      dateFrom: dateFrom ?? now.subtract(const Duration(days: 10)),
+      dateTo: dateTo ?? now,
+      selectedFilterCategories: categories ?? const [],
     );
   }
 

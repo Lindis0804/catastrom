@@ -27,6 +27,7 @@ dependencies:
   drift: ^2.26.1
   drift_flutter: ^0.2.4
   path_provider: ^2.1.5
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:
@@ -42,11 +43,54 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    # - .env
+    - .env
     - assets/fonts/
     - assets/images/
     - assets/icons/
     - assets/svg_icons/
+  fonts:
+    - family: AvertaStdCY
+      fonts:
+        - asset: assets/fonts/averta-std/AvertaStd-Extrathin.otf
+          weight: 100
+        - asset: assets/fonts/averta-std/AvertaStd-ExtrathinItalic.otf
+          weight: 100
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-Thin.otf
+          weight: 200
+        - asset: assets/fonts/averta-std/AvertaStd-ThinItalic.otf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-Light.otf
+          weight: 300
+        - asset: assets/fonts/averta-std/AvertaStd-LightItalic.otf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-Regular.otf
+          weight: 400
+        - asset: assets/fonts/averta-std/AvertaStd-RegularItalic.otf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-Semibold.otf
+          weight: 600
+        - asset: assets/fonts/averta-std/AvertaStd-SemiboldItalic.otf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-Bold.otf
+          weight: 700
+        - asset: assets/fonts/averta-std/AvertaStd-BoldItalic.otf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-ExtraBold.otf
+          weight: 800
+        - asset: assets/fonts/averta-std/AvertaStd-ExtraBoldItalic.otf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/averta-std/AvertaStd-Black.otf
+          weight: 900
+        - asset: assets/fonts/averta-std/AvertaStd-BlackItalic.otf
+          weight: 900
+          style: italic
 
 # region: flutter pub run build_runner build --delete-conflicting-outputs
 flutter_gen:

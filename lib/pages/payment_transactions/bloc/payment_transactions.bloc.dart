@@ -12,9 +12,21 @@ part 'payment_transactions.state.dart';
 
 class PaymentTransactionsBloc
     extends Bloc<PaymentTransactionsEvent, PaymentTransactionsState> {
-  static const int _pageSize = 6;
+  final int _pageSize;
 
-  PaymentTransactionsBloc() : super(PaymentTransactionsState.initialize()) {
+  PaymentTransactionsBloc({
+    DateTime? initialDateFrom,
+    DateTime? initialDateTo,
+    List<Category>? initialCategories,
+    int pageSize = 6,
+  })  : _pageSize = pageSize,
+        super(
+          PaymentTransactionsState.initialize(
+            dateFrom: initialDateFrom,
+            dateTo: initialDateTo,
+            categories: initialCategories,
+          ),
+        ) {
     on<Inititalize>(_onInitialize);
     on<LoadTransactions>(_onLoadTransactions);
     on<ToggleFilterEvent>(_onToggleFilter);

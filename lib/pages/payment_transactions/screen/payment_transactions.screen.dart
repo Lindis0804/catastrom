@@ -1,22 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import 'package:template/common/constants/colors.dart';
 import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/enums/payment_transactions.enum.dart';
 import 'package:template/common/widgets/custom_date_picker.dart';
 import 'package:template/common/widgets/custom_empty_list.dart';
-import 'package:template/common/widgets/custom_list_separator.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/common/widgets/top_notification.dart';
+import 'package:template/data/models/payment/category.model.dart';
+import 'package:template/data/models/payment/transaction.model.dart';
 import 'package:template/pages/payment_transactions/bloc/payment_transactions.bloc.dart';
 import 'package:template/pages/payment_transactions/widgets/category_search_picker.dart';
 import 'package:template/pages/payment_transactions/widgets/transaction_list_item.dart';
 import 'package:template/root/app_routers.dart';
 
+// Flattens a transDate-sorted list into date-header + transaction rows for
+// ListView.builder (transactions are already sorted DESC by transDate, so
+// this only needs to detect when the date changes, not resort anything).
+List<Object> _groupTransactionsByDate(List<Transaction> transactions) {
+  List<Object> rows = [];
+  DateTime? lastDate;
+  for (final transaction in transactions) {
+    DateTime dateOnly = DateTime(
+      transaction.transDate.year,
+      transaction.transDate.month,
+      transaction.transDate.day,
+    );
+    if (lastDate == null || dateOnly != lastDate) {
+      rows.add(dateOnly);
+      lastDate = dateOnly;
+    }
+    rows.add(transaction);
+  }
+  return rows;
+}
+
 class PaymentTransactions extends StatefulWidget {
-  const PaymentTransactions({super.key, required this.bloc});
+  const PaymentTransactions({
+    super.key,
+    required this.bloc,
+    this.lockDateRange = false,
+    this.embedded = false,
+    this.showFilterBar = true,
+  });
   final PaymentTransactionsBloc bloc;
+  final bool lockDateRange;
+  final bool embedded;
+  final bool showFilterBar;
 
   @override
   State<PaymentTransactions> createState() => _PaymentTransactionsState();
@@ -28,6 +60,9 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
     return BlocBuilder<PaymentTransactionsBloc, PaymentTransactionsState>(
       bloc: widget.bloc,
       builder: (context, state) {
+        if (widget.embedded) {
+          return _buildBody(state);
+        }
         return Scaffold(
           appBar: AppBar(
             title: const Text('Quản lý thu chi'),
@@ -41,134 +76,166 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
               ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
+          body: _buildBody(state),
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(PaymentTransactionsState state) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          if (widget.showFilterBar) ...[
+            Row(
               children: [
+                TextButton.icon(
+                  onPressed: () {
+                    widget.bloc.add(const ToggleFilterEvent());
+                  },
+                  icon: const Icon(Icons.filter_list_rounded),
+                  label: const Text('Filter'),
+                ),
+                if (widget.embedded) ...[
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.add_rounded),
+                    tooltip: 'Add transaction',
+                    onPressed: () {
+                      widget.bloc.add(const ToAddTransactionsEvent());
+                    },
+                  ),
+                ],
+              ],
+            ),
+            if (state.isFilterExpanded) ...[
+              CategorySearchPicker(
+                selectedCategories: state.selectedFilterCategories,
+                onChanged: (categories) {
+                  widget.bloc.add(
+                    FilterChanged(
+                      categories: categories,
+                      dateFrom: state.dateFrom,
+                      dateTo: state.dateTo,
+                    ),
+                  );
+                },
+              ),
+              if (!widget.lockDateRange) ...[
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        widget.bloc.add(const ToggleFilterEvent());
-                      },
-                      icon: const Icon(Icons.filter_list_rounded),
-                      label: const Text('Filter'),
+                    Expanded(
+                      child: CustomDatePicker(
+                        label: 'Từ ngày',
+                        placeholder: 'Từ ngày',
+                        dateFormat: 'dd/MM/yyyy',
+                        initialDate: state.dateFrom,
+                        onDateChanged: (date) {
+                          widget.bloc.add(
+                            FilterChanged(
+                              categories: state.selectedFilterCategories,
+                              dateFrom: date,
+                              dateTo: state.dateTo,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: CustomDatePicker(
+                        label: 'Đến ngày',
+                        placeholder: 'Đến ngày',
+                        dateFormat: 'dd/MM/yyyy',
+                        initialDate: state.dateTo,
+                        onDateChanged: (date) {
+                          widget.bloc.add(
+                            FilterChanged(
+                              categories: state.selectedFilterCategories,
+                              dateFrom: state.dateFrom,
+                              dateTo: date,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
-                if (state.isFilterExpanded) ...[
-                  CategorySearchPicker(
-                    selectedCategories: state.selectedFilterCategories,
-                    onChanged: (categories) {
-                      widget.bloc.add(
-                        FilterChanged(
-                          categories: categories,
-                          dateFrom: state.dateFrom,
-                          dateTo: state.dateTo,
-                        ),
-                      );
-                    },
+              ],
+            ],
+          ],
+          const SizedBox(height: 8),
+          Expanded(
+            child: state.getTransactionsStatus.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: () => _onRefresh(widget.bloc),
+                    child: _buildTransactionsList(state),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomDatePicker(
-                          label: 'Từ ngày',
-                          placeholder: 'Từ ngày',
-                          dateFormat: 'dd/MM/yyyy',
-                          initialDate: state.dateFrom,
-                          onDateChanged: (date) {
-                            widget.bloc.add(
-                              FilterChanged(
-                                categories: state.selectedFilterCategories,
-                                dateFrom: date,
-                                dateTo: state.dateTo,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: CustomDatePicker(
-                          label: 'Đến ngày',
-                          placeholder: 'Đến ngày',
-                          dateFormat: 'dd/MM/yyyy',
-                          initialDate: state.dateTo,
-                          onDateChanged: (date) {
-                            widget.bloc.add(
-                              FilterChanged(
-                                categories: state.selectedFilterCategories,
-                                dateFrom: state.dateFrom,
-                                dateTo: date,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+          ),
+          if (!state.getTransactionsStatus.isLoading &&
+              state.transactions != null &&
+              (state.pageIdx > 0 || state.hasMoreTransactions))
+            _PaginationControls(bloc: widget.bloc, state: state),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionsList(PaymentTransactionsState state) {
+    if (state.transactions == null || state.transactions!.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          CustomEmptyList(
+            icon: Icons.receipt_long_outlined,
+            title: 'Không có giao dịch nào',
+          ),
+        ],
+      );
+    }
+
+    List<Object> rows = _groupTransactionsByDate(state.transactions!);
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: rows.length,
+      itemBuilder: (context, idx) {
+        final row = rows[idx];
+        if (row is DateTime) {
+          return Padding(
+            padding: EdgeInsets.only(top: idx == 0 ? 0 : 12, bottom: 6),
+            child: Text(
+              DateFormat('dd/MM/yyyy').format(row),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: CustomColors.textLabel,
+              ),
+            ),
+          );
+        }
+        final transaction = row as Transaction;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Slidable(
+            endActionPane: ActionPane(
+              motion: const StretchMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (context) => _confirmDeleteTransaction(
+                    context,
+                    widget.bloc,
+                    transaction.id!,
                   ),
-                ],
-                const SizedBox(height: 8),
-                Expanded(
-                  child: state.getTransactionsStatus.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : RefreshIndicator(
-                          onRefresh: () => _onRefresh(widget.bloc),
-                          child: (state.transactions == null ||
-                                  state.transactions!.isEmpty)
-                              ? ListView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  children: const [
-                                    CustomEmptyList(
-                                      icon: Icons.receipt_long_outlined,
-                                      title: 'Không có giao dịch nào',
-                                    ),
-                                  ],
-                                )
-                              : ListView.separated(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  itemBuilder: (context, idx) {
-                                    final transaction =
-                                        state.transactions![idx];
-                                    return Slidable(
-                                      endActionPane: ActionPane(
-                                        motion: const StretchMotion(),
-                                        children: [
-                                          SlidableAction(
-                                            onPressed: (context) =>
-                                                _confirmDeleteTransaction(
-                                              context,
-                                              widget.bloc,
-                                              transaction.id!,
-                                            ),
-                                            backgroundColor:
-                                                CustomColors.error,
-                                            icon: Icons.delete_rounded,
-                                            label: 'Xoá',
-                                          ),
-                                        ],
-                                      ),
-                                      child: TransactionListItem(
-                                        transaction: transaction,
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (context, idx) =>
-                                      const CustomListSeparator(),
-                                  itemCount: state.transactions!.length,
-                                ),
-                        ),
+                  backgroundColor: CustomColors.error,
+                  icon: Icons.delete_rounded,
+                  label: 'Xoá',
                 ),
-                if (!state.getTransactionsStatus.isLoading &&
-                    state.transactions != null &&
-                    state.transactions!.isNotEmpty)
-                  _PaginationControls(bloc: widget.bloc, state: state),
               ],
             ),
+            child: TransactionListItem(transaction: transaction),
           ),
         );
       },
@@ -261,12 +328,34 @@ void _navigationListener(
 }
 
 class PaymentTransactionsScreen extends StatelessWidget {
-  const PaymentTransactionsScreen({super.key});
+  const PaymentTransactionsScreen({
+    super.key,
+    this.initialDateFrom,
+    this.initialDateTo,
+    this.initialCategories,
+    this.lockDateRange = false,
+    this.embedded = false,
+    this.showFilterBar = true,
+    this.pageSize = 6,
+  });
+
+  final DateTime? initialDateFrom;
+  final DateTime? initialDateTo;
+  final List<Category>? initialCategories;
+  final bool lockDateRange;
+  final bool embedded;
+  final bool showFilterBar;
+  final int pageSize;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<PaymentTransactionsBloc>(
-      create: (_) => PaymentTransactionsBloc(),
+      create: (_) => PaymentTransactionsBloc(
+        initialDateFrom: initialDateFrom,
+        initialDateTo: initialDateTo,
+        initialCategories: initialCategories,
+        pageSize: pageSize,
+      ),
       child: MultiBlocListener(
         listeners: [
           BlocListener<PaymentTransactionsBloc, PaymentTransactionsState>(
@@ -318,6 +407,9 @@ class PaymentTransactionsScreen extends StatelessWidget {
         child: Builder(
           builder: (BuildContext context) => PaymentTransactions(
             bloc: context.read<PaymentTransactionsBloc>(),
+            lockDateRange: lockDateRange,
+            embedded: embedded,
+            showFilterBar: showFilterBar,
           ),
         ),
       ),
