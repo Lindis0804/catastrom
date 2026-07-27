@@ -7,6 +7,7 @@ import 'package:template/common/utils/size.dart';
 import 'package:template/common/utils/validate.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
+import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/generated/assets.gen.dart';
 import 'package:template/pages/signup/bloc/signup.bloc.dart';
 import 'package:template/pages/signup/loading.screen.dart';
@@ -22,7 +23,6 @@ class SignupForm extends StatefulWidget {
 class _SignupForm extends State<SignupForm> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -30,28 +30,62 @@ class _SignupForm extends State<SignupForm> {
   String wrongUsernameMessage = '',
       wrongFirstNameMessage = '',
       wrongLastNameMessage = '',
-      wrongPhoneNumberMessage = '',
       wrongPasswordMessage = '',
       wrongConfirmPasswordMessage = '';
   bool _passwordObscureText = true, _confirmPasswordObscureText = true;
 
-  bool enableSignUp(SignupBloc signupBloc) {
-    if (wrongUsernameMessage.isNotEmpty ||
-        wrongFirstNameMessage.isNotEmpty ||
+  static const String _usernameErrorMessage =
+      'Tên đăng nhập chỉ được chứa chữ cái và chữ số';
+  static const String _passwordErrorMessage =
+      'Mật khẩu phải chứa ít nhất 8 chữ cái - ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt';
+  static const String _firstNameErrorMessage =
+      'Họ và tên đệm chỉ được chứa chữ cái';
+  static const String _lastNameErrorMessage = 'Tên chỉ được chứa chữ cái';
+  static const String _confirmPasswordErrorMessage =
+      'Mật khẩu xác nhận không khớp';
+
+  void _handleSignUp() {
+    String firstName = _firstNameController.text;
+    String lastName = _lastNameController.text;
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
+
+    setState(() {
+      wrongFirstNameMessage =
+          (firstName.isEmpty || !validateName(firstName))
+              ? _firstNameErrorMessage
+              : '';
+      wrongLastNameMessage = (lastName.isEmpty || !validateName(lastName))
+          ? _lastNameErrorMessage
+          : '';
+      wrongUsernameMessage =
+          (username.isEmpty || !validateUserName(username))
+              ? _usernameErrorMessage
+              : '';
+      wrongPasswordMessage =
+          (password.isEmpty || !validatePassword(password))
+              ? _passwordErrorMessage
+              : '';
+      wrongConfirmPasswordMessage = (confirmPassword != password)
+          ? _confirmPasswordErrorMessage
+          : '';
+    });
+
+    if (wrongFirstNameMessage.isNotEmpty ||
         wrongLastNameMessage.isNotEmpty ||
-        wrongPhoneNumberMessage.isNotEmpty ||
+        wrongUsernameMessage.isNotEmpty ||
         wrongPasswordMessage.isNotEmpty ||
-        wrongConfirmPasswordMessage.isNotEmpty ||
-        _firstNameController.text.isEmpty ||
-        _lastNameController.text.isEmpty ||
-        _phoneNumberController.text.isEmpty ||
-        _usernameController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty ||
-        signupBloc.state.signupStatus != SignupStatus.init) {
-      return false;
+        wrongConfirmPasswordMessage.isNotEmpty) {
+      return;
     }
-    return true;
+
+    widget.signupBloc.add(SignUp(
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      password: password,
+    ));
   }
 
   @override
@@ -87,17 +121,27 @@ class _SignupForm extends State<SignupForm> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(bottom: 15),
+                        margin: const EdgeInsets.only(bottom: 8),
                         child: const Text(
-                          'Welcome to DoLa Trip',
+                          'Wellytics',
                           style: TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 20,
-                              color: Colors.green),
+                              color: CustomColors.primary),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 15),
+                        child: const Text(
+                          'Đăng kí',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: CustomColors.textLabel),
                         ),
                       ),
                       FormTextField(
-                        label: 'First Name',
+                        label: 'Họ và tên đệm',
                         errorMessage: wrongFirstNameMessage,
                         controller: _firstNameController,
                         onChanged: (text) => {
@@ -105,14 +149,14 @@ class _SignupForm extends State<SignupForm> {
                             () {
                               wrongFirstNameMessage = (text.isNotEmpty &&
                                       !validateName(text))
-                                  ? 'First Name can only contains alphabetic characters.'
+                                  ? _firstNameErrorMessage
                                   : '';
                             },
                           ),
                         },
                       ),
                       FormTextField(
-                        label: 'Last Name',
+                        label: 'Tên',
                         errorMessage: wrongLastNameMessage,
                         controller: _lastNameController,
                         onChanged: (text) => {
@@ -120,27 +164,14 @@ class _SignupForm extends State<SignupForm> {
                             () {
                               wrongLastNameMessage = (text.isNotEmpty &&
                                       !validateName(text))
-                                  ? 'Last Name can only contains alphabetic characters.'
+                                  ? _lastNameErrorMessage
                                   : '';
                             },
                           ),
-                        }, placeholder: '',
-                      ),
-                      FormTextField(
-                        label: 'Phone Number',
-                        errorMessage: wrongPhoneNumberMessage,
-                        controller: _phoneNumberController,
-                        onChanged: (phoneNumber) => {
-                          setState(() {
-                            wrongPhoneNumberMessage = (phoneNumber.isNotEmpty &&
-                                    !validatePhoneNumber(phoneNumber))
-                                ? 'Phone number must have at least 9 digits'
-                                : '';
-                          })
                         },
                       ),
                       FormTextField(
-                        label: 'Username',
+                        label: 'Tên đăng nhập',
                         errorMessage: wrongUsernameMessage,
                         controller: _usernameController,
                         onChanged: (username) {
@@ -148,7 +179,7 @@ class _SignupForm extends State<SignupForm> {
                             () {
                               wrongUsernameMessage = (username.isNotEmpty &&
                                       !validateUserName(username))
-                                  ? 'Username must have at least 8 character, contain at least 1 letter and 1 digit.'
+                                  ? _usernameErrorMessage
                                   : '';
                             },
                           );
@@ -156,7 +187,7 @@ class _SignupForm extends State<SignupForm> {
                       ),
                       FormTextField(
                         controller: _passwordController,
-                        label: 'Password',
+                        label: 'Mật khẩu',
                         errorMessage: wrongPasswordMessage,
                         suffixIcon: IconButton(
                           icon: _passwordObscureText
@@ -180,7 +211,7 @@ class _SignupForm extends State<SignupForm> {
                             () {
                               wrongPasswordMessage = (password.isNotEmpty &&
                                       !validatePassword(password))
-                                  ? 'Password must have at least 5 characters - include at least 1 lower case letter, 1 uppder case letter, 1 digit and 1 special letter'
+                                  ? _passwordErrorMessage
                                   : '';
                             },
                           );
@@ -189,7 +220,7 @@ class _SignupForm extends State<SignupForm> {
                       FormTextField(
                         controller: _confirmPasswordController,
                         isObscureText: _confirmPasswordObscureText,
-                        label: 'Confirm Password',
+                        label: 'Nhập lại mật khẩu',
                         errorMessage: wrongConfirmPasswordMessage,
                         suffixIcon: IconButton(
                           icon: _confirmPasswordObscureText
@@ -211,7 +242,7 @@ class _SignupForm extends State<SignupForm> {
                             () {
                               wrongConfirmPasswordMessage = (confirmPassword !=
                                       _passwordController.text)
-                                  ? 'ConfirmePassword is not the same to password.'
+                                  ? _confirmPasswordErrorMessage
                                   : '';
                             },
                           );
@@ -221,32 +252,23 @@ class _SignupForm extends State<SignupForm> {
                         width: double.infinity,
                         margin: const EdgeInsets.only(bottom: 20),
                         child: BigCustomButton(
-                            onPressed: (enableSignUp(widget.signupBloc))
-                                ? () {
-                                    widget.signupBloc.add(SignUp(
-                                        firstName: _firstNameController.text,
-                                        lastName: _lastNameController.text,
-                                        phoneNumber:
-                                            _phoneNumberController.text,
-                                        username: _usernameController.text,
-                                        password: _passwordController.text));
-                                  }
-                                : null,
-                            text: 'Sign Up',
-                            backgroundColor: enableSignUp(widget.signupBloc)
-                                ? CustomColors.primary
-                                : CustomColors.gray),
+                            onPressed:
+                                state.signupStatus == SignupStatus.init
+                                    ? _handleSignUp
+                                    : null,
+                            text: 'Đăng kí',
+                            backgroundColor: CustomColors.primary),
                       ),
                       InkWell(
                         onTap: () {
                           widget.signupBloc.add(const GoToSignIn());
                         },
-                        child: Text(
-                          'Sign In',
+                        child: const Text(
+                          'Đăng nhập',
                           style: TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 18,
-                              color: Colors.green[700]),
+                              color: CustomColors.primary),
                         ),
                       )
                     ],
@@ -254,7 +276,6 @@ class _SignupForm extends State<SignupForm> {
                 ),
               ),
             ),
-            //  ),
           ],
         );
       },
@@ -304,11 +325,10 @@ void _listener(BuildContext context, SignupState state) {
       break;
     case SignupStatus.callApiSignUpFail:
       if (state is CallApiFailState) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.message),
-            duration: const Duration(seconds: 2),
-          ),
+        ErrorDialogUtils.showErrorDialog(
+          context: context,
+          title: 'Đăng kí không thành công',
+          errorMessage: state.message,
         );
         context.read<SignupBloc>().add(const Inititalize());
       }

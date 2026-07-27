@@ -12,10 +12,9 @@ class SignUp extends SignupEvent {
   const SignUp(
       {required this.firstName,
       required this.lastName,
-      required this.phoneNumber,
       required this.username,
       required this.password});
-  final String firstName, lastName, phoneNumber, username, password;
+  final String firstName, lastName, username, password;
 }
 
 class GoToSignIn extends SignupEvent {

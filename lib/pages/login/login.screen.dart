@@ -6,6 +6,7 @@ import 'package:template/common/enums/login_status.enum.dart';
 import 'package:template/common/utils/size.dart';
 import 'package:template/common/widgets/custom_button.dart';
 import 'package:template/common/widgets/custom_textfield.dart';
+import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/generated/assets.gen.dart';
 import 'package:template/pages/login/bloc/login.bloc.dart';
 import 'package:template/pages/signup/loading.screen.dart';
@@ -25,19 +26,28 @@ class _SignInFormState extends State<SignInForm> {
   String wrongUsernameMessage = '', wrongPasswordMessage = '';
   bool _passwordObscureText = true;
 
-  bool enableLogin() {
-    // if (_usernameController.text.isEmpty ||
-    //     _passwordController.text.isEmpty ||
-    //     wrongUsernameMessage.isNotEmpty ||
-    //     wrongPasswordMessage.isNotEmpty) {
-    //   return false;
-    // }
-    return true;
+  void _handleSignIn() {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+
+    setState(() {
+      wrongUsernameMessage = (username.isEmpty || !validateUserName(username))
+          ? 'Tên đăng nhập chỉ được chứa chữ cái và chữ số'
+          : '';
+      wrongPasswordMessage = (password.isEmpty || !validatePassword(password))
+          ? 'Mật khẩu phải chứa ít nhất 8 chữ cái - ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt'
+          : '';
+    });
+
+    if (wrongUsernameMessage.isNotEmpty || wrongPasswordMessage.isNotEmpty) {
+      return;
+    }
+
+    widget.loginBloc.add(Login(username: username, password: password));
   }
 
   @override
   Widget build(BuildContext context) {
-    //print({'status__': widget.loginBloc.state.loginStatus});
     double screenHeight = getScreenHeight(context);
     double screenWidth = getScreenWidth(context);
     return BlocBuilder<LoginBloc, LoginState>(
@@ -67,17 +77,27 @@ class _SignInFormState extends State<SignInForm> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(bottom: 20),
+                      margin: const EdgeInsets.only(bottom: 8),
                       child: const Text(
-                        'Welcome to Wellytics',
+                        'Wellytics',
                         style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 25,
                             color: CustomColors.primary),
                       ),
                     ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: const Text(
+                        'Đăng nhập',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: CustomColors.textLabel),
+                      ),
+                    ),
                     FormTextField(
-                      label: 'Username',
+                      label: 'Tên đăng nhập',
                       errorMessage: wrongUsernameMessage,
                       controller: _usernameController,
                       onChanged: (username) {
@@ -85,7 +105,7 @@ class _SignInFormState extends State<SignInForm> {
                           () {
                             wrongUsernameMessage = (username.isNotEmpty &&
                                     !validateUserName(username))
-                                ? 'Username must have at least 8 character, contain at least 1 letter and 1 digit.'
+                                ? 'Tên đăng nhập chỉ được chứa chữ cái và chữ số'
                                 : '';
                           },
                         );
@@ -93,7 +113,7 @@ class _SignInFormState extends State<SignInForm> {
                     ),
                     FormTextField(
                       controller: _passwordController,
-                      label: 'Password',
+                      label: 'Mật khẩu',
                       errorMessage: wrongPasswordMessage,
                       isObscureText: _passwordObscureText,
                       onChanged: (password) {
@@ -101,7 +121,7 @@ class _SignInFormState extends State<SignInForm> {
                           () {
                             wrongPasswordMessage = (password.isNotEmpty &&
                                     !validatePassword(password))
-                                ? 'Password must have at least 5 characters - include at least 1 lower case letter, 1 uppder case letter, 1 digit and 1 special letter'
+                                ? 'Mật khẩu phải chứa ít nhất 8 chữ cái - ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt'
                                 : '';
                           },
                         );
@@ -145,32 +165,23 @@ class _SignInFormState extends State<SignInForm> {
                       width: double.infinity,
                       margin: const EdgeInsets.only(bottom: 20),
                       child: BigCustomButton(
-                        onPressed: (enableLogin() &&
-                                state.loginStatus == LoginStatus.initialize)
-                            ? () {
-                                widget.loginBloc.add(
-                                  Login(
-                                      username: _usernameController.text,
-                                      password: _passwordController.text),
-                                );
-                              }
+                        onPressed: state.loginStatus == LoginStatus.initialize
+                            ? _handleSignIn
                             : null,
-                        text: 'Sign In',
-                        backgroundColor: enableLogin()
-                            ? CustomColors.primary
-                            : CustomColors.disable,
+                        text: 'Đăng nhập',
+                        backgroundColor: CustomColors.primary,
                       ),
                     ),
                     InkWell(
                       onTap: () {
                         widget.loginBloc.add(const MoveToSignUp());
                       },
-                      child: Text(
-                        'Create new account',
+                      child: const Text(
+                        'Đăng kí',
                         style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
-                            color: Colors.green[700]),
+                            color: CustomColors.primary),
                       ),
                     ),
                   ],
@@ -185,7 +196,6 @@ class _SignInFormState extends State<SignInForm> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _passwordController.dispose();
   }
@@ -201,15 +211,15 @@ void _listener(BuildContext context, LoginState state) {
       Navigator.of(context).pushReplacementNamed(AppRouters.signUp);
       break;
     case LoginStatus.moveToHome:
-      print('Move to home');
       Navigator.of(context).pushReplacementNamed(AppRouters.home);
       break;
     case LoginStatus.callApiLoginFail:
       if (state is CallApiLoginFailState) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(state.message),
-          duration: const Duration(seconds: 2),
-        ));
+        ErrorDialogUtils.showErrorDialog(
+          context: context,
+          title: 'Đăng nhập không thành công',
+          errorMessage: state.message,
+        );
       }
       context.read<LoginBloc>().add(const Inititalize());
       break;
@@ -233,9 +243,7 @@ class LoginScreen extends StatelessWidget {
           builder: (BuildContext context) => Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              title: const Text(
-                'Login Screen',
-              ),
+              title: const Text('Đăng nhập'),
             ),
             body: SingleChildScrollView(
               child: SignInForm(loginBloc: context.read<LoginBloc>()),

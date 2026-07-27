@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template/api/auth/provider.dart';
 import 'package:template/common/enums/login_status.enum.dart';
 import 'package:equatable/equatable.dart';
 import 'package:template/common/utils/share_preferences.dart';
+import 'package:template/data/models/auth/sign_in_response.model.dart';
 part 'login.event.dart';
 part 'login.state.dart';
 
@@ -70,28 +74,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       String username = loginEvent.username;
       String password = loginEvent.password;
-      bool rememberMe = loginEvent.rememberMe;
 
-      // LoginUser loginUserData = LoginUser(
-      //     username: username, password: password, rememberMe: rememberMe);
-      // Dio dio = DioUtils.getDioClient();
-      // AuthApiProvider authApiProvider = AuthApiProvider(dio: dio);
-      // ResLogin resLogin = await authApiProvider.login(data: loginUserData);
+      SignInResponse signInRes = await AuthApiProvider()
+          .signIn(username: username, password: password);
 
-      // await SharedPreferencesManager.saveString(
-      //     SPKeys.ACCESS_TOKEN, resLogin.accessToken);
-      // await SharedPreferencesManager.saveString(
-      //     SPKeys.USER_PROFILE, resLogin.strUser);
-      // SharedPreferencesManager.saveString(
-      //     SPKeys.REFRESH_TOKEN, resLogin.refreshToken);
+      await SharedPreferencesManager.saveString(
+          SPKeys.ACCESS_TOKEN, signInRes.accessToken);
+      await SharedPreferencesManager.saveString(
+          SPKeys.USER_PROFILE, jsonEncode(signInRes.user.toJson()));
 
-      // print('Login successful, access token: ${resLogin.accessToken}');
       add(
         const MoveToHome(),
       );
     } catch (err) {
-      print('Error in call api log in: $err');
-      add(CallApiLoginFailEvent(message: 'Call api login fail: $err'));
+      add(CallApiLoginFailEvent(message: '$err'));
     }
   }
 

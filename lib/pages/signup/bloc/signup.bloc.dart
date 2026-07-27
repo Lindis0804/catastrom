@@ -1,11 +1,11 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/common/constants/keys.dart';
+import 'package:template/api/auth/provider.dart';
 import 'package:template/common/enums/signup_status.enum.dart';
 import 'package:equatable/equatable.dart';
-import 'package:template/common/utils/env.dart';
 import 'package:template/common/utils/share_preferences.dart';
-import 'package:template/pages/signup/dto/signup.dto.dart';
+import 'package:template/data/models/auth/sign_in_response.model.dart';
 part 'signup.event.dart';
 part 'signup.state.dart';
 
@@ -36,6 +36,9 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
         case SignupStatus.goToVerifySignUpCode:
           signupEmitter(const SignupState.goToVerifySignUpCode());
           break;
+        case SignupStatus.goToHome:
+          signupEmitter(const SignupState.goToHome());
+          break;
         default:
           signupEmitter(const SignupState.init());
           break;
@@ -60,36 +63,21 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     }
     add(const SignupStatusChanged(SignupStatus.signUp));
     try {
-      String firstName = signupEvent.firstName;
-      String lastName = signupEvent.lastName;
-      String username = signupEvent.username;
-      String password = signupEvent.password;
-      String phoneNumber = signupEvent.phoneNumber;
-      Dio dio = Dio(
-        BaseOptions(connectTimeout: 10000),
+      SignInResponse signInRes = await AuthApiProvider().signUp(
+        username: signupEvent.username,
+        password: signupEvent.password,
+        firstName: signupEvent.firstName,
+        lastName: signupEvent.lastName,
       );
-      SignUpUserDto signUpUserData = SignUpUserDto(
-          firstName: firstName,
-          lastName: lastName,
-          phoneNumber: phoneNumber,
-          username: username,
-          password: password);
-      Response res = await dio.post(
-        '${EnvVariable.clientCustomerHost}/api/signup',
-        data: signUpUserData.toJson(),
-      );
-      if (res.statusCode == 200) {
-        String accessToken = res.data['data']['accessToken'] ?? '';
-        if (accessToken == '') {
-          add(const CallApiSignupFail(message: 'Access token is empty'));
-          return;
-        }
-        await SharedPreferencesManager.saveString(
-            ACCESS_TOKEN_KEY, accessToken);
-        add(const GoToVerifySignUpCode());
-      }
+
+      await SharedPreferencesManager.saveString(
+          SPKeys.ACCESS_TOKEN, signInRes.accessToken);
+      await SharedPreferencesManager.saveString(
+          SPKeys.USER_PROFILE, jsonEncode(signInRes.user.toJson()));
+
+      add(const SignupStatusChanged(SignupStatus.goToHome));
     } catch (err) {
-      add(const CallApiSignupFail(message: 'Call api sign up fail'));
+      add(CallApiSignupFail(message: '$err'));
     }
   }
 

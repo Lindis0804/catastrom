@@ -8,6 +8,7 @@ class SignupState extends Equatable {
   const SignupState.goToSignIn() : signupStatus = SignupStatus.goToSignIn;
   const SignupState.goToVerifySignUpCode()
       : signupStatus = SignupStatus.goToVerifySignUpCode;
+  const SignupState.goToHome() : signupStatus = SignupStatus.goToHome;
   const SignupState.callApiSignUpFail()
       : signupStatus = SignupStatus.callApiSignUpFail;
   @override
