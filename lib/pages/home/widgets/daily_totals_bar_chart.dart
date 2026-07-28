@@ -16,7 +16,6 @@ class DailyTotalsBarChart extends StatelessWidget {
   final bool isLoading;
 
   static const double _chartHeight = 220;
-  static const num _yAxisStep = 50;
   static const num _yAxisHeadroom = 50;
   static const double _groupsSpace = 2;
   static const Color _foreground = Color(0xFF0B4A28);
@@ -48,25 +47,12 @@ class DailyTotalsBarChart extends StatelessWidget {
                     )
                   : null,
             )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 4, bottom: 8),
-                  child: Text(
-                    'Số tiền (k VND)',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: _foreground,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: _chartHeight,
-                  child: BarChart(_buildChartData(context)),
-                ),
-              ],
+          : SizedBox(
+              height: _chartHeight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: BarChart(_buildChartData(context)),
+              ),
             ),
     );
   }
@@ -122,19 +108,8 @@ class DailyTotalsBarChart extends StatelessWidget {
         rightTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 40,
-            interval: _yAxisStep.toDouble(),
-            getTitlesWidget: (value, meta) => Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Text(
-                _compactFormat.format(value),
-                style: const TextStyle(fontSize: 10, color: _foreground),
-              ),
-            ),
-          ),
+        leftTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
         ),
         bottomTitles: AxisTitles(
           axisNameWidget: const Padding(
