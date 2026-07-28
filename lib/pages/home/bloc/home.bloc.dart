@@ -44,6 +44,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     List<Plan>? myPlans;
     try {
       String accessToken = await SharedPreferencesManager.getAccessToken();
+      await _resolveCurrentExpenseMonth(emitter);
       await Future.wait(
         [
           () async {
@@ -119,6 +120,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
+  Future<void> _resolveCurrentExpenseMonth(Emitter<HomeState> emitter) async {
+    try {
+      String accessToken = await SharedPreferencesManager.getAccessToken();
+      String currentExpenseMonth =
+          await PaymentApiProvider(accessToken: accessToken)
+              .getCurrentExpenseMonth(date: DateTime.now());
+      DateTime dateTo = DateFormat('MM/yyyy').parse(currentExpenseMonth);
+      DateTime dateFrom = DateTime(dateTo.year, dateTo.month - 1);
+      emitter(
+        state.copyWith(dateFrom: dateFrom, dateTo: dateTo),
+      );
+    } catch (err) {
+      // fall back to the calendar-based defaults already set by HomeState.initialize()
+    }
+  }
+
   Future<void> _fetchMonthlyTotals(Emitter<HomeState> emitter) async {
     emitter(
       state.copyWith(getMonthlyTotalsStatus: LoadingStatus.loading),
@@ -127,8 +144,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       String accessToken = await SharedPreferencesManager.getAccessToken();
       List<MonthlyTotal> monthlyTotals =
           await PaymentApiProvider(accessToken: accessToken).getTotalByMonth(
-        from: state.monthFrom,
-        to: state.monthTo,
+        from: DateFormat('MM/yyyy').format(state.dateFrom),
+        to: DateFormat('MM/yyyy').format(state.dateTo),
         order: state.sortOrder.apiValue,
       );
       emitter(
@@ -153,21 +170,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     try {
       String accessToken = await SharedPreferencesManager.getAccessToken();
-      DateTime now = DateTime.now();
-      DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+      String currentExpenseMonth = DateFormat('MM/yyyy').format(state.dateTo);
       List<MonthlyTotal> monthlyTotals =
           await PaymentApiProvider(accessToken: accessToken).getTotalByMonth(
-        from: firstDayOfMonth,
-        to: now,
+        from: currentExpenseMonth,
+        to: currentExpenseMonth,
         order: 'DESC',
       );
       MonthlyTotal currentMonthTotal = monthlyTotals.isNotEmpty
           ? monthlyTotals.first
           : MonthlyTotal(
-              month: DateFormat('MM/yyyy').format(now),
+              month: currentExpenseMonth,
               total: 0,
-              dateFrom: DateFormat('dd/MM/yyyy').format(firstDayOfMonth),
-              dateTo: DateFormat('dd/MM/yyyy').format(now),
+              dateFrom: DateFormat('dd/MM/yyyy').format(state.dateTo),
+              dateTo: DateFormat('dd/MM/yyyy').format(state.dateTo),
             );
       emitter(
         state.copyWith(
@@ -221,8 +237,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     emitter(
       state.copyWith(
-        monthFrom: event.monthFrom,
-        monthTo: event.monthTo,
+        dateFrom: event.monthFrom,
+        dateTo: event.monthTo,
       ),
     );
     await _fetchMonthlyTotals(emitter);

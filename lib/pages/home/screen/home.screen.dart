@@ -70,12 +70,12 @@ class _HomeState extends State<Home> {
                         label: 'Từ tháng',
                         placeholder: 'Từ tháng',
                         dateFormat: 'MM/yyyy',
-                        initialDate: state.monthFrom,
+                        initialDate: state.dateFrom,
                         onDateChanged: (date) {
                           widget.homeBloc.add(
                             ChangeMonthFilterEvent(
                               monthFrom: date,
-                              monthTo: state.monthTo,
+                              monthTo: state.dateTo,
                             ),
                           );
                         },
@@ -87,11 +87,11 @@ class _HomeState extends State<Home> {
                         label: 'Đến tháng',
                         placeholder: 'Đến tháng',
                         dateFormat: 'MM/yyyy',
-                        initialDate: state.monthTo,
+                        initialDate: state.dateTo,
                         onDateChanged: (date) {
                           widget.homeBloc.add(
                             ChangeMonthFilterEvent(
-                              monthFrom: state.monthFrom,
+                              monthFrom: state.dateFrom,
                               monthTo: date,
                             ),
                           );

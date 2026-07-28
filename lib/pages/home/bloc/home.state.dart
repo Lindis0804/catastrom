@@ -12,7 +12,7 @@ class HomeState extends Equatable {
   final User? user;
   final List<RecommendedPlace>? recommendedPlaces;
   final List<Plan>? myPlans;
-  final DateTime monthFrom, monthTo;
+  final DateTime dateFrom, dateTo;
   final ESortOrder sortOrder;
   final List<MonthlyTotal>? monthlyTotals;
   final MonthlyTotal? currentMonthTotal;
@@ -35,8 +35,8 @@ class HomeState extends Equatable {
       this.user,
       this.recommendedPlaces,
       this.myPlans,
-      required this.monthFrom,
-      required this.monthTo,
+      required this.dateFrom,
+      required this.dateTo,
       this.sortOrder = ESortOrder.asc,
       this.monthlyTotals,
       this.currentMonthTotal,
@@ -50,6 +50,11 @@ class HomeState extends Equatable {
 
   factory HomeState.initialize() {
     DateTime now = DateTime.now();
+    // Calendar-month placeholder only: real dateFrom/dateTo come from
+    // GET /doc/current-expense-month (see HomeBloc._resolveCurrentExpenseMonth,
+    // awaited before anything reads these) and overwrite this before use. This
+    // is only the synchronous value shown for the instant before that resolves,
+    // and the fallback if that call fails.
     return HomeState(
         homeStatus: HomeStatus.init,
         getUserStatus: LoadingStatus.initialize,
@@ -58,8 +63,8 @@ class HomeState extends Equatable {
         getMonthlyTotalsStatus: LoadingStatus.initialize,
         getCurrentMonthSpentStatus: LoadingStatus.initialize,
         getDailyTotalsStatus: LoadingStatus.initialize,
-        monthFrom: DateTime(now.year, now.month - 1),
-        monthTo: DateTime(now.year, now.month));
+        dateFrom: DateTime(now.year, now.month - 1),
+        dateTo: DateTime(now.year, now.month));
   }
 
   HomeState copyWith(
@@ -73,8 +78,8 @@ class HomeState extends Equatable {
       User? user,
       List<RecommendedPlace>? recommendedPlaces,
       List<Plan>? myPlans,
-      DateTime? monthFrom,
-      DateTime? monthTo,
+      DateTime? dateFrom,
+      DateTime? dateTo,
       ESortOrder? sortOrder,
       List<MonthlyTotal>? monthlyTotals,
       MonthlyTotal? currentMonthTotal,
@@ -99,8 +104,8 @@ class HomeState extends Equatable {
         user: user ?? this.user,
         recommendedPlaces: recommendedPlaces ?? this.recommendedPlaces,
         myPlans: myPlans ?? this.myPlans,
-        monthFrom: monthFrom ?? this.monthFrom,
-        monthTo: monthTo ?? this.monthTo,
+        dateFrom: dateFrom ?? this.dateFrom,
+        dateTo: dateTo ?? this.dateTo,
         sortOrder: sortOrder ?? this.sortOrder,
         monthlyTotals: monthlyTotals ?? this.monthlyTotals,
         currentMonthTotal: currentMonthTotal ?? this.currentMonthTotal,
@@ -128,8 +133,8 @@ class HomeState extends Equatable {
         user,
         recommendedPlaces,
         myPlans,
-        monthFrom,
-        monthTo,
+        dateFrom,
+        dateTo,
         sortOrder,
         monthlyTotals,
         currentMonthTotal,

@@ -92,15 +92,15 @@ class PaymentApiProvider {
   }
 
   Future<List<MonthlyTotal>> getTotalByMonth({
-    required DateTime from,
-    required DateTime to,
+    required String from,
+    required String to,
     required String order,
   }) async {
     Response res = await dio.get(
       '${EnvVariable.clientCustomerHost}/doc/total-by-month',
       queryParameters: {
-        'from': DateFormat('MM/yyyy').format(from),
-        'to': DateFormat('MM/yyyy').format(to),
+        'from': from,
+        'to': to,
         'saveAmount': false,
         'order': order,
       },
@@ -114,6 +114,20 @@ class PaymentApiProvider {
         .map((dynamic rawMonthlyTotal) =>
             MonthlyTotal.fromDynamic(rawMonthlyTotal))
         .toList();
+  }
+
+  Future<String> getCurrentExpenseMonth({required DateTime date}) async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/doc/current-expense-month',
+      queryParameters: {
+        'date': DateFormat('dd/MM/yyyy').format(date),
+      },
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception('Get current expense month fail: ${resData['error']}');
+    }
+    return resData['data']['month'] ?? '';
   }
 
   Future<SpendingByCategorySummary> getTotalByCategory({

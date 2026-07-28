@@ -42,6 +42,14 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   }
 
   @override
+  void didUpdateWidget(covariant CustomDatePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialDate != oldWidget.initialDate) {
+      _selectedDate = widget.initialDate;
+    }
+  }
+
+  @override
   void dispose() {
     _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
