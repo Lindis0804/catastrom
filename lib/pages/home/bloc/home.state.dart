@@ -37,7 +37,7 @@ class HomeState extends Equatable {
       this.myPlans,
       required this.dateFrom,
       required this.dateTo,
-      this.sortOrder = ESortOrder.asc,
+      this.sortOrder = ESortOrder.desc,
       this.monthlyTotals,
       this.currentMonthTotal,
       this.dailyTotals,
