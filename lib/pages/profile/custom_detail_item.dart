@@ -7,22 +7,30 @@ import 'package:template/generated/assets.gen.dart';
 class CustomDetailItem extends StatelessWidget {
   final String title;
   final String value;
-  final SvgGenImage icon;
+  final SvgGenImage? icon;
+  final IconData? materialIcon;
 
   const CustomDetailItem({
     required this.title,
     required this.value,
-    required this.icon,
+    this.icon,
+    this.materialIcon,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: icon.svg(
-        height: 24,
-        width: 24,
-        color: Theme.of(context).iconTheme.color,
-      ),
+      leading: icon != null
+          ? icon!.svg(
+              height: 24,
+              width: 24,
+              color: Theme.of(context).iconTheme.color,
+            )
+          : Icon(
+              materialIcon,
+              size: 24,
+              color: Theme.of(context).iconTheme.color,
+            ),
       title: Text(
         title,
         style: const TextStyle(

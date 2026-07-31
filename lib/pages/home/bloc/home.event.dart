@@ -8,6 +8,10 @@ class Inititalize extends HomeEvent {
   const Inititalize();
 }
 
+class RefreshEvent extends HomeEvent {
+  const RefreshEvent();
+}
+
 class ChangeMonthFilterEvent extends HomeEvent {
   final DateTime? monthFrom;
   final DateTime? monthTo;

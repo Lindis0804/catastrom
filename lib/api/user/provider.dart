@@ -21,6 +21,17 @@ class UserApiProvider {
     dio = DioUtils.getDioClient(accessToken: accessToken);
   }
 
+  Future<User> getProfile() async {
+    Response res = await dio.get(
+      '${EnvVariable.clientCustomerHost}/user',
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception('Get profile fail: ${resData['error']}');
+    }
+    return User.fromJson(resData['data']);
+  }
+
   Future<User> getUser({required int userId}) async {
     Response res = await dio.get(
       '${EnvVariable.clientCustomerHost}/api/v1/user/$userId',

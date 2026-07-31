@@ -7,26 +7,33 @@ class User {
   @j.JsonKey(name: 'id')
   int? id;
 
-  @j.JsonKey(name: 'firstname')
+  @j.JsonKey(name: 'firstName')
   String? firstName;
 
-  @j.JsonKey(name: 'lastname')
+  @j.JsonKey(name: 'lastName')
   String? lastName;
 
-  @j.JsonKey(name: 'phoneNumber')
+  @j.JsonKey(name: 'email')
+  String? email;
+
+  @j.JsonKey(name: 'phone')
   String? phone;
 
   @j.JsonKey(name: 'username')
   String? username;
 
-  String? avatar, cover;
+  @j.JsonKey(name: 'avatarUrl')
+  String? avatarUrl;
+
+  String? cover;
   User({
     this.id,
     this.firstName,
     this.lastName,
+    this.email,
     this.phone,
     this.username,
-    this.avatar,
+    this.avatarUrl,
     this.cover,
   });
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

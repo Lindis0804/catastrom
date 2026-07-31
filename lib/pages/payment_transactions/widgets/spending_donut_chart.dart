@@ -9,12 +9,14 @@ class SpendingDonutChart extends StatelessWidget {
 
   const SpendingDonutChart({super.key, required this.items});
 
+  static const double chartSize = 160;
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 160,
-        height: 160,
+        width: chartSize,
+        height: chartSize,
         child: CustomPaint(
           painter: _DonutChartPainter(items: items),
         ),

@@ -21,6 +21,7 @@ part 'home.state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeState.initialize()) {
     on<Inititalize>(_onInitialize);
+    on<RefreshEvent>(_onRefresh);
     on<ChangeMonthFilterEvent>(_onChangeMonthFilter);
     on<ChangeSortOrderEvent>(_onChangeSortOrder);
 
@@ -39,6 +40,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emitter(
       HomeState.initialize(),
     );
+    await _fetchAll(emitter);
+  }
+
+  void _onRefresh(
+    HomeEvent event,
+    Emitter<HomeState> emitter,
+  ) async {
+    if (event is! RefreshEvent) {
+      return;
+    }
+    await _fetchAll(emitter);
+  }
+
+  Future<void> _fetchAll(Emitter<HomeState> emitter) async {
     User? user;
     List<RecommendedPlace>? recommendedPlaces;
     List<Plan>? myPlans;

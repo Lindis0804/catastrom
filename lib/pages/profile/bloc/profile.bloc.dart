@@ -44,10 +44,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
 
     try {
+      String accessToken = await SharedPreferencesManager.getAccessToken();
       if (userId == null) {
-        user = currentProfile;
+        user = await UserApiProvider(accessToken: accessToken).getProfile();
       } else {
-        String accessToken = await SharedPreferencesManager.getAccessToken();
         user = await UserApiProvider(accessToken: accessToken)
             .getUser(userId: userId);
       }

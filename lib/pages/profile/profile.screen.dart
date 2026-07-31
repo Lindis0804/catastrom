@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template/api/user/dto/addFriend/ReqAddFriend.dart';
@@ -29,6 +30,12 @@ class _ProfileScreenState extends State<ProfileBlocBuilder> {
     widget.profileBloc.add(Inititalize(userId: widget.userId));
   }
 
+  Future<void> _onRefresh() {
+    widget.profileBloc.add(Inititalize(userId: widget.userId));
+    return widget.profileBloc.stream
+        .firstWhere((state) => state.getUserStatus.isCompleted);
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = getScreenHeight(context);
@@ -41,8 +48,11 @@ class _ProfileScreenState extends State<ProfileBlocBuilder> {
                   title: const Text('Profile'),
                 )
               : null,
-          body: Container(
-            child: Column(
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
               children: [
                 Stack(
                   alignment: Alignment.topCenter,
@@ -67,7 +77,7 @@ class _ProfileScreenState extends State<ProfileBlocBuilder> {
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: CustomImage.network(
-                              imageUrl: state.user?.avatar ??
+                              imageUrl: state.user?.avatarUrl ??
                                   EnvVariable.defaultAvatar,
                               width: 100,
                               height: 100,
@@ -78,38 +88,6 @@ class _ProfileScreenState extends State<ProfileBlocBuilder> {
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        !UserUtils.isMe(
-                                currentProfile: state.currentProfile,
-                                user: state.user)
-                            ? (state.requestAddFriendStatus ==
-                                    LoadingStatus.loading
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : (state.resRequestAddFriend?.status ==
-                                        'PENDING_ACCEPT'
-                                    ? CustomOutlinedButton(
-                                        text: 'Đã gửi lời mời',
-                                        onPressed: () {},
-                                      )
-                                    : BigCustomButton(
-                                        text: 'Kết bạn',
-                                        onPressed: () {
-                                          String? username =
-                                              state.user!.username;
-                                          if (username == null) {
-                                            return;
-                                          }
-                                          widget.profileBloc.add(
-                                            RequestAddFriendEvent(
-                                              req: ReqRequestAddFriend(
-                                                username: username,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      )))
-                            : const SizedBox.shrink(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Column(
@@ -127,19 +105,14 @@ class _ProfileScreenState extends State<ProfileBlocBuilder> {
                                 ],
                               ),
                               CustomDetailItem(
-                                title: 'Số chuyến đi',
-                                value: '0',
-                                icon: Assets.svgIcons.trip,
+                                title: 'email',
+                                value: state.user?.email ?? '',
+                                materialIcon: CupertinoIcons.mail_solid,
                               ),
                               CustomDetailItem(
-                                title: 'Gần đây',
-                                value: 'Unknown',
-                                icon: Assets.svgIcons.location,
-                              ),
-                              CustomDetailItem(
-                                title: 'Số điện thoại',
-                                value: 'Unknown',
-                                icon: Assets.svgIcons.phone,
+                                title: 'số điện thoại',
+                                value: state.user?.phone ?? '',
+                                materialIcon: CupertinoIcons.phone_fill,
                               )
                             ],
                           ),
@@ -149,6 +122,7 @@ class _ProfileScreenState extends State<ProfileBlocBuilder> {
                   ],
                 ),
               ],
+            ),
             ),
           ),
         );

@@ -6,7 +6,6 @@ import 'package:template/common/enums/loading_status.enum.dart';
 import 'package:template/common/enums/sort_order.enum.dart';
 import 'package:template/common/widgets/custom_date_picker.dart';
 import 'package:template/common/widgets/custom_empty_list.dart';
-import 'package:template/common/widgets/custom_list_separator.dart';
 import 'package:template/common/widgets/error_dialog_utils.dart';
 import 'package:template/data/models/payment/monthly_total.model.dart';
 import 'package:template/pages/home/widgets/daily_totals_bar_chart.dart';
@@ -30,6 +29,12 @@ class _HomeState extends State<Home> {
     widget.homeBloc.add(const Inititalize());
   }
 
+  Future<void> _onRefresh() {
+    widget.homeBloc.add(const RefreshEvent());
+    return widget.homeBloc.stream
+        .firstWhere((state) => state.getMonthlyTotalsStatus.isCompleted);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
@@ -38,10 +43,11 @@ class _HomeState extends State<Home> {
           appBar: AppBar(
             title: const Text('Trang chủ'),
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: ListView(
+              padding: const EdgeInsets.all(12),
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 _CurrentMonthSpentCard(
                   isLoading: state.getCurrentMonthSpentStatus.isLoading,
@@ -137,72 +143,74 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Expanded(
-                  child: state.getMonthlyTotalsStatus.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : (state.monthlyTotals == null ||
-                              state.monthlyTotals!.isEmpty)
-                          ? const CustomEmptyList(
-                              icon: Icons.bar_chart_outlined,
-                              title: 'Không có dữ liệu',
-                            )
-                          : ListView.separated(
-                              itemBuilder: (context, idx) {
-                                final item = state.monthlyTotals![idx];
-                                return Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      Navigator.of(context).pushNamed(
-                                        AppRouters.spendingStatement,
-                                        arguments: SpendingStatementArguments(
-                                          monthlyTotal: item,
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 10,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color: CustomColors.border),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            item.month,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          Text(
-                                            NumberFormat.decimalPattern('vi')
-                                                .format(item.total),
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: CustomColors.primary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              separatorBuilder: (context, idx) =>
-                                  const CustomListSeparator(),
-                              itemCount: state.monthlyTotals!.length,
+                if (state.getMonthlyTotalsStatus.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (state.monthlyTotals == null ||
+                    state.monthlyTotals!.isEmpty)
+                  const CustomEmptyList(
+                    icon: Icons.bar_chart_outlined,
+                    title: 'Không có dữ liệu',
+                  )
+                else
+                  ...List.generate(state.monthlyTotals!.length, (idx) {
+                    final item = state.monthlyTotals![idx];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: idx == state.monthlyTotals!.length - 1 ? 0 : 8,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              AppRouters.spendingStatement,
+                              arguments: SpendingStatementArguments(
+                                monthlyTotal: item,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
                             ),
-                ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border:
+                                  Border.all(color: CustomColors.border),
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  item.month,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  NumberFormat.decimalPattern('vi')
+                                      .format(item.total),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: CustomColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
               ],
             ),
           ),
