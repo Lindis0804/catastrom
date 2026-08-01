@@ -49,7 +49,10 @@ class _ManageState extends State<Manage> {
       bloc: widget.manageBloc,
       builder: (context, state) {
         return Scaffold(
-          body: screens[state.pageIdx],
+          body: IndexedStack(
+            index: state.pageIdx,
+            children: screens,
+          ),
           bottomNavigationBar: Theme(
             data: Theme.of(context)
                 .copyWith(iconTheme: const IconThemeData(color: Colors.black)),

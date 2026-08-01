@@ -31,7 +31,7 @@ class _NotificationsBlocBuilderState extends State<NotificationsBlocBuilder> {
         return Scaffold(
           body: SafeArea(
             child: ListUtils.isNullOrEmpty(state.addFriendRequests)
-                ? const Center(child: Text('Không có lời mời kết bạn nào'))
+                ? const Center(child: Text('Comming soon...'))
                 : // Replace with actual widget to display notifications
                 ListView.separated(
                     itemBuilder: (context, index) => CustomAddFriendRequestItem(
