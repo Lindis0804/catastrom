@@ -45,9 +45,10 @@ void showAddTransactionSheet(
       return StatefulBuilder(
         builder: (context, setModalState) {
           void handleSave() {
-            String amountText = amountController.text.replaceAll(',', '');
-            bool isAmountValid =
-                amountText.isNotEmpty && validateAmount(amountText);
+            final normalizedAmount =
+                normalizeAmountValue(amountController.text);
+            final bool isAmountValid = normalizedAmount != null;
+
             if (!isAmountValid || selectedDate == null) {
               setModalState(() {
                 amountErrMsg = isAmountValid ? '' : 'Số tiền không hợp lệ';
@@ -58,7 +59,7 @@ void showAddTransactionSheet(
               Transaction(
                 id: isEditing ? initialTransaction.id : null,
                 description: descriptionController.text,
-                transAmount: num.parse(amountText),
+                transAmount: normalizedAmount,
                 transDate: selectedDate!,
                 categoryList: selectedCategories.map((c) => c.id).toList(),
                 categories:
@@ -129,9 +130,9 @@ void showAddTransactionSheet(
                     errorMessage: amountErrMsg,
                     onChanged: (value) {
                       setModalState(() {
-                        String cleanValue = value.replaceAll(',', '');
+                        final normalizedValue = normalizeAmountValue(value);
                         amountErrMsg =
-                            (cleanValue.isNotEmpty && !validateAmount(cleanValue))
+                            (value.trim().isNotEmpty && normalizedValue == null)
                                 ? 'Số tiền không hợp lệ'
                                 : '';
                       });

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:template/common/constants/api.dart';
+import 'package:template/common/utils/token_refresh_interceptor.dart';
 
 class DioUtils {
   static Dio getDioClient({String? accessToken}) {
@@ -8,6 +9,7 @@ class DioUtils {
     if (accessToken != null) {
       dio.options.headers['Authorization'] = 'Bearer $accessToken';
     }
+    dio.interceptors.add(TokenRefreshInterceptor());
     return dio;
   }
 

@@ -27,6 +27,7 @@ class _SettingsBlocBuilderState extends State<SettingsBlocBuilder> {
                     Navigator.of(context)
                         .pushReplacementNamed(AppRouters.login);
                     SharedPreferencesManager.removeToken(SPKeys.ACCESS_TOKEN);
+                    SharedPreferencesManager.removeToken(SPKeys.REFRESH_TOKEN);
                   },
                   text: 'Log out')
             ],

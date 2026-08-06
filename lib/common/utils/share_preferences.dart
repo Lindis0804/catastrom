@@ -32,6 +32,12 @@ class SharedPreferencesManager {
     return spAccessToken;
   }
 
+  static Future<String> getRefreshToken() async {
+    String spRefreshToken =
+        await SharedPreferencesManager.getString(SPKeys.REFRESH_TOKEN) ?? '';
+    return spRefreshToken;
+  }
+
   static Future<User?> getUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userjson = prefs.getString(SPKeys.USER_PROFILE);

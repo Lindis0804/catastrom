@@ -46,4 +46,16 @@ class AuthApiProvider {
     }
     return SignInResponse.fromDynamic(resData['data']);
   }
+
+  Future<String> refreshToken({required String refreshToken}) async {
+    Response res = await dio.post(
+      '${EnvVariable.clientCustomerHost}/auth/refresh-token',
+      data: {'refreshToken': refreshToken},
+    );
+    dynamic resData = res.data;
+    if (resData['status'] != 200) {
+      throw Exception(resData['error'] ?? 'Refresh token failed');
+    }
+    return resData['data']['accessToken'] ?? '';
+  }
 }

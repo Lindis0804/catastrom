@@ -73,6 +73,8 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
       await SharedPreferencesManager.saveString(
           SPKeys.ACCESS_TOKEN, signInRes.accessToken);
       await SharedPreferencesManager.saveString(
+          SPKeys.REFRESH_TOKEN, signInRes.refreshToken);
+      await SharedPreferencesManager.saveString(
           SPKeys.USER_PROFILE, jsonEncode(signInRes.user.toJson()));
 
       add(const SignupStatusChanged(SignupStatus.goToHome));

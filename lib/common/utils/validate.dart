@@ -9,9 +9,38 @@ bool validateName(String name) {
 }
 
 const List<String> _passwordSpecialChars = [
-  '!', '@', '#', '\$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+',
-  '[', ']', '{', '}', '\\', '|', ';', ':', "'", '"', ',', '.', '<', '>',
-  '/', '?', '~', '`',
+  '!',
+  '@',
+  '#',
+  '\$',
+  '%',
+  '^',
+  '&',
+  '*',
+  '(',
+  ')',
+  '-',
+  '_',
+  '=',
+  '+',
+  '[',
+  ']',
+  '{',
+  '}',
+  '\\',
+  '|',
+  ';',
+  ':',
+  "'",
+  '"',
+  ',',
+  '.',
+  '<',
+  '>',
+  '/',
+  '?',
+  '~',
+  '`',
 ];
 
 bool validatePassword(String password) {
@@ -39,10 +68,51 @@ bool validatePhoneNumber(String phoneNumber) {
   return false;
 }
 
-bool validateAmount(String amount) {
-  RegExp regex = RegExp(r'^\d+(\.\d{1,2})?$');
-  if (!regex.hasMatch(amount)) {
-    return false;
+double? normalizeAmountValue(String amount) {
+  if (amount.trim().isEmpty) {
+    return null;
   }
-  return double.parse(amount) > 0;
+
+  String cleaned = amount.trim().replaceAll(RegExp(r'\s+'), '');
+  cleaned = cleaned.replaceAll(RegExp(r'[^0-9,\.]'), '');
+
+  if (cleaned.isEmpty) {
+    return null;
+  }
+
+  if (cleaned.contains(',') && cleaned.contains('.')) {
+    final lastComma = cleaned.lastIndexOf(',');
+    final lastDot = cleaned.lastIndexOf('.');
+
+    if (lastDot > lastComma) {
+      cleaned = cleaned.replaceAll(',', '');
+    } else {
+      cleaned = cleaned.replaceAll('.', '');
+      cleaned = cleaned.replaceAll(',', '.');
+    }
+  } else if (cleaned.contains(',')) {
+    cleaned = cleaned.replaceAll(',', '');
+  }
+
+  if (cleaned.contains('.')) {
+    final parts = cleaned.split('.');
+    if (parts.length > 2) {
+      return null;
+    }
+    if (parts[1].length > 3) {
+      return null;
+    }
+  }
+
+  final value = double.tryParse(cleaned);
+  if (value == null || value <= 0) {
+    return null;
+  }
+
+  return value;
+}
+
+bool validateAmount(String amount) {
+  final normalized = normalizeAmountValue(amount);
+  return normalized != null && normalized > 0;
 }
