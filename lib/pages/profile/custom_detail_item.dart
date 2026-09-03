@@ -11,6 +11,7 @@ class CustomDetailItem extends StatelessWidget {
   final IconData? materialIcon;
 
   const CustomDetailItem({
+    super.key,
     required this.title,
     required this.value,
     this.icon,
@@ -19,29 +20,56 @@ class CustomDetailItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: icon != null
-          ? icon!.svg(
+    final iconColor = Theme.of(context).iconTheme.color;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null)
+            icon!.svg(
               height: 24,
               width: 24,
-              color: Theme.of(context).iconTheme.color,
+              color: iconColor,
             )
-          : Icon(
+          else if (materialIcon != null)
+            Icon(
               materialIcon,
               size: 24,
-              color: Theme.of(context).iconTheme.color,
+              color: iconColor,
             ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-        ),
-      ),
-      trailing: Text(
-        value,
-        style: const TextStyle(
-          fontSize: 16,
-        ),
+
+          const SizedBox(width: 16),
+
+          // Expanded(
+          //   child: Text(
+          //     title,
+          //     style: const TextStyle(
+          //       fontSize: 16,
+          //     ),
+          //     maxLines: 2,
+          //     overflow: TextOverflow.ellipsis,
+          //   ),
+          // ),
+
+          // const SizedBox(width: 12),
+
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.end,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

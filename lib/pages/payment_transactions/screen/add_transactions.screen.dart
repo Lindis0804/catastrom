@@ -27,7 +27,7 @@ class _AddTransactionsState extends State<AddTransactions> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Add transactions'),
+            title: const Text('Thêm giao dịch'),
             actions: [
               IconButton(
                 icon: const Icon(Icons.add_rounded),

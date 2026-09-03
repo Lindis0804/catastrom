@@ -62,132 +62,133 @@ class _SignInFormState extends State<SignInForm> {
               padding: const EdgeInsets.all(10),
               alignment: Alignment.topCenter,
               width: screenWidth,
-              height: screenHeight,
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 30),
-                      child: Image(
-                        image: Assets.images.logo4x.provider(),
-                        width: 170,
-                        fit: BoxFit.fitWidth,
-                      ),
+              // height: screenHeight,
+              // child: SingleChildScrollView(
+              //   physics: const BouncingScrollPhysics(),
+
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 30),
+                    child: Image(
+                      image: Assets.images.logo4x.provider(),
+                      width: 170,
+                      fit: BoxFit.fitWidth,
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: const Text(
-                        'Wellytics',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 25,
-                            color: CustomColors.primary),
-                      ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: const Text(
+                      'Wellytics',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 25,
+                          color: CustomColors.primary),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: const Text(
-                        'Đăng nhập',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                            color: CustomColors.textLabel),
-                      ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: const Text(
+                      'Đăng nhập',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: CustomColors.textLabel),
                     ),
-                    FormTextField(
-                      label: 'Tên đăng nhập',
-                      errorMessage: wrongUsernameMessage,
-                      controller: _usernameController,
-                      onChanged: (username) {
+                  ),
+                  FormTextField(
+                    label: 'Tên đăng nhập',
+                    errorMessage: wrongUsernameMessage,
+                    controller: _usernameController,
+                    onChanged: (username) {
+                      setState(
+                        () {
+                          wrongUsernameMessage = (username.isNotEmpty &&
+                                  !validateUserName(username))
+                              ? 'Tên đăng nhập chỉ được chứa chữ cái và chữ số'
+                              : '';
+                        },
+                      );
+                    },
+                  ),
+                  FormTextField(
+                    controller: _passwordController,
+                    label: 'Mật khẩu',
+                    errorMessage: wrongPasswordMessage,
+                    isObscureText: _passwordObscureText,
+                    onChanged: (password) {
+                      setState(
+                        () {
+                          wrongPasswordMessage = (password.isNotEmpty &&
+                                  !validatePassword(password))
+                              ? 'Mật khẩu phải chứa ít nhất 8 chữ cái - ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt'
+                              : '';
+                        },
+                      );
+                    },
+                    suffixIcon: IconButton(
+                      icon: _passwordObscureText
+                          ? SvgPicture.asset(
+                              'assets/icons/ic_eye_off.svg',
+                              width: 20,
+                              height: 20,
+                            )
+                          : const Icon(Icons.remove_red_eye, size: 20),
+                      onPressed: () {
                         setState(
                           () {
-                            wrongUsernameMessage = (username.isNotEmpty &&
-                                    !validateUserName(username))
-                                ? 'Tên đăng nhập chỉ được chứa chữ cái và chữ số'
-                                : '';
+                            _passwordObscureText = !_passwordObscureText;
                           },
                         );
                       },
                     ),
-                    FormTextField(
-                      controller: _passwordController,
-                      label: 'Mật khẩu',
-                      errorMessage: wrongPasswordMessage,
-                      isObscureText: _passwordObscureText,
-                      onChanged: (password) {
-                        setState(
-                          () {
-                            wrongPasswordMessage = (password.isNotEmpty &&
-                                    !validatePassword(password))
-                                ? 'Mật khẩu phải chứa ít nhất 8 chữ cái - ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt'
-                                : '';
-                          },
-                        );
-                      },
-                      suffixIcon: IconButton(
-                        icon: _passwordObscureText
-                            ? SvgPicture.asset(
-                                'assets/icons/ic_eye_off.svg',
-                                width: 20,
-                                height: 20,
-                              )
-                            : const Icon(Icons.remove_red_eye, size: 20),
-                        onPressed: () {
-                          setState(
-                            () {
-                              _passwordObscureText = !_passwordObscureText;
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.centerRight,
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: InkWell(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Forgot Password')));
-                          widget.loginBloc.add(const ForgotPasswordWhenLogIn());
-                        },
-                        child: Text(
-                          'Forgot password ? 🧐',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green[700],
-                              fontSize: 15),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: BigCustomButton(
-                        onPressed: state.loginStatus == LoginStatus.initialize
-                            ? _handleSignIn
-                            : null,
-                        text: 'Đăng nhập',
-                        backgroundColor: CustomColors.primary,
-                      ),
-                    ),
-                    InkWell(
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: InkWell(
                       onTap: () {
-                        widget.loginBloc.add(const MoveToSignUp());
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Forgot Password')));
+                        widget.loginBloc.add(const ForgotPasswordWhenLogIn());
                       },
-                      child: const Text(
-                        'Đăng kí',
+                      child: Text(
+                        'Forgot password ? 🧐',
                         style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            color: CustomColors.primary),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green[700],
+                            fontSize: 15),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: BigCustomButton(
+                      onPressed: state.loginStatus == LoginStatus.initialize
+                          ? _handleSignIn
+                          : null,
+                      text: 'Đăng nhập',
+                      backgroundColor: CustomColors.primary,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      widget.loginBloc.add(const MoveToSignUp());
+                    },
+                    child: const Text(
+                      'Đăng kí',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                          color: CustomColors.primary),
+                    ),
+                  ),
+                ],
               ),
             ),
+            // ),
           ],
         );
       },
@@ -198,6 +199,7 @@ class _SignInFormState extends State<SignInForm> {
   void dispose() {
     super.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
   }
 }
 
@@ -236,19 +238,35 @@ class LoginScreen extends StatelessWidget {
     return BlocProvider<LoginBloc>(
       create: (_) => LoginBloc(),
       child: BlocListener<LoginBloc, LoginState>(
-        listenWhen: ((previous, current) =>
-            previous.loginStatus != current.loginStatus),
+        listenWhen: (previous, current) =>
+            previous.loginStatus != current.loginStatus,
         listener: _listener,
         child: Builder(
-          builder: (BuildContext context) => Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: const Text('Đăng nhập'),
-            ),
-            body: SingleChildScrollView(
-              child: SignInForm(loginBloc: context.read<LoginBloc>()),
-            ),
-          ),
+          builder: (context) {
+            return Scaffold(
+              // QUAN TRỌNG:
+              // Không set false.
+              // Flutter mặc định là true.
+              resizeToAvoidBottomInset: true,
+
+              appBar: AppBar(
+                title: const Text('Đăng nhập'),
+              ),
+
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 20,
+                  ),
+                  child: SignInForm(
+                    loginBloc: context.read<LoginBloc>(),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

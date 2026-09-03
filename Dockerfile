@@ -1,49 +1,42 @@
-# cấu trúc thư mục cần thiết
-# project-root/
-# ├── lib/
-# ├── web/
-# ├── pubspec.yaml
-# ├── pubspec.lock
-# └── Dockerfile
+# Sử dụng Ubuntu làm base image
+FROM ubuntu:22.04
 
-# Base image with Flutter SDK
-FROM cirrusci/flutter:stable
+# Thiết lập biến môi trường
+ENV DEBIAN_FRONTEND=noninteractive
+ENV FLUTTER_HOME=/opt/flutter
+ENV PATH="$FLUTTER_HOME/bin:$PATH"
 
-# Set working directory
+# Cài đặt dependencies
+RUN apt-get update && apt-get install -y \
+    curl git unzip xz-utils zip libglu1-mesa wget ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone Flutter SDK (stable)
+RUN git clone https://github.com/flutter/flutter.git -b stable $FLUTTER_HOME
+
+# Enable Flutter web
+RUN flutter config --enable-web
+
+# Pre-cache web artifacts để build nhanh hơn
+RUN flutter precache --web
+
+# Kiểm tra cài đặt
+RUN flutter doctor -v
+
+# Đặt thư mục làm việc
 WORKDIR /app
 
-# Copy the rest of the app source code
+# Copy source code Flutter vào container
 COPY . .
 
-# Copy pubspec files and install dependencies first (to leverage Docker cache)
-COPY pubspec.yaml pubspec.lock ./
-
-# Cấu hình Git để tránh lỗi "dubious ownership"
-RUN git config --global --add safe.directory /sdks/flutter
-
-# Tạo user mới không dùng root
-RUN adduser --disabled-password flutteruser
-
-# Cấp quyền cho user mới với thư mục flutter SDK
-RUN chown -R flutteruser:flutteruser /sdks /app
-
-# Chuyển sang user không phải root
-USER flutteruser
-
+# Get packages
 RUN flutter pub get
+RUN flutter pub run build_runner build --delete-conflicting-outputs
+# Build Flutter web release
+RUN flutter build web --release --target lib/root/main.dart
 
-# Enable web support
-## RUN flutter config --enable-web
+# Expose port để chạy web server nếu muốn preview
+EXPOSE 8080
 
-# Build the Flutter web app (default to release mode)
-RUN flutter build web
-
-# Optional: use Nginx to serve the build
-FROM nginx:alpine
-COPY --from=0 /app/build/web /usr/share/nginx/html
-
-# Expose default Nginx port
-EXPOSE 80
-
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Dùng web server của Flutter để serve app (chỉ để test, không nên dùng production)
+CMD ["flutter", "run", "-d", "web-server", "--web-port=8080", "--release"]

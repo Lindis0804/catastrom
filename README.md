@@ -56,10 +56,15 @@ open -a Simulator
 
 ## RUN ANDROID
 1. Run flutter android:
+
+**-** Run at debug mode:
 ```bash
 flutter run -d <device_id> --target  lib/root/main.dart 
 ```
-
+**-** Run at release mode:
+```
+flutter run --target -d <device_id> --target  lib/root/main.dart 
+```
 ## Config git LOCAL profile:
 ```bash
 git config user.name "<username>"

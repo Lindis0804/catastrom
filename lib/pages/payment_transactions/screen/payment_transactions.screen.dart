@@ -69,7 +69,7 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.add_rounded),
-                tooltip: 'Add transaction',
+                tooltip: 'Thêm giao dịch',
                 onPressed: () {
                   widget.bloc.add(const ToAddTransactionsEvent());
                 },
@@ -101,7 +101,7 @@ class _PaymentTransactionsState extends State<PaymentTransactions> {
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.add_rounded),
-                    tooltip: 'Add transaction',
+                    tooltip: 'Thêm giao dịch',
                     onPressed: () {
                       widget.bloc.add(const ToAddTransactionsEvent());
                     },

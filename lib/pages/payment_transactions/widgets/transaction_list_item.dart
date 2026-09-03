@@ -61,42 +61,40 @@ class TransactionListItem extends StatelessWidget {
                   ),
                 ),
               ),
-              if (transaction.categories.isNotEmpty)
-                Container(
-                  color: Colors.transparent,
-                  child: Flexible(
-                    // Container padding is 12 on the right; shift by 7px so
-                    // the chip list itself sits only 5px from the card's edge.
-                    child: Transform.translate(
-                      offset: const Offset(7, 0),
-                      child: Wrap(
-                        alignment: WrapAlignment.end,
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: transaction.categories.map((name) {
-                          Color color = categoryColor(name);
-                          return Chip(
-                            label: Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: color,
-                                fontWeight: FontWeight.w600,
-                              ),
+              if (transaction.categories.isNotEmpty) ...[
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: transaction.categories.map((name) {
+                        final color = categoryColor(name);
+
+                        return Chip(
+                          label: Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: color,
+                              fontWeight: FontWeight.w600,
                             ),
-                            backgroundColor: color.withValues(alpha: 0.12),
-                            side: BorderSide(color: color),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                          );
-                        }).toList(),
-                      ),
+                          ),
+                          backgroundColor: color.withValues(alpha: 0.12),
+                          side: BorderSide(color: color),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        );
+                      }).toList(),
                     ),
                   ),
-                )
+                ),
+              ],
             ],
-          ),
+          )
         ],
       ),
     );

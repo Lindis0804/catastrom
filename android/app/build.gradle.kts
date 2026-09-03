@@ -39,7 +39,9 @@ android {
         applicationId = "com.hieuld.template"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        //[fix config - 03/09/2026]
+        //minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = appVersionCode
         versionName = flutter.versionName
@@ -70,6 +72,7 @@ android {
             //signingConfig = signingConfigs.getByName("debug")
             // thêm vào ngày 1/9/2025, add own signing config for the release build
             isMinifyEnabled = false
+            //nếu = true => xoá tài nguyên ko dùng + isMinifyEnabled = true
             isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
         }
@@ -78,4 +81,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("com.huawei.hms:health:6.11.0.300")
 }
